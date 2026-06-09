@@ -1,0 +1,29 @@
+---
+const steps = [
+  { title: "Read the page", copy: "Design Humanizer scans the visible structure: sections, cards, buttons, spacing, and repeated patterns." },
+  { title: "Detect design issues", copy: "It finds what makes the interface feel generic: weak focus, repeated cards, flat rhythm, unclear hierarchy, or poor CTA placement." },
+  { title: "Suggest improvements", copy: "You get practical recommendations for layout, spacing, hierarchy, and visual priority." },
+  { title: "Preview the direction", copy: "See how the same content can feel more intentional before applying changes." },
+];
+---
+
+<section id="how" class="lp-section lp-section--alt">
+  <div class="lp-container">
+    <div class="lp-head">
+      <span class="lp-label">How it works</span>
+      <h2 class="lp-title">From AI draft to designed composition.</h2>
+    </div>
+
+    <div class="lp-grid lp-grid--2">
+      {steps.map((s, i) => (
+        <article class="lp-card lp-step">
+          <div class="lp-step-row">
+            <span class="lp-card-num">{i + 1}</span>
+            <h3>{s.title}</h3>
+          </div>
+          <p>{s.copy}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

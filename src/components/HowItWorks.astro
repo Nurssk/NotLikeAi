@@ -1,0 +1,46 @@
+---
+const steps = [
+  {
+    number: "01",
+    title: "Open your generated page",
+    description: "Start from your existing AI-generated page and choose the screen you want to improve.",
+  },
+  {
+    number: "02",
+    title: "Run Design Humanizer",
+    description: "Activate the Chrome extension and let it analyze layout, spacing, and hierarchy.",
+  },
+  {
+    number: "03",
+    title: "Preview improved layout",
+    description: "Compare the original and improved screen before you commit to the changes.",
+  },
+  {
+    number: "04",
+    title: "Apply or copy changes",
+    description: "Apply the updated layout in one click or copy the improved design to your workflow.",
+  },
+];
+---
+
+<section id="how-it-works" class="section section-gray">
+  <div class="container">
+    <div class="section-intro center">
+      <p class="section-kicker muted">How it works</p>
+      <h2>How it works</h2>
+    </div>
+
+    <div class="steps-grid">
+      {steps.map((step, index) => (
+        <article class="step-item">
+          {index < steps.length - 1 && <span class="connector" aria-hidden="true"></span>}
+          <div class="surface-card hover-lift">
+            <span class={index === 0 ? "step-number active" : "step-number"}>{step.number}</span>
+            <h3>{step.title}</h3>
+            <p>{step.description}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

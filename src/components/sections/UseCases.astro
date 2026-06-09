@@ -1,0 +1,29 @@
+---
+const cases = [
+  { title: "AI-generated landing pages", copy: "Make first drafts feel less generic and more trustworthy." },
+  { title: "Startup MVPs", copy: "Improve your product look before demos, interviews, and launches." },
+  { title: "SaaS dashboards", copy: "Fix flat metrics, repeated cards, and weak visual priority." },
+  { title: "No-code prototypes", copy: "Turn fast prototypes into cleaner product screens." },
+  { title: "Hackathon demos", copy: "Make your project look more convincing before demo day." },
+  { title: "Student products", copy: "Improve visual quality without needing a full design team." },
+];
+---
+
+<section id="use-cases" class="lp-section lp-section--alt">
+  <div class="lp-container">
+    <div class="lp-head">
+      <span class="lp-label">Use cases</span>
+      <h2 class="lp-title">Built for builders who ship before they polish.</h2>
+    </div>
+
+    <div class="lp-grid lp-grid--3">
+      {cases.map((c) => (
+        <article class="lp-card">
+          <span class="lp-card-ico" aria-hidden="true"></span>
+          <h3>{c.title}</h3>
+          <p>{c.copy}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

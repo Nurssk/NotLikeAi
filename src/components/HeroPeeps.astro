@@ -1,0 +1,326 @@
+---
+// HeroPeeps.astro
+// Canvas animation adapted from skiper39.tsx (CrowdCanvas by @gurvinder-singh02)
+// Ported from React+GSAP to vanilla JS for Astro. Draws geometric "peep" figures
+// using Canvas 2D instead of a sprite sheet, styled to the Design Humanizer palette.
+---
+
+<canvas
+  id="peeps-canvas"
+  class="peeps-canvas"
+  aria-hidden="true"
+></canvas>
+
+<script>
+(function initPeepsCanvas() {
+  const canvas = document.getElementById("peeps-canvas") as HTMLCanvasElement | null;
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  // Respect reduced-motion preference
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (prefersReduced.matches) {
+    canvas.style.display = "none";
+    return;
+  }
+
+  // ─── Palette (Design Humanizer warm beige/yellow) ────────────────────────
+  type PeepType = {
+    body: string;
+    head: string;
+    accent: string;
+    outline?: string;
+  };
+
+  const TYPES: PeepType[] = [
+    { body: "#1E1A16", head: "#F5C89A", accent: "#FFD84D" },
+    { body: "#6F6257", head: "#FDEBD0", accent: "#FFD84D" },
+    { body: "#E5D8C8", head: "#C68642", accent: "#1E1A16", outline: "#D8C8B5" },
+    { body: "#FFD84D", head: "#8D5524", accent: "#1E1A16" },
+    { body: "#FFFCF5", head: "#D4A574", accent: "#FFC928", outline: "#E5D8C8" },
+    { body: "#9A8B7D", head: "#FDEBD0", accent: "#FFD84D" },
+  ];
+
+  // ─── Utils (mirrors original CrowdCanvas helpers) ─────────────────────────
+  const rnd  = (min: number, max: number) => min + Math.random() * (max - min);
+  const pick = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+
+  // ─── Stage ────────────────────────────────────────────────────────────────
+  const stage = { width: 0, height: 0 };
+
+  // ─── Peep shape (drawn with Canvas 2D, no sprite needed) ──────────────────
+  interface Peep {
+    type: PeepType;
+    w: number;
+    h: number;
+    x: number;
+    y: number;
+    anchorY: number;
+    scaleX: number;
+    speed: number;
+    bobOffset: number;
+    bobAmp: number;
+    bobFreq: number;
+    progress: number;
+    startX: number;
+    endX: number;
+    reset(): void;
+    draw(ctx: CanvasRenderingContext2D): void;
+  }
+
+  function createPeep(): Peep {
+    const type = pick(TYPES);
+    const scale = rnd(0.55, 1.05);
+    const w = 28 * scale;
+    const h = 52 * scale;
+
+    return {
+      type, w, h,
+      x: 0, y: 0, anchorY: 0,
+      scaleX: 1,
+      speed: rnd(0.35, 0.95),
+      bobOffset: Math.random() * Math.PI * 2,
+      bobAmp: rnd(3, 8) * scale,
+      bobFreq: rnd(1.4, 2.8),
+      progress: 0,
+      startX: 0,
+      endX: 0,
+
+      reset() {
+        const dir = Math.random() > 0.5 ? 1 : -1;
+        // Distribute Y from bottom up — replicates original offsetY logic
+        const offsetY = rnd(-this.h * 3, this.h * 0.6);
+        this.anchorY = stage.height - this.h + offsetY;
+        this.y = this.anchorY;
+        this.scaleX = dir;
+
+        if (dir === 1) {
+          this.startX = -this.w - 10;
+          this.endX   = stage.width + this.w + 10;
+        } else {
+          this.startX = stage.width + this.w + 10;
+          this.endX   = -this.w - 10;
+        }
+        this.x = this.startX;
+        this.progress = 0;
+      },
+
+      draw(ctx: CanvasRenderingContext2D) {
+        const { type, w, h, scaleX } = this;
+        const headR  = w * 0.42;
+        const bodyW  = w * 0.70;
+        const bodyH  = h * 0.52;
+        const bodyX  = -bodyW / 2;
+        const bodyY  = -h * 0.06;
+        const corner = Math.min(bodyW, bodyH) * 0.3;
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.scale(scaleX, 1);
+
+        // Soft ground shadow
+        ctx.fillStyle = "rgba(30,26,22,0.06)";
+        ctx.beginPath();
+        ctx.ellipse(0, bodyY + bodyH + 4, bodyW * 0.52, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Body
+        ctx.fillStyle = type.body;
+        ctx.beginPath();
+        if ((ctx as any).roundRect) {
+          (ctx as any).roundRect(bodyX, bodyY, bodyW, bodyH, [corner, corner, corner * 0.4, corner * 0.4]);
+        } else {
+          ctx.rect(bodyX, bodyY, bodyW, bodyH);
+        }
+        ctx.fill();
+        if (type.outline) {
+          ctx.strokeStyle = type.outline;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        // Accent badge stripe (like the "humanized" element highlight)
+        const badgeW = bodyW * 0.38;
+        const badgeH = Math.max(4, w * 0.15);
+        ctx.fillStyle = type.accent;
+        ctx.beginPath();
+        if ((ctx as any).roundRect) {
+          (ctx as any).roundRect(
+            bodyX + (bodyW - badgeW) / 2,
+            bodyY + bodyH * 0.24,
+            badgeW, badgeH, 99
+          );
+        } else {
+          ctx.rect(bodyX + (bodyW - badgeW) / 2, bodyY + bodyH * 0.24, badgeW, badgeH);
+        }
+        ctx.fill();
+
+        // Head
+        ctx.fillStyle = type.head;
+        ctx.beginPath();
+        ctx.arc(0, bodyY - headR * 0.65, headR, 0, Math.PI * 2);
+        ctx.fill();
+        if (type.outline) {
+          ctx.strokeStyle = type.outline;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+
+        // Eyes
+        const eyeR = headR * 0.13;
+        ctx.fillStyle = type.body === "#FFFCF5" ? "#6F6257" : type.body;
+        ctx.beginPath();
+        ctx.arc(-headR * 0.3, bodyY - headR * 0.6, eyeR, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc( headR * 0.3, bodyY - headR * 0.6, eyeR, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      },
+    };
+  }
+
+  // ─── Crowd management (mirrors CrowdCanvas allPeeps/availablePeeps/crowd) ─
+  const TOTAL        = 22;
+  const ACTIVE_COUNT = 11;
+  const allPeeps:   Peep[] = [];
+  const available:  Peep[] = [];
+  const crowd:      Peep[] = [];
+
+  function addPeep(randomProgress = false) {
+    if (!available.length) return;
+    const i = Math.floor(Math.random() * available.length);
+    const peep = available.splice(i, 1)[0];
+    peep.reset();
+    if (randomProgress) {
+      peep.progress = Math.random();
+      peep.x = peep.startX + (peep.endX - peep.startX) * peep.progress;
+    }
+    crowd.push(peep);
+    crowd.sort((a, b) => a.anchorY - b.anchorY);
+  }
+
+  function init() {
+    for (let i = 0; i < TOTAL; i++) {
+      const p = createPeep();
+      allPeeps.push(p);
+      available.push(p);
+    }
+    for (let i = 0; i < ACTIVE_COUNT; i++) addPeep(true);
+  }
+
+  // ─── Render loop (mirrors gsap.ticker.add(render) + timeline updates) ─────
+  let rafId     = 0;
+  let lastTime  = 0;
+
+  function tick(now: number) {
+    if (!lastTime) lastTime = now;
+    const dt = Math.min((now - lastTime) / 1000, 0.05); // seconds, capped
+    lastTime = now;
+
+    // Advance each peep (replaces GSAP tween x progress)
+    const done: Peep[] = [];
+    for (const p of crowd) {
+      p.progress += dt * p.speed * 0.082;
+      p.x = p.startX + (p.endX - p.startX) * p.progress;
+      // Bob: replicates the yoyo tween in normalWalk
+      p.y = p.anchorY + Math.sin(p.bobOffset + now * 0.001 * p.bobFreq * Math.PI * 2) * p.bobAmp;
+      if (p.progress >= 1.02) done.push(p);
+    }
+
+    // Recycle (mirrors removePeepFromCrowd → addPeepToCrowd)
+    for (const p of done) {
+      crowd.splice(crowd.indexOf(p), 1);
+      available.push(p);
+      addPeep(false);
+    }
+
+    // Draw
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    for (const p of crowd) p.draw(ctx);
+    ctx.restore();
+
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // ─── Resize (mirrors CrowdCanvas resize()) ────────────────────────────────
+  function resize() {
+    stage.width  = canvas.clientWidth;
+    stage.height = canvas.clientHeight;
+    canvas.width  = stage.width  * devicePixelRatio;
+    canvas.height = stage.height * devicePixelRatio;
+
+    // Re-anchor all active peeps to new stage size
+    for (const p of crowd) {
+      const offsetY = rnd(-p.h * 3, p.h * 0.6);
+      p.anchorY = stage.height - p.h + offsetY;
+    }
+    crowd.sort((a, b) => a.anchorY - b.anchorY);
+  }
+
+  // ─── Bootstrap ────────────────────────────────────────────────────────────
+  resize();
+  init();
+  rafId = requestAnimationFrame(tick);
+
+  window.addEventListener("resize", resize, { passive: true });
+
+  prefersReduced.addEventListener("change", () => {
+    if (prefersReduced.matches) {
+      cancelAnimationFrame(rafId);
+      canvas.style.display = "none";
+    }
+  });
+})();
+</script>
+
+<style>
+  .peeps-canvas {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    pointer-events: none;
+    z-index: 1;
+    /* Fade peeps out as the scroll-zoom progresses (--zoom-progress is set on the parent section) */
+    opacity: calc(0.82 - var(--zoom-progress, 0) * 0.82);
+    /* Soft vignette so peeps emerge from the background */
+    -webkit-mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.70) 0%,
+      rgba(0, 0, 0, 0.45) 45%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.70) 0%,
+      rgba(0, 0, 0, 0.45) 45%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    transition: opacity 200ms ease;
+  }
+
+  @media (max-width: 760px) {
+    .peeps-canvas {
+      height: 140px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .peeps-canvas {
+      height: 100px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .peeps-canvas {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,46 @@
+---
+const qa = [
+  {
+    q: "Is Design Humanizer a design generator?",
+    a: "Not exactly. It does not create a random new design from scratch. It analyzes your existing AI-generated interface and suggests how to improve hierarchy, spacing, rhythm, and layout structure.",
+  },
+  {
+    q: "Will it change my content?",
+    a: "No. The goal is to keep your original content and improve how it is presented.",
+  },
+  {
+    q: "Who is it for?",
+    a: "Design Humanizer is built for developers, indie hackers, no-code builders, startup founders, students, and anyone using AI tools to build interfaces quickly.",
+  },
+  {
+    q: "Does it replace a designer?",
+    a: "No. It helps non-designers make better design decisions faster. Think of it as a design critique layer for AI-generated UI.",
+  },
+  {
+    q: "Will it work with any website?",
+    a: "The goal is to work directly in the browser on landing pages, dashboards, MVPs, and generated frontend screens.",
+  },
+  {
+    q: "When will it be available?",
+    a: "Design Humanizer is currently in development. Join the waitlist to get early access.",
+  },
+];
+---
+
+<section id="qa" class="lp-section">
+  <div class="lp-container">
+    <div class="lp-head">
+      <span class="lp-label">Q&amp;A</span>
+      <h2 class="lp-title">Questions &amp; answers</h2>
+    </div>
+
+    <div class="lp-qa">
+      {qa.map((item, i) => (
+        <details class="lp-qa-item" open={i === 0}>
+          <summary>{item.q}</summary>
+          <p class="lp-qa-answer">{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

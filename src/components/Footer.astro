@@ -1,0 +1,32 @@
+---
+const links = [
+  { label: "Problem", href: "#why" },
+  { label: "How it works", href: "#how" },
+  { label: "Use cases", href: "#use-cases" },
+  { label: "Q&A", href: "#qa" },
+  { label: "Waitlist", href: "#waitlist" },
+];
+---
+
+<footer id="contact" class="site-footer">
+  <div class="site-footer-inner">
+    <div>
+      <a class="footer-brand" href="#product" aria-label="Design Humanizer home">
+        <span class="footer-brand-mark" aria-hidden="true"></span>
+        <span>Design Humanizer</span>
+      </a>
+      <p class="footer-tagline">
+        A Chrome extension for turning AI-generated interfaces into intentional product design.
+      </p>
+    </div>
+
+    <nav class="footer-nav" aria-label="Footer">
+      {links.map((link) => <a href={link.href}>{link.label}</a>)}
+    </nav>
+  </div>
+
+  <div class="site-footer-bottom">
+    <span>© 2026 Design Humanizer. All rights reserved.</span>
+    <span>Built for developers, indie hackers, and AI app builders.</span>
+  </div>
+</footer>

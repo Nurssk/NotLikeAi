@@ -1,0 +1,22 @@
+---
+// Reuse the existing morphing waitlist button (no second implementation).
+// Click sparks are now provided site-wide by <GlobalClickSpark /> in index.astro.
+import WaitlistMorphButton from "../WaitlistMorphButton";
+---
+
+<section id="waitlist" class="lp-section lp-waitlist">
+  <div class="lp-container">
+    <span class="lp-label">Waitlist</span>
+    <h2 class="lp-title">Stop shipping first drafts.</h2>
+    <p class="lp-waitlist-text">
+      Join the waitlist and get early access to Design Humanizer — the Chrome extension that helps AI-generated UI
+      feel more human, intentional, and ready to ship.
+    </p>
+
+    <div class="lp-waitlist-action">
+      <WaitlistMorphButton client:visible size="lg" />
+    </div>
+
+    <p class="lp-waitlist-note">No spam. Just early access and product updates.</p>
+  </div>
+</section>
