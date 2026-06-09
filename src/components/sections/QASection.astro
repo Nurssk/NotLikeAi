@@ -1,46 +1,40 @@
 ---
+import FAQAccordion from "../FAQAccordion.astro";
+
 const qa = [
   {
-    q: "Is Design Humanizer a design generator?",
-    a: "Not exactly. It does not create a random new design from scratch. It analyzes your existing AI-generated interface and suggests how to improve hierarchy, spacing, rhythm, and layout structure.",
+    q: "What does Design Humanizer actually do?",
+    a: "It analyzes an AI-generated interface and shows what feels generic: weak hierarchy, repeated cards, unclear focus, poor spacing, and low visual priority. Then it suggests how to make the same content feel more intentional.",
   },
   {
-    q: "Will it change my content?",
-    a: "No. The goal is to keep your original content and improve how it is presented.",
+    q: "Does it change my content?",
+    a: "No. Design Humanizer is focused on presentation, not rewriting your product. It helps improve structure, layout, hierarchy, spacing, and visual rhythm while keeping your original content.",
   },
   {
     q: "Who is it for?",
-    a: "Design Humanizer is built for developers, indie hackers, no-code builders, startup founders, students, and anyone using AI tools to build interfaces quickly.",
-  },
-  {
-    q: "Does it replace a designer?",
-    a: "No. It helps non-designers make better design decisions faster. Think of it as a design critique layer for AI-generated UI.",
-  },
-  {
-    q: "Will it work with any website?",
-    a: "The goal is to work directly in the browser on landing pages, dashboards, MVPs, and generated frontend screens.",
-  },
-  {
-    q: "When will it be available?",
-    a: "Design Humanizer is currently in development. Join the waitlist to get early access.",
+    a: "It is built for developers, indie hackers, no-code builders, students, and startup teams who use AI to generate interfaces but do not want to ship something that looks like a default AI template.",
   },
 ];
 ---
 
-<section id="qa" class="lp-section">
-  <div class="lp-container">
-    <div class="lp-head">
-      <span class="lp-label">Q&amp;A</span>
-      <h2 class="lp-title">Questions &amp; answers</h2>
+<section id="qa" class="lp-section qa-preview-section">
+  <div class="lp-container qa-preview-shell">
+    <div class="qa-preview-copy">
+      <span class="lp-label">QUESTIONS</span>
+      <h2 class="qa-preview-title">Answers before you join</h2>
+      <p class="qa-preview-text">
+        Three quick answers before you try Design Humanizer. The full FAQ is available on a separate section so this
+        page stays focused.
+      </p>
+
+      <div class="qa-preview-actions">
+        <a class="btn btn-primary" href="/faq">Open full FAQ</a>
+        <a class="btn btn-secondary" href="mailto:hello@designhumanizer.com">Ask a question</a>
+      </div>
     </div>
 
-    <div class="lp-qa">
-      {qa.map((item, i) => (
-        <details class="lp-qa-item" open={i === 0}>
-          <summary>{item.q}</summary>
-          <p class="lp-qa-answer">{item.a}</p>
-        </details>
-      ))}
+    <div class="qa-preview-list">
+      <FAQAccordion items={qa} className="faq-accordion--preview" />
     </div>
   </div>
 </section>

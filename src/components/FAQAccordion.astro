@@ -1,0 +1,58 @@
+---
+type FAQItem = {
+  id?: string;
+  number?: string;
+  category?: string;
+  q?: string;
+  a?: string;
+  question?: string;
+  answer?: string;
+};
+
+const { items, className = "", startOpenIndex = 0 } = Astro.props as {
+  items: FAQItem[];
+  className?: string;
+  startOpenIndex?: number;
+};
+---
+
+<div class={`faq-accordion ${className}`} data-faq-accordion>
+  {items.map((item, i) => (
+    <details
+      class="faq-item"
+      data-faq-item
+      data-category={item.category}
+      data-id={item.id}
+      open={i === startOpenIndex}
+    >
+      <summary>
+        <span class="faq-item-number">{item.number ?? String(i + 1).padStart(2, "0")}</span>
+        <span class="faq-item-question">{item.question ?? item.q}</span>
+        <span class="faq-item-toggle" aria-hidden="true"></span>
+      </summary>
+      <div class="faq-item-panel">
+        <p>{item.answer ?? item.a}</p>
+      </div>
+    </details>
+  ))}
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-faq-accordion]").forEach((accordion) => {
+    if (accordion.dataset.faqBound === "true") return;
+    accordion.dataset.faqBound = "true";
+
+    accordion.addEventListener(
+      "toggle",
+      (event) => {
+        const item = event.target;
+        if (!(item instanceof HTMLDetailsElement) || !item.open) return;
+
+        accordion.querySelectorAll<HTMLDetailsElement>("details[open]").forEach((openItem) => {
+          if (openItem !== item) openItem.removeAttribute("open");
+        });
+      },
+      true,
+    );
+  });
+</script>

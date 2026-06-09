@@ -1,16 +1,15 @@
 ---
 const navItems = [
-  { label: "What it does", href: "#what" },
-  { label: "How it works", href: "#how" },
-  { label: "Why", href: "#why" },
-  { label: "Use cases", href: "#use-cases" },
-  { label: "Q&A", href: "#qa" },
+  { label: "How it works", href: "/#how" },
+  { label: "Q&A", href: "/#qa" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Waitlist", href: "/#waitlist" },
 ];
 ---
 
 <header class="site-header" data-header>
   <div class="container header-inner">
-    <a class="brand" href="#product" aria-label="Design Humanizer home">
+    <a class="brand" href="/#product" aria-label="Design Humanizer home">
       <span class="brand-mark" aria-hidden="true">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <rect x="1" y="1" width="5" height="5" rx="1.5" fill="currentColor" opacity="0.9" />
@@ -26,7 +25,7 @@ const navItems = [
       {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
     </nav>
 
-    <a class="btn btn-primary btn-small" href="#waitlist">Join waitlist</a>
+    <a class="btn btn-primary btn-small" href="/#waitlist">Join waitlist</a>
   </div>
 </header>
 

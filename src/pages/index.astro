@@ -1,11 +1,7 @@
 ---
 import "../styles/global.css";
-import Header from "../components/Header.astro";
 import Hero from "../components/Hero.astro";
-import WhatItDoes from "../components/sections/WhatItDoes.astro";
 import HowItWorks from "../components/sections/HowItWorks.astro";
-import WhyItMatters from "../components/sections/WhyItMatters.astro";
-import UseCases from "../components/sections/UseCases.astro";
 import WaitlistSection from "../components/sections/WaitlistSection.astro";
 import QASection from "../components/sections/QASection.astro";
 import Footer from "../components/Footer.astro";
@@ -26,21 +22,17 @@ import GlobalClickSpark from "../components/GlobalClickSpark";
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <Header />
     <main>
       <Hero />
-      <WhatItDoes />
       <HowItWorks />
-      <WhyItMatters />
-      <UseCases />
-      <WaitlistSection />
       <QASection />
+      <WaitlistSection />
     </main>
     <Footer />
     <!-- Site-wide click sparks (every section, incl. hero); pointer-events:none -->
     <GlobalClickSpark
       client:load
-      sparkColor="#FFC928"
+      sparkColor="#00F5D4"
       sparkSize={12}
       sparkRadius={22}
       sparkCount={10}

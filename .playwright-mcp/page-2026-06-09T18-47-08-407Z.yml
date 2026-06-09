@@ -1,0 +1,104 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: DESIGN HUMANIZER FAQ
+        - heading "FAQ about AI-made UI" [level=1] [ref=e7]
+        - paragraph [ref=e8]: A full list of questions for builders who want to understand how Design Humanizer works, what it changes, and when to use it.
+      - generic "FAQ statistics" [ref=e9]:
+        - generic [ref=e10]:
+          - strong [ref=e11]: "11"
+          - generic [ref=e12]: questions
+        - generic [ref=e13]:
+          - strong [ref=e14]: "4"
+          - generic [ref=e15]: categories
+        - generic [ref=e16]:
+          - strong [ref=e17]: 24/7
+          - generic [ref=e18]: browser
+    - region "Full FAQ list" [ref=e19]:
+      - generic [ref=e20]:
+        - complementary "FAQ navigation" [ref=e21]:
+          - heading "Navigation" [level=2] [ref=e22]
+          - generic [ref=e23]:
+            - link "All" [ref=e24] [cursor=pointer]:
+              - /url: "#faq-list"
+            - link "Product" [ref=e25] [cursor=pointer]:
+              - /url: "#faq-list"
+            - link "Workflow" [ref=e26] [cursor=pointer]:
+              - /url: "#faq-list"
+            - link "Privacy" [ref=e27] [cursor=pointer]:
+              - /url: "#faq-list"
+            - link "Waitlist" [ref=e28] [cursor=pointer]:
+              - /url: "#faq-list"
+            - link "Chrome Extension" [ref=e29] [cursor=pointer]:
+              - /url: "#faq-list"
+          - link "Ask your question →" [ref=e30] [cursor=pointer]:
+            - /url: mailto:hello@designhumanizer.com
+        - generic [ref=e31]:
+          - generic [ref=e33]: QUICK BRIEFING
+          - heading "Full FAQ list" [level=2] [ref=e35]
+          - generic [ref=e36]:
+            - group [ref=e37]:
+              - generic "01 What does Design Humanizer actually do?" [ref=e38] [cursor=pointer]:
+                - generic [ref=e39]: "01"
+                - generic [ref=e40]: What does Design Humanizer actually do?
+              - paragraph [ref=e43]: It reviews an AI-generated interface and points out why it feels generic. It focuses on hierarchy, spacing, repeated patterns, CTA focus, visual rhythm, and layout structure.
+            - group [ref=e44]:
+              - generic "02 Does it change my content?" [ref=e45] [cursor=pointer]:
+                - generic [ref=e46]: "02"
+                - generic [ref=e47]: Does it change my content?
+            - group [ref=e49]:
+              - generic "03 Is it a design generator?" [ref=e50] [cursor=pointer]:
+                - generic [ref=e51]: "03"
+                - generic [ref=e52]: Is it a design generator?
+            - group [ref=e54]:
+              - generic "04 Who should use it?" [ref=e55] [cursor=pointer]:
+                - generic [ref=e56]: "04"
+                - generic [ref=e57]: Who should use it?
+            - group [ref=e59]:
+              - generic "05 Does it replace a designer?" [ref=e60] [cursor=pointer]:
+                - generic [ref=e61]: "05"
+                - generic [ref=e62]: Does it replace a designer?
+            - group [ref=e64]:
+              - generic "06 What kinds of pages can it analyze?" [ref=e65] [cursor=pointer]:
+                - generic [ref=e66]: "06"
+                - generic [ref=e67]: What kinds of pages can it analyze?
+            - group [ref=e69]:
+              - generic "07 How does the Chrome extension work?" [ref=e70] [cursor=pointer]:
+                - generic [ref=e71]: "07"
+                - generic [ref=e72]: How does the Chrome extension work?
+            - group [ref=e74]:
+              - generic "08 What problems does it detect?" [ref=e75] [cursor=pointer]:
+                - generic [ref=e76]: "08"
+                - generic [ref=e77]: What problems does it detect?
+            - group [ref=e79]:
+              - generic "09 Will it edit my code automatically?" [ref=e80] [cursor=pointer]:
+                - generic [ref=e81]: "09"
+                - generic [ref=e82]: Will it edit my code automatically?
+            - group [ref=e84]:
+              - generic "10 Is my page data stored?" [ref=e85] [cursor=pointer]:
+                - generic [ref=e86]: "10"
+                - generic [ref=e87]: Is my page data stored?
+            - group [ref=e89]:
+              - generic "11 When will it be available?" [ref=e90] [cursor=pointer]:
+                - generic [ref=e91]: "11"
+                - generic [ref=e92]: When will it be available?
+  - contentinfo [ref=e94]:
+    - generic [ref=e95]:
+      - generic [ref=e96]:
+        - link "Design Humanizer home" [ref=e97] [cursor=pointer]:
+          - /url: /#product
+          - generic [ref=e99]: Design Humanizer
+        - paragraph [ref=e100]: A Chrome extension for turning AI-generated interfaces into intentional product design.
+      - navigation "Footer" [ref=e101]:
+        - link "How it works" [ref=e102] [cursor=pointer]:
+          - /url: /#how
+        - link "Q&A" [ref=e103] [cursor=pointer]:
+          - /url: /#qa
+        - link "FAQ" [ref=e104] [cursor=pointer]:
+          - /url: /faq
+        - link "Waitlist" [ref=e105] [cursor=pointer]:
+          - /url: /#waitlist
+    - generic [ref=e106]:
+      - generic [ref=e107]: © 2026 Design Humanizer. All rights reserved.
+      - generic [ref=e108]: Built for developers, indie hackers, and AI app builders.

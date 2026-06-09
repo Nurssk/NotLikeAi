@@ -1,0 +1,202 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - heading "Fix AI-made UI" [level=1] [ref=e7]
+        - paragraph [ref=e8]: A Chrome extension that turns generic AI-generated pages into cleaner, more intentional interfaces.
+        - button "Join waitlist" [ref=e13] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: Join waitlist
+      - generic "Design Humanizer product preview" [ref=e19]:
+        - img "Example of a generic AI-generated website (before)" [ref=e20]:
+          - generic: AI template
+          - generic: generic copy
+          - generic: same cards
+          - generic: no focal point
+          - generic: weak hierarchy
+          - generic [ref=e21]:
+            - generic [ref=e22]:
+              - generic [ref=e23]: AI Site
+              - navigation [ref=e25]:
+                - generic [ref=e26]: Features
+                - generic [ref=e27]: Pricing
+                - generic [ref=e28]: About
+              - generic [ref=e29]: Start
+            - generic [ref=e30]:
+              - generic [ref=e31]: Made with AI
+              - heading "AI Generated Website" [level=3] [ref=e33]
+              - paragraph [ref=e34]: This landing page was created instantly with AI. It includes modern sections, smart content, and beautiful components for your next big idea.
+              - generic [ref=e35]:
+                - generic [ref=e36]: Get Started
+                - generic [ref=e37]: Learn More
+            - paragraph [ref=e38]: Powerful Features
+            - generic [ref=e39]:
+              - article [ref=e40]:
+                - generic [ref=e42]: Fast Setup
+                - generic [ref=e43]: Launch your project in minutes with smart AI tools.
+              - article [ref=e44]:
+                - generic [ref=e46]: Smart Design
+                - generic [ref=e47]: Create beautiful layouts without design experience.
+              - article [ref=e48]:
+                - generic [ref=e50]: Modern Layout
+                - generic [ref=e51]: Use flexible blocks for any type of website.
+              - article [ref=e52]:
+                - generic [ref=e54]: Easy Customization
+                - generic [ref=e55]: Change content, colors, and sections quickly.
+              - article [ref=e56]:
+                - generic [ref=e58]: AI Powered
+                - generic [ref=e59]: Boost your workflow with intelligent automation.
+              - article [ref=e60]:
+                - generic [ref=e62]: Responsive Blocks
+                - generic [ref=e63]: Everything works across different screen sizes.
+            - generic [ref=e64]:
+              - generic [ref=e65]:
+                - generic [ref=e66]: Ready to Launch?
+                - generic [ref=e67]: Everything you need to build faster, smarter, and better with AI.
+              - generic [ref=e68]: Get Started
+        - complementary "Design Humanizer Chrome extension" [ref=e69]:
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - generic [ref=e72]:
+                - generic [ref=e73]: DH
+                - generic [ref=e74]:
+                  - generic [ref=e75]: Design Humanizer
+                  - generic [ref=e76]: Chrome extension
+              - generic [ref=e77]: Analyzing UI
+            - generic [ref=e79]:
+              - button "Humanize this page" [ref=e80]
+              - generic [ref=e81]:
+                - generic [ref=e82]:
+                  - generic [ref=e83]: Analysis
+                  - generic [ref=e84]: Scanning…
+                - list [ref=e85]:
+                  - listitem [ref=e86]:
+                    - generic [ref=e87]: Hierarchy
+                    - generic [ref=e90]: Weak
+                  - listitem [ref=e91]:
+                    - generic [ref=e92]: Spacing
+                    - generic [ref=e95]: OK
+                  - listitem [ref=e96]:
+                    - generic [ref=e97]: Repetition
+                    - generic [ref=e100]: Weak
+                  - listitem [ref=e101]:
+                    - generic [ref=e102]: CTA focus
+                    - generic [ref=e105]: Weak
+                  - listitem [ref=e106]:
+                    - generic [ref=e107]: Layout rhythm
+                    - generic [ref=e110]: OK
+              - generic [ref=e111]:
+                - generic [ref=e112]:
+                  - generic [ref=e113]: Findings
+                  - generic [ref=e114]: "4"
+                - list [ref=e115]:
+                  - listitem [ref=e116]: 6 similar cards detected
+                  - listitem [ref=e118]: Weak primary CTA
+                  - listitem [ref=e120]: Repeated section rhythm
+                  - listitem [ref=e122]: No clear focal point
+            - generic [ref=e124]:
+              - button "Preview changes" [ref=e125]
+              - generic [ref=e126]:
+                - button "Apply layout" [ref=e127]
+                - button "Copy CSS suggestions" [ref=e128]
+    - generic [ref=e131]:
+      - generic [ref=e132]:
+        - generic [ref=e133]: Process
+        - heading "How it works" [level=2] [ref=e134]
+        - paragraph [ref=e135]: Design Humanizer reads your AI-generated page, finds what feels generic, and shows how to make it feel designed.
+      - generic [ref=e136]:
+        - article [ref=e137]:
+          - generic [ref=e138]:
+            - img [ref=e140]
+            - generic [ref=e142]: "01"
+          - heading "Read the page" [level=3] [ref=e143]
+          - generic [ref=e144]:
+            - paragraph [ref=e145]: Design Humanizer scans the visible structure of your interface.
+            - list [ref=e146]:
+              - listitem [ref=e147]: sections and cards
+              - listitem [ref=e148]: buttons and CTAs
+              - listitem [ref=e149]: spacing and repeated patterns
+        - article [ref=e150]:
+          - generic [ref=e151]:
+            - img [ref=e153]
+            - generic [ref=e156]: "02"
+          - heading "Find what feels generic" [level=3] [ref=e157]
+          - generic:
+            - paragraph [ref=e158]: It detects the patterns that make AI-generated UI feel unfinished.
+            - list [ref=e159]:
+              - listitem [ref=e160]: weak hierarchy
+              - listitem [ref=e161]: repeated cards
+              - listitem [ref=e162]: unclear visual focus
+        - article [ref=e163]:
+          - generic [ref=e164]:
+            - img [ref=e166]
+            - generic [ref=e169]: "03"
+          - heading "Suggest improvements" [level=3] [ref=e170]
+          - generic:
+            - paragraph [ref=e171]: It gives practical design recommendations without changing your content.
+            - list [ref=e172]:
+              - listitem [ref=e173]: stronger grouping
+              - listitem [ref=e174]: better rhythm
+              - listitem [ref=e175]: clearer CTA priority
+        - article [ref=e176]:
+          - generic [ref=e177]:
+            - img [ref=e179]
+            - generic [ref=e181]: "04"
+          - heading "Preview the result" [level=3] [ref=e182]
+          - generic:
+            - paragraph [ref=e183]: You compare the same content with a cleaner, more intentional structure.
+            - list [ref=e184]:
+              - listitem [ref=e185]: before and after view
+              - listitem [ref=e186]: improved composition
+              - listitem [ref=e187]: ready-to-apply direction
+    - generic [ref=e194]:
+      - generic [ref=e195]: Waitlist
+      - heading "Stop shipping first drafts." [level=2] [ref=e196]
+      - paragraph [ref=e197]: Join the waitlist and get early access to Design Humanizer — the Chrome extension that helps AI-generated UI feel more human, intentional, and ready to ship.
+      - button "Join waitlist" [ref=e202] [cursor=pointer]:
+        - img [ref=e204]
+        - generic [ref=e207]: Join waitlist
+      - paragraph [ref=e208]: No spam. Just early access and product updates.
+    - generic [ref=e210]:
+      - generic [ref=e211]:
+        - generic [ref=e212]: QUESTIONS
+        - heading "Answers before you join" [level=2] [ref=e213]
+        - paragraph [ref=e214]: Three quick answers before you try Design Humanizer. The full FAQ is available on a separate section so this page stays focused.
+        - generic [ref=e215]:
+          - link "Open full FAQ" [ref=e216] [cursor=pointer]:
+            - /url: /faq
+          - link "Ask a question" [ref=e217] [cursor=pointer]:
+            - /url: mailto:hello@designhumanizer.com
+      - generic [ref=e219]:
+        - group [ref=e220]:
+          - generic "01 What does Design Humanizer actually do?" [ref=e221] [cursor=pointer]:
+            - generic [ref=e222]: "01"
+            - generic [ref=e223]: What does Design Humanizer actually do?
+          - paragraph [ref=e226]: "It analyzes an AI-generated interface and shows what feels generic: weak hierarchy, repeated cards, unclear focus, poor spacing, and low visual priority. Then it suggests how to make the same content feel more intentional."
+        - group [ref=e227]:
+          - generic "02 Does it change my content?" [ref=e228] [cursor=pointer]:
+            - generic [ref=e229]: "02"
+            - generic [ref=e230]: Does it change my content?
+        - group [ref=e232]:
+          - generic "03 Who is it for?" [ref=e233] [cursor=pointer]:
+            - generic [ref=e234]: "03"
+            - generic [ref=e235]: Who is it for?
+  - contentinfo [ref=e237]:
+    - generic [ref=e238]:
+      - generic [ref=e239]:
+        - link "Design Humanizer home" [ref=e240] [cursor=pointer]:
+          - /url: /#product
+          - generic [ref=e242]: Design Humanizer
+        - paragraph [ref=e243]: A Chrome extension for turning AI-generated interfaces into intentional product design.
+      - navigation "Footer" [ref=e244]:
+        - link "How it works" [ref=e245] [cursor=pointer]:
+          - /url: /#how
+        - link "Q&A" [ref=e246] [cursor=pointer]:
+          - /url: /#qa
+        - link "FAQ" [ref=e247] [cursor=pointer]:
+          - /url: /faq
+        - link "Waitlist" [ref=e248] [cursor=pointer]:
+          - /url: /#waitlist
+    - generic [ref=e249]:
+      - generic [ref=e250]: © 2026 Design Humanizer. All rights reserved.
+      - generic [ref=e251]: Built for developers, indie hackers, and AI app builders.

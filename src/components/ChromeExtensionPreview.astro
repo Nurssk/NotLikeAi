@@ -92,19 +92,19 @@ const findings = [
 <style>
   .extension-panel {
     /* Light, landing-matched product palette with a YELLOW accent */
-    --product-bg: #FFFCF5;
-    --product-surface: #FFF9EF;
+    --product-bg: #FFFFFF;
+    --product-surface: #F8FAFA;
     --product-card: #FFFFFF;
-    --product-card-elevated: #FFF6E0;
-    --product-primary: #FFD84D;
-    --product-primary-bright: #B8902A; /* readable amber for text on light */
-    --product-primary-deep: #FFC928;
-    --product-border: rgba(229, 216, 200, 0.95);
-    --product-border-strong: rgba(232, 200, 58, 0.7);
-    --product-text: #1E1A16;
-    --product-muted: #6F6257;
-    --product-soft: #9A8B7D;
-    --product-success: #1E1A16; /* neutral dark for "OK" states */
+    --product-card-elevated: #ECFBF8;
+    --product-primary: #00F5D4;
+    --product-primary-bright: #0A6B5D; /* readable amber for text on light */
+    --product-primary-deep: #00DDC0;
+    --product-border: rgba(230, 236, 236, 0.95);
+    --product-border-strong: rgba(0, 221, 192, 0.7);
+    --product-text: #101112;
+    --product-muted: #5F666A;
+    --product-soft: #9AA3A6;
+    --product-success: #101112; /* neutral dark for "OK" states */
 
     /* Scroll-driven reveal: enters from the right as --progress passes ~0.42 */
     --reveal: clamp(0, calc((var(--progress, 0) - 0.42) * 2.4), 1);
@@ -118,7 +118,7 @@ const findings = [
     border-radius: 28px;
     background: var(--product-bg);
     border: 1px solid var(--product-border);
-    box-shadow: 0 28px 80px rgba(80, 58, 35, 0.18), 0 0 44px rgba(255, 216, 77, 0.14);
+    box-shadow: 0 28px 80px rgba(16, 17, 18, 0.18), 0 0 44px rgba(0, 245, 212, 0.14);
     overflow: hidden;
     opacity: var(--reveal);
     transform: translateX(calc((1 - var(--reveal)) * 120%));
@@ -143,9 +143,9 @@ const findings = [
     gap: 10px;
     padding: 14px 16px;
     background:
-      radial-gradient(circle at 80% 0%, rgba(255, 200, 87, 0.32), transparent 120px),
+      radial-gradient(circle at 80% 0%, rgba(0, 245, 212, 0.32), transparent 120px),
       linear-gradient(135deg, var(--product-primary-deep) 0%, var(--product-primary) 100%);
-    color: #120B03;
+    color: #101112;
   }
 
   .ext-brand {
@@ -163,11 +163,11 @@ const findings = [
     height: 34px;
     flex: 0 0 auto;
     border-radius: 11px;
-    background: rgba(18, 11, 3, 0.12);
-    border: 1px solid rgba(18, 11, 3, 0.22);
+    background: rgba(16, 17, 18, 0.12);
+    border: 1px solid rgba(16, 17, 18, 0.22);
     font-size: 12px;
     font-weight: 800;
-    color: #120B03;
+    color: #101112;
   }
 
   .ext-brand-text {
@@ -185,7 +185,7 @@ const findings = [
   .ext-sub {
     font-size: 10px;
     font-weight: 600;
-    color: rgba(18, 11, 3, 0.68);
+    color: rgba(16, 17, 18, 0.68);
   }
 
   .ext-status {
@@ -195,8 +195,8 @@ const findings = [
     flex: 0 0 auto;
     padding: 5px 9px;
     border-radius: 999px;
-    background: rgba(18, 11, 3, 0.12);
-    border: 1px solid rgba(18, 11, 3, 0.22);
+    background: rgba(16, 17, 18, 0.12);
+    border: 1px solid rgba(16, 17, 18, 0.22);
     font-size: 10px;
     font-weight: 700;
     white-space: nowrap;
@@ -206,8 +206,8 @@ const findings = [
     width: 6px;
     height: 6px;
     border-radius: 999px;
-    background: #1E1A16;
-    box-shadow: 0 0 10px rgba(30, 26, 22, 0.35);
+    background: #101112;
+    box-shadow: 0 0 10px rgba(16, 17, 18, 0.35);
   }
 
   /* ── Body ─────────────────────────────────────────────────────────────── */
@@ -228,10 +228,10 @@ const findings = [
     border: 0;
     border-radius: 13px;
     background: linear-gradient(90deg, var(--product-primary-deep), var(--product-primary));
-    color: #1E1A16;
+    color: #101112;
     font-size: 13px;
     font-weight: 800;
-    box-shadow: 0 12px 26px rgba(255, 201, 40, 0.4);
+    box-shadow: 0 12px 26px rgba(0, 221, 192, 0.4);
     cursor: default;
   }
 
@@ -269,7 +269,7 @@ const findings = [
     height: 18px;
     padding: 0 5px;
     border-radius: 999px;
-    background: rgba(255, 216, 77, 0.22);
+    background: rgba(0, 245, 212, 0.22);
     color: var(--product-primary-bright);
     font-size: 10px;
     font-weight: 800;
@@ -324,12 +324,12 @@ const findings = [
 
   .ext-ok .ext-section-flag {
     color: var(--product-muted);
-    background: rgba(30, 26, 22, 0.06);
+    background: rgba(16, 17, 18, 0.06);
   }
 
   .ext-weak .ext-section-flag {
-    color: #1E1A16;
-    background: rgba(255, 216, 77, 0.5);
+    color: #101112;
+    background: rgba(0, 245, 212, 0.5);
   }
 
   /* Findings */
@@ -389,7 +389,7 @@ const findings = [
 
   .ext-btn-yellow {
     background: linear-gradient(90deg, var(--product-primary-deep), var(--product-primary));
-    color: #120B03;
+    color: #101112;
   }
 
   .ext-btn-amber {

@@ -39,14 +39,14 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const spring = { type: "spring", stiffness: 260, damping: 22, mass: 1 } as const;
 
 const COLORS = {
-  accent: "#FFD84D",
-  accentStrong: "#FFC928",
-  text: "#1E1A16",
-  surface: "#FFFCF5",
-  border: "#E5D8C8",
-  muted: "#6F6257",
+  accent: "#00F5D4",
+  accentStrong: "#00DDC0",
+  text: "#101112",
+  surface: "#FFFFFF",
+  border: "#E6ECEC",
+  muted: "#5F666A",
   danger: "#C0392B",
-  success: "#1E1A16",
+  success: "#101112",
 };
 
 export default function WaitlistMorphButton({
@@ -127,7 +127,7 @@ export default function WaitlistMorphButton({
           >
             <span style={styles.check} aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2.5 7.5l3 3 6-6.5" stroke="#1E1A16" strokeWidth="2"
+                <path d="M2.5 7.5l3 3 6-6.5" stroke="#101112" strokeWidth="2"
                   strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
@@ -182,7 +182,7 @@ export default function WaitlistMorphButton({
                     style={styles.closeBtn}
                   >
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                      <path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="#6F6257" strokeWidth="1.8"
+                      <path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="#5F666A" strokeWidth="1.8"
                         strokeLinecap="round" />
                     </svg>
                   </button>
@@ -202,8 +202,8 @@ export default function WaitlistMorphButton({
                 <span style={styles.bell} aria-hidden="true">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M8 1.6a3.3 3.3 0 0 0-3.3 3.3c0 3.2-1.2 4.3-1.2 4.3h9s-1.2-1.1-1.2-4.3A3.3 3.3 0 0 0 8 1.6Z"
-                      stroke="#1E1A16" strokeWidth="1.4" strokeLinejoin="round" />
-                    <path d="M6.7 12.2a1.4 1.4 0 0 0 2.6 0" stroke="#1E1A16" strokeWidth="1.4" strokeLinecap="round" />
+                      stroke="#101112" strokeWidth="1.4" strokeLinejoin="round" />
+                    <path d="M6.7 12.2a1.4 1.4 0 0 0 2.6 0" stroke="#101112" strokeWidth="1.4" strokeLinecap="round" />
                   </svg>
                 </span>
               )}
@@ -258,7 +258,7 @@ const styles: Record<string, React.CSSProperties> = {
     border: `1px solid ${COLORS.border}`,
     padding: 5,
     width: "min(360px, 78vw)",
-    boxShadow: "0 12px 30px rgba(80, 58, 35, 0.10)",
+    boxShadow: "0 12px 30px rgba(16, 17, 18, 0.10)",
   },
   field: {
     display: "flex",
@@ -296,7 +296,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    border: "none",
+    border: "1px solid rgba(16, 17, 18, 0.12)",
     borderRadius: 999,
     background: COLORS.accent,
     color: COLORS.text,
@@ -307,7 +307,7 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     padding: "13px 26px",
     minHeight: 44,
-    boxShadow: "0 4px 14px rgba(255, 216, 77, 0.35)",
+    boxShadow: "0 4px 14px rgba(0, 245, 212, 0.35)",
   },
   ctaSmall: {
     padding: "10px 20px",
@@ -325,7 +325,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 15,
     padding: "12px 22px 12px 14px",
     minHeight: 44,
-    boxShadow: "0 4px 14px rgba(80, 58, 35, 0.08)",
+    boxShadow: "0 4px 14px rgba(16, 17, 18, 0.08)",
   },
   check: {
     display: "inline-flex",

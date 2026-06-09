@@ -1,29 +1,400 @@
 ---
 const steps = [
-  { title: "Read the page", copy: "Design Humanizer scans the visible structure: sections, cards, buttons, spacing, and repeated patterns." },
-  { title: "Detect design issues", copy: "It finds what makes the interface feel generic: weak focus, repeated cards, flat rhythm, unclear hierarchy, or poor CTA placement." },
-  { title: "Suggest improvements", copy: "You get practical recommendations for layout, spacing, hierarchy, and visual priority." },
-  { title: "Preview the direction", copy: "See how the same content can feel more intentional before applying changes." },
+  {
+    title: "Read the page",
+    detail: "Design Humanizer scans the visible structure of your interface.",
+    bullets: ["sections and cards", "buttons and CTAs", "spacing and repeated patterns"],
+    icon: "scan",
+  },
+  {
+    title: "Find what feels generic",
+    detail: "It detects the patterns that make AI-generated UI feel unfinished.",
+    bullets: ["weak hierarchy", "repeated cards", "unclear visual focus"],
+    icon: "find",
+  },
+  {
+    title: "Suggest improvements",
+    detail: "It gives practical design recommendations without changing your content.",
+    bullets: ["stronger grouping", "better rhythm", "clearer CTA priority"],
+    icon: "suggest",
+  },
+  {
+    title: "Preview the result",
+    detail: "You compare the same content with a cleaner, more intentional structure.",
+    bullets: ["before and after view", "improved composition", "ready-to-apply direction"],
+    icon: "preview",
+  },
 ];
 ---
 
-<section id="how" class="lp-section lp-section--alt">
-  <div class="lp-container">
-    <div class="lp-head">
-      <span class="lp-label">How it works</span>
-      <h2 class="lp-title">From AI draft to designed composition.</h2>
-    </div>
+<section id="how" class="how-it-works-scroll" data-how-scroll>
+  <div class="how-it-works-sticky">
+    <div class="how-inner">
+      <div class="how-head">
+        <span class="lp-label">Process</span>
+        <h2 class="how-title">How it works</h2>
+        <p class="how-sub">
+          Design Humanizer reads your AI-generated page, finds what feels generic, and shows how to make it feel designed.
+        </p>
+      </div>
 
-    <div class="lp-grid lp-grid--2">
-      {steps.map((s, i) => (
-        <article class="lp-card lp-step">
-          <div class="lp-step-row">
-            <span class="lp-card-num">{i + 1}</span>
-            <h3>{s.title}</h3>
-          </div>
-          <p>{s.copy}</p>
-        </article>
-      ))}
+      <div class="how-cards" data-how-cards>
+        {steps.map((step, i) => (
+          <article class="how-card" data-how-card style={i === 0 ? "--expand: 1" : "--expand: 0"} aria-expanded={i === 0 ? "true" : "false"}>
+            <div class="how-card-top">
+              <span class="how-card-ico" aria-hidden="true">
+                {step.icon === "scan" && (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M3 12h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                )}
+                {step.icon === "find" && (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="m20 20-3.2-3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                )}
+                {step.icon === "suggest" && (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 18h6M10 21h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.9 1 1 1.7l.1.5h5l.1-.5c.1-.7.5-1.3 1-1.7A6 6 0 0 0 12 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                  </svg>
+                )}
+                {step.icon === "preview" && (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="4" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M12 4v16" stroke="currentColor" stroke-width="1.8" stroke-dasharray="2 2.4"/>
+                  </svg>
+                )}
+              </span>
+              <span class="how-card-step">{`0${i + 1}`}</span>
+            </div>
+
+            <h3 class="how-card-title">{step.title}</h3>
+
+            <div class="how-card-details">
+              <p class="how-card-detail">{step.detail}</p>
+              <ul class="how-card-bullets">
+                {step.bullets.map((b) => (
+                  <li>{b}</li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="how-progress" aria-hidden="true">
+        {steps.map((_, i) => (
+          <span class:list={["how-dot", { "is-active": i === 0 }]} data-how-dot></span>
+        ))}
+      </div>
     </div>
   </div>
 </section>
+
+<script>
+  const section = document.querySelector<HTMLElement>("[data-how-scroll]");
+  const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-how-card]"));
+  const dots = Array.from(document.querySelectorAll<HTMLElement>("[data-how-dot]"));
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const mobile = window.matchMedia("(max-width: 768px)");
+
+  let ticking = false;
+
+  const clamp = (v: number, min = 0, max = 1) => Math.min(max, Math.max(min, v));
+
+  function update() {
+    ticking = false;
+    if (!section) return;
+
+    const total = cards.length;
+
+    // Stacked / reduced motion: every card fully expanded (CSS also forces this).
+    if (reduceMotion.matches || mobile.matches) {
+      cards.forEach((card) => {
+        card.style.setProperty("--expand", "1");
+        card.setAttribute("aria-expanded", "true");
+      });
+      dots.forEach((d) => d.classList.remove("is-active"));
+      return;
+    }
+
+    const rect = section.getBoundingClientRect();
+    const maxScroll = section.offsetHeight - window.innerHeight;
+    const progress = maxScroll > 0 ? clamp(-rect.top / maxScroll) : 0;
+
+    let focusIndex = 0;
+    let focusValue = -1;
+
+    cards.forEach((card, index) => {
+      // Continuous focus model: each card expands as the scroll approaches its
+      // center and collapses smoothly as the scroll moves away.
+      const center = (index + 0.5) / total;
+      const distance = Math.abs(progress - center);
+      const expand = clamp(1 - distance * total * 1.35);
+
+      card.style.setProperty("--expand", expand.toFixed(3));
+      card.setAttribute("aria-expanded", expand > 0.55 ? "true" : "false");
+
+      if (expand > focusValue) {
+        focusValue = expand;
+        focusIndex = index;
+      }
+    });
+
+    dots.forEach((dot, i) => dot.classList.toggle("is-active", i === focusIndex));
+  }
+
+  function requestUpdate() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  }
+
+  update();
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate);
+  reduceMotion.addEventListener("change", requestUpdate);
+  mobile.addEventListener("change", requestUpdate);
+</script>
+
+<style>
+  .how-it-works-scroll {
+    position: relative;
+    min-height: 320vh;
+    background: var(--bg, #ffffff);
+  }
+
+  .how-it-works-sticky {
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .how-inner {
+    width: min(100% - 48px, 1200px);
+    margin: 0 auto;
+    padding: clamp(64px, 9vh, 120px) 0;
+  }
+
+  .how-head {
+    max-width: 760px;
+    margin: 0 auto clamp(36px, 5vh, 64px);
+    text-align: center;
+  }
+
+  .how-title {
+    margin: 16px 0 0;
+    color: var(--text, #101112);
+    font-family: var(--font-display, "Montserrat", system-ui, sans-serif);
+    font-size: clamp(34px, 5vw, 60px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+
+  .how-sub {
+    margin: 18px auto 0;
+    max-width: 620px;
+    color: var(--muted, #5f666a);
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  /* ── Cards row: each card driven by its own --expand (0..1) ───────────── */
+  .how-cards {
+    display: flex;
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  .how-card {
+    --expand: 0;
+    /* Width, opacity, scale interpolate continuously with --expand */
+    flex: calc(0.8 + var(--expand) * 1.7);
+    opacity: calc(0.6 + var(--expand) * 0.4);
+    transform: scale(calc(0.95 + var(--expand) * 0.05));
+    transform-origin: center bottom;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 320px;
+    padding: 26px;
+    border-radius: 28px;
+    background: var(--card, #ffffff);
+    border: 1px solid color-mix(in srgb, var(--border, #e6ecec) calc(100% - var(--expand) * 100%), rgba(0, 245, 212, 0.85) calc(var(--expand) * 100%));
+    box-shadow: 0 8px 24px rgba(16, 17, 18, 0.04),
+      0 28px 70px rgba(0, 245, 212, calc(var(--expand) * 0.18));
+    overflow: hidden;
+    /* Only smooth the non-scroll-driven props; size/opacity follow scroll live */
+    transition: box-shadow 160ms linear;
+    will-change: flex-grow, opacity, transform;
+  }
+
+  .how-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .how-card-ico {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(44px + var(--expand) * 10px);
+    height: calc(44px + var(--expand) * 10px);
+    flex: 0 0 auto;
+    border-radius: 14px;
+    /* Tile fills with accent as --expand grows */
+    background: color-mix(in srgb, var(--accent-soft, rgba(0, 245, 212, 0.14)) calc(100% - var(--expand) * 100%), var(--accent, #00f5d4) calc(var(--expand) * 100%));
+    border: 1px solid color-mix(in srgb, var(--border, #e6ecec) calc(100% - var(--expand) * 100%), transparent calc(var(--expand) * 100%));
+    color: var(--text, #101112);
+  }
+
+  .how-card-step {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    /* Faint → strong text color with expand */
+    color: color-mix(in srgb, var(--faint, #9aa3a6) calc(100% - var(--expand) * 100%), var(--text, #101112) calc(var(--expand) * 100%));
+  }
+
+  .how-card-title {
+    margin: 4px 0 0;
+    color: var(--text, #101112);
+    font-size: calc(18px + var(--expand) * 4px);
+    font-weight: 700;
+    line-height: 1.22;
+  }
+
+  /* ── Detail content: revealed continuously via --expand ───────────────── */
+  .how-card-details {
+    opacity: var(--expand);
+    max-height: calc(var(--expand) * 280px);
+    transform: translateY(calc((1 - var(--expand)) * 12px));
+    overflow: hidden;
+  }
+
+  .how-card-detail {
+    margin: 0 0 14px;
+    color: var(--muted, #5f666a);
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 42ch;
+  }
+
+  .how-card-bullets {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .how-card-bullets li {
+    position: relative;
+    padding-left: 22px;
+    color: var(--text, #101112);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .how-card-bullets li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--accent, #00f5d4);
+    border: 1px solid rgba(16, 17, 18, 0.12);
+  }
+
+  /* ── Progress dots ────────────────────────────────────────────────────── */
+  .how-progress {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: clamp(28px, 4vh, 44px);
+  }
+
+  .how-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: var(--border, #e6ecec);
+    transition: width 360ms ease, background 360ms ease;
+  }
+
+  .how-dot.is-active {
+    width: 26px;
+    background: var(--accent, #00f5d4);
+  }
+
+  /* ── Mobile: vertical stack, all details visible, no scroll-driven expand ─ */
+  @media (max-width: 768px) {
+    .how-it-works-scroll {
+      min-height: auto;
+    }
+    .how-it-works-sticky {
+      position: relative;
+      min-height: auto;
+    }
+    .how-cards {
+      flex-direction: column;
+      gap: 14px;
+    }
+    .how-card {
+      --expand: 1 !important;
+      flex: none;
+      width: 100%;
+      min-height: 0;
+      opacity: 1;
+      transform: none;
+    }
+    .how-card-details {
+      opacity: 1;
+      max-height: none;
+      transform: none;
+    }
+    .how-progress {
+      display: none;
+    }
+  }
+
+  /* ── Reduced motion: static, all cards expanded ───────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .how-it-works-scroll {
+      min-height: auto;
+    }
+    .how-it-works-sticky {
+      position: relative;
+      min-height: auto;
+    }
+    .how-cards {
+      flex-wrap: wrap;
+    }
+    .how-card {
+      --expand: 1 !important;
+      flex: 1 1 260px;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    .how-card-details {
+      opacity: 1 !important;
+      max-height: none !important;
+      transform: none !important;
+    }
+    .how-progress {
+      display: none;
+    }
+  }
+</style>
