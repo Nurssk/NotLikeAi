@@ -9,12 +9,14 @@
  * morphing behavior is reused via `motion/react` while styling is done with the
  * landing's design tokens (milk-beige / yellow / Montserrat / pill radius).
  *
- * Adds the requested behavior: email validation, inline error, success state,
- * autofocus, Enter to submit, Escape to close. Email is logged (no backend).
+ * Adds email validation, Firestore persistence, inline error, success state,
+ * autofocus, Enter to submit, Escape to close.
  */
 
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 
 interface WaitlistMorphButtonProps {
   buttonText?: string;
@@ -60,8 +62,10 @@ export default function WaitlistMorphButton({
   const lg = size === "lg";
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDone, setIsDone] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [resolvedSuccessText, setResolvedSuccessText] = useState(successText);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -70,6 +74,7 @@ export default function WaitlistMorphButton({
   useEffect(() => {
     if (!isExpanded) return;
     const onDown = (e: MouseEvent) => {
+      if (isSaving) return;
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsExpanded(false);
         setError("");
@@ -77,7 +82,7 @@ export default function WaitlistMorphButton({
     };
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
-  }, [isExpanded]);
+  }, [isExpanded, isSaving]);
 
   // Autofocus the input when the form opens
   useEffect(() => {
@@ -94,20 +99,52 @@ export default function WaitlistMorphButton({
     setError("");
   };
 
-  const submit = () => {
+  const submit = async () => {
+    if (isSaving) return;
+
     const value = email.trim();
     if (!value || !EMAIL_RE.test(value)) {
       setError("Enter a valid email");
       inputRef.current?.focus();
       return;
     }
-    // No backend available — log it (and surface via callback if provided)
-    console.log("[waitlist] new signup:", value);
-    onSubmit?.(value);
+
+    const normalizedEmail = value.toLowerCase();
+    const docId = normalizedEmail.replace(/[.#$[\]/]/g, "_");
+    const waitlistRef = doc(db, "waitlist", docId);
+
+    setIsSaving(true);
     setError("");
-    setIsExpanded(false);
-    setEmail("");
-    setIsDone(true);
+
+    try {
+      const existing = await getDoc(waitlistRef);
+
+      await setDoc(
+        waitlistRef,
+        {
+          email: value,
+          normalizedEmail,
+          source: "landing",
+          ...(existing.exists() ? {} : { createdAt: serverTimestamp() }),
+          updatedAt: serverTimestamp(),
+          userAgent: window.navigator.userAgent,
+          page: window.location.href,
+        },
+        { merge: true },
+      );
+
+      onSubmit?.(value);
+      setResolvedSuccessText(existing.exists() ? "You're already on the list" : successText);
+      setIsExpanded(false);
+      setEmail("");
+      setIsDone(true);
+    } catch (err) {
+      console.error("[waitlist] failed to save signup:", err);
+      setError("Something went wrong. Please try again.");
+      inputRef.current?.focus();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -131,7 +168,7 @@ export default function WaitlistMorphButton({
                   strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
-            {successText}
+            {resolvedSuccessText}
           </motion.div>
         ) : (
           /* ── Morphing button / form ────────────────────────────────── */
@@ -164,6 +201,7 @@ export default function WaitlistMorphButton({
                     aria-label="Email address for the waitlist"
                     aria-invalid={!!error}
                     aria-describedby={error ? "waitlist-error" : undefined}
+                    disabled={isSaving}
                     style={{ ...styles.input, ...(lg ? big.input : null) }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
@@ -179,7 +217,11 @@ export default function WaitlistMorphButton({
                     type="button"
                     onClick={close}
                     aria-label="Close waitlist form"
-                    style={styles.closeBtn}
+                    disabled={isSaving}
+                    style={{
+                      ...styles.closeBtn,
+                      ...(isSaving ? styles.disabledControl : null),
+                    }}
                   >
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                       <path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="#5F666A" strokeWidth="1.8"
@@ -195,7 +237,13 @@ export default function WaitlistMorphButton({
               type="button"
               onClick={() => (isExpanded ? submit() : open())}
               transition={spring}
-              style={{ ...styles.cta, ...(isExpanded ? styles.ctaSmall : null), ...(lg ? (isExpanded ? big.ctaSmall : big.cta) : null) }}
+              disabled={isSaving}
+              style={{
+                ...styles.cta,
+                ...(isExpanded ? styles.ctaSmall : null),
+                ...(lg ? (isExpanded ? big.ctaSmall : big.cta) : null),
+                ...(isSaving ? styles.disabledCta : null),
+              }}
               aria-expanded={isExpanded}
             >
               {!isExpanded && (
@@ -207,7 +255,7 @@ export default function WaitlistMorphButton({
                   </svg>
                 </span>
               )}
-              <motion.span layout="position">{isExpanded ? submitText : buttonText}</motion.span>
+              <motion.span layout="position">{isExpanded ? (isSaving ? "Joining..." : submitText) : buttonText}</motion.span>
             </motion.button>
           </motion.div>
         )}
@@ -291,6 +339,10 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 999,
     cursor: "pointer",
   },
+  disabledControl: {
+    cursor: "not-allowed",
+    opacity: 0.52,
+  },
   cta: {
     display: "inline-flex",
     alignItems: "center",
@@ -308,6 +360,11 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "13px 26px",
     minHeight: 44,
     boxShadow: "0 4px 14px rgba(0, 245, 212, 0.35)",
+  },
+  disabledCta: {
+    cursor: "wait",
+    opacity: 0.78,
+    transform: "none",
   },
   ctaSmall: {
     padding: "10px 20px",
