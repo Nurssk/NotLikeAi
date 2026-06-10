@@ -101,41 +101,50 @@ const steps = [
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const mobile = window.matchMedia("(max-width: 768px)");
 
-  let ticking = false;
+  const SMOOTHING = 0.055; // lerp factor — soft/cinematic catch-up (augen.pro feel)
+  let targetProgress = 0;
+  let currentProgress = 0;
+  let rafId: number | null = null;
 
   const clamp = (v: number, min = 0, max = 1) => Math.min(max, Math.max(min, v));
+  // Smoothstep: slow start, smooth middle, slow finish.
+  const smoothstep = (t: number) => t * t * (3 - 2 * t);
 
-  function update() {
-    ticking = false;
-    if (!section) return;
+  function applyStacked() {
+    cards.forEach((card) => {
+      card.style.setProperty("--expand", "1");
+      card.style.setProperty("--detail", "1");
+      card.setAttribute("aria-expanded", "true");
+    });
+    dots.forEach((d) => d.classList.remove("is-active"));
+  }
 
-    const total = cards.length;
-
-    // Stacked / reduced motion: every card fully expanded (CSS also forces this).
-    if (reduceMotion.matches || mobile.matches) {
-      cards.forEach((card) => {
-        card.style.setProperty("--expand", "1");
-        card.setAttribute("aria-expanded", "true");
-      });
-      dots.forEach((d) => d.classList.remove("is-active"));
-      return;
-    }
-
+  function calculateTargetProgress() {
+    if (!section) return 0;
     const rect = section.getBoundingClientRect();
     const maxScroll = section.offsetHeight - window.innerHeight;
-    const progress = maxScroll > 0 ? clamp(-rect.top / maxScroll) : 0;
+    targetProgress = maxScroll > 0 ? clamp(-rect.top / maxScroll) : 0;
+    return targetProgress;
+  }
 
+  // Paint the cards for a given (already-smoothed) global progress value.
+  function updateCards(progress: number) {
+    const total = cards.length;
     let focusIndex = 0;
     let focusValue = -1;
 
     cards.forEach((card, index) => {
-      // Continuous focus model: each card expands as the scroll approaches its
-      // center and collapses smoothly as the scroll moves away.
       const center = (index + 0.5) / total;
       const distance = Math.abs(progress - center);
-      const expand = clamp(1 - distance * total * 1.35);
+      // Gentle blend factor (1.08) so neighbouring cards overlap softly.
+      let expand = clamp(1 - distance * total * 1.08);
+      expand = smoothstep(expand); // soft start / smooth middle / soft finish
 
-      card.style.setProperty("--expand", expand.toFixed(3));
+      // Details lag slightly behind size for a more premium reveal.
+      const detail = clamp((expand - 0.18) / 0.82);
+
+      card.style.setProperty("--expand", expand.toFixed(4));
+      card.style.setProperty("--detail", detail.toFixed(4));
       card.setAttribute("aria-expanded", expand > 0.55 ? "true" : "false");
 
       if (expand > focusValue) {
@@ -147,13 +156,47 @@ const steps = [
     dots.forEach((dot, i) => dot.classList.toggle("is-active", i === focusIndex));
   }
 
-  function requestUpdate() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(update);
+  // rAF loop: ease currentProgress toward targetProgress, then idle.
+  function animate() {
+    currentProgress += (targetProgress - currentProgress) * SMOOTHING;
+
+    if (Math.abs(targetProgress - currentProgress) > 0.0005) {
+      updateCards(currentProgress);
+      rafId = requestAnimationFrame(animate);
+    } else {
+      currentProgress = targetProgress;
+      updateCards(currentProgress);
+      rafId = null;
+    }
   }
 
-  update();
+  function requestUpdate() {
+    if (!section) return;
+
+    // Stacked / reduced motion: every card fully expanded, no animation loop.
+    if (reduceMotion.matches || mobile.matches) {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      applyStacked();
+      return;
+    }
+
+    calculateTargetProgress();
+    if (rafId === null) {
+      rafId = requestAnimationFrame(animate);
+    }
+  }
+
+  // Initial paint (snap to current scroll position without easing-in).
+  if (reduceMotion.matches || mobile.matches) {
+    applyStacked();
+  } else {
+    currentProgress = calculateTargetProgress();
+    updateCards(currentProgress);
+  }
+
   window.addEventListener("scroll", requestUpdate, { passive: true });
   window.addEventListener("resize", requestUpdate);
   reduceMotion.addEventListener("change", requestUpdate);
@@ -163,7 +206,7 @@ const steps = [
 <style>
   .how-it-works-scroll {
     position: relative;
-    min-height: 320vh;
+    min-height: 380vh;
     background: var(--bg, #ffffff);
   }
 
@@ -214,10 +257,13 @@ const steps = [
 
   .how-card {
     --expand: 0;
-    /* Width, opacity, scale interpolate continuously with --expand */
-    flex: calc(0.8 + var(--expand) * 1.7);
-    opacity: calc(0.6 + var(--expand) * 0.4);
-    transform: scale(calc(0.95 + var(--expand) * 0.05));
+    --detail: 0;
+    /* Calmer sizing — gentle scale/opacity range so switches don't feel jumpy.
+       JS lerp-smooths --expand, so these follow scroll live (no long CSS
+       transition on width/scale/opacity). */
+    flex: calc(0.9 + var(--expand) * 1.35);
+    opacity: calc(0.76 + var(--expand) * 0.24);
+    transform: scale(calc(0.975 + var(--expand) * 0.035));
     transform-origin: center bottom;
     min-width: 0;
     display: flex;
@@ -228,11 +274,16 @@ const steps = [
     border-radius: 28px;
     background: var(--card, #ffffff);
     border: 1px solid color-mix(in srgb, var(--border, #e6ecec) calc(100% - var(--expand) * 100%), rgba(0, 245, 212, 0.85) calc(var(--expand) * 100%));
-    box-shadow: 0 8px 24px rgba(16, 17, 18, 0.04),
-      0 28px 70px rgba(0, 245, 212, calc(var(--expand) * 0.18));
+    /* Soft depth that grows with expand */
+    box-shadow:
+      0 8px 24px rgba(16, 17, 18, 0.04),
+      0 calc(var(--expand) * 28px) calc(var(--expand) * 70px) rgba(0, 245, 212, calc(var(--expand) * 0.14));
     overflow: hidden;
-    /* Only smooth the non-scroll-driven props; size/opacity follow scroll live */
-    transition: box-shadow 160ms linear;
+    /* Short, linear smoothing only on non-scroll-driven (color/shadow) props */
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      background 180ms ease;
     will-change: flex-grow, opacity, transform;
   }
 
@@ -272,11 +323,11 @@ const steps = [
     line-height: 1.22;
   }
 
-  /* ── Detail content: revealed continuously via --expand ───────────────── */
+  /* ── Detail content: revealed via --detail (lags --expand for a premium feel) */
   .how-card-details {
-    opacity: var(--expand);
-    max-height: calc(var(--expand) * 280px);
-    transform: translateY(calc((1 - var(--expand)) * 12px));
+    opacity: var(--detail);
+    max-height: calc(var(--detail) * 280px);
+    transform: translateY(calc((1 - var(--detail)) * 16px));
     overflow: hidden;
   }
 
@@ -354,6 +405,7 @@ const steps = [
     }
     .how-card {
       --expand: 1 !important;
+      --detail: 1 !important;
       flex: none;
       width: 100%;
       min-height: 0;
@@ -384,6 +436,7 @@ const steps = [
     }
     .how-card {
       --expand: 1 !important;
+      --detail: 1 !important;
       flex: 1 1 260px;
       opacity: 1 !important;
       transform: none !important;
