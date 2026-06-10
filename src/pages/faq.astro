@@ -109,9 +109,9 @@ const categories = ["All", "Product", "Workflow", "Chrome Extension", "Privacy",
       (function () {
         try {
           var t = localStorage.getItem("theme");
-          document.documentElement.dataset.theme = t === "light" ? "light" : "dark";
+          document.documentElement.dataset.theme = t === "dark" ? "dark" : "light";
         } catch (e) {
-          document.documentElement.dataset.theme = "dark";
+          document.documentElement.dataset.theme = "light";
         }
       })();
     </script>

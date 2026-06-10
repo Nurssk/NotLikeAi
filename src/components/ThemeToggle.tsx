@@ -16,12 +16,12 @@ import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 
 export default function ThemeToggle() {
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
 
-  // Sync from the theme set by the inline head script (no flash).
+  // Sync from the theme set by the inline head script (light is the default).
   useEffect(() => {
     const current = document.documentElement.dataset.theme;
-    setIsDark(current !== "light");
+    setIsDark(current === "dark");
   }, []);
 
   const apply = (dark: boolean) => {
