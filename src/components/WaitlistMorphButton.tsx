@@ -15,7 +15,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 interface WaitlistMorphButtonProps {
@@ -110,37 +110,49 @@ export default function WaitlistMorphButton({
     }
 
     const normalizedEmail = value.toLowerCase();
+    // Safe Firestore doc id (no ".", "#", "$", "[", "]", "/")
     const docId = normalizedEmail.replace(/[.#$[\]/]/g, "_");
     const waitlistRef = doc(db, "waitlist", docId);
 
     setIsSaving(true);
     setError("");
 
-    try {
-      const existing = await getDoc(waitlistRef);
+    if (import.meta.env.DEV) {
+      console.log("[waitlist] submitting", { normalizedEmail, path: `waitlist/${docId}` });
+    }
 
+    try {
+      // Write only (no pre-read): the secure waitlist rules deny reads so emails
+      // cannot be enumerated, so getDoc() would throw permission-denied. merge
+      // makes re-submitting the same email a harmless re-confirmation.
       await setDoc(
         waitlistRef,
         {
           email: value,
           normalizedEmail,
           source: "landing",
-          ...(existing.exists() ? {} : { createdAt: serverTimestamp() }),
-          updatedAt: serverTimestamp(),
-          userAgent: window.navigator.userAgent,
           page: window.location.href,
+          userAgent: window.navigator.userAgent,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         },
         { merge: true },
       );
 
       onSubmit?.(value);
-      setResolvedSuccessText(existing.exists() ? "You're already on the list" : successText);
+      setResolvedSuccessText(successText);
       setIsExpanded(false);
       setEmail("");
       setIsDone(true);
     } catch (err) {
-      console.error("[waitlist] failed to save signup:", err);
-      setError("Something went wrong. Please try again.");
+      const code = (err as { code?: string } | null)?.code ?? "";
+      if (code === "permission-denied") {
+        console.error("[waitlist] Firestore permission denied. Check firestore.rules", err);
+        setError("Waitlist is not enabled yet. Please try again later.");
+      } else {
+        console.error("[waitlist] failed to save signup:", code || (err as Error)?.message || err);
+        setError("Something went wrong. Please try again.");
+      }
       inputRef.current?.focus();
     } finally {
       setIsSaving(false);

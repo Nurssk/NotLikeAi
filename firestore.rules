@@ -1,0 +1,42 @@
+rules_version = '2';
+
+// Design Humanizer — MVP waitlist rules.
+//
+// Public visitors may ADD/UPDATE their own waitlist entry, but:
+//   - reads are DISABLED (so the email list cannot be enumerated);
+//   - deletes are DISABLED;
+//   - only the expected fields are allowed, and `source` must be "landing".
+//
+// The frontend writes to: waitlist/{docId}, where docId is the normalized
+// email with [.#$[]/ ] replaced by "_". It does NOT read before writing.
+//
+// Apply in Firebase Console → Firestore Database → Rules → paste → Publish.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /waitlist/{docId} {
+      allow create, update: if
+        request.resource.data.keys().hasOnly([
+          'email',
+          'normalizedEmail',
+          'source',
+          'page',
+          'userAgent',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.email is string
+        && request.resource.data.normalizedEmail is string
+        && request.resource.data.source == 'landing'
+        && request.resource.data.normalizedEmail.size() <= 254;
+
+      allow read, delete: if false;
+    }
+
+    // Everything else stays locked.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
