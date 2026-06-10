@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import Analytics from "@vercel/analytics/astro";
 import FAQAccordion from "../components/FAQAccordion.astro";
 import Footer from "../components/Footer.astro";
 import GlobalClickSpark from "../components/GlobalClickSpark";
@@ -153,6 +154,7 @@ const categories = ["All", "Product", "Workflow", "Chrome Extension", "Privacy",
       sparkCount={10}
       duration={520}
     />
+    <Analytics />
     <script>
       const faqRoot = document.querySelector("[data-faq-filter-root]");
 
