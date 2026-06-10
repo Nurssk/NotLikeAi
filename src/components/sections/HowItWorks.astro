@@ -27,7 +27,7 @@ const steps = [
 ];
 ---
 
-<section id="how" class="how-it-works-scroll" data-how-scroll>
+<section id="how" class="how-it-works-scroll">
   <div class="how-it-works-sticky">
     <div class="how-inner">
       <div class="how-head">
@@ -40,7 +40,7 @@ const steps = [
 
       <div class="how-cards" data-how-cards>
         {steps.map((step, i) => (
-          <article class="how-card" data-how-card style={i === 0 ? "--expand: 1" : "--expand: 0"} aria-expanded={i === 0 ? "true" : "false"}>
+          <article class:list={["how-card", { "is-active": i === 0 }]} data-how-card tabindex="0" aria-expanded={i === 0 ? "true" : "false"}>
             <div class="how-card-top">
               <span class="how-card-ico" aria-hidden="true">
                 {step.icon === "scan" && (
@@ -95,127 +95,49 @@ const steps = [
 </section>
 
 <script>
-  const section = document.querySelector<HTMLElement>("[data-how-scroll]");
   const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-how-card]"));
   const dots = Array.from(document.querySelectorAll<HTMLElement>("[data-how-dot]"));
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const mobile = window.matchMedia("(max-width: 768px)");
 
-  const SMOOTHING = 0.055; // lerp factor — soft/cinematic catch-up (augen.pro feel)
-  let targetProgress = 0;
-  let currentProgress = 0;
-  let rafId: number | null = null;
-
-  const clamp = (v: number, min = 0, max = 1) => Math.min(max, Math.max(min, v));
-  // Smoothstep: slow start, smooth middle, slow finish.
-  const smoothstep = (t: number) => t * t * (3 - 2 * t);
-
-  function applyStacked() {
-    cards.forEach((card) => {
-      card.style.setProperty("--expand", "1");
-      card.style.setProperty("--detail", "1");
-      card.setAttribute("aria-expanded", "true");
-    });
-    dots.forEach((d) => d.classList.remove("is-active"));
-  }
-
-  function calculateTargetProgress() {
-    if (!section) return 0;
-    const rect = section.getBoundingClientRect();
-    const maxScroll = section.offsetHeight - window.innerHeight;
-    targetProgress = maxScroll > 0 ? clamp(-rect.top / maxScroll) : 0;
-    return targetProgress;
-  }
-
-  // Paint the cards for a given (already-smoothed) global progress value.
-  function updateCards(progress: number) {
-    const total = cards.length;
-    let focusIndex = 0;
-    let focusValue = -1;
-
+  function setActiveCard(activeIndex: number) {
     cards.forEach((card, index) => {
-      const center = (index + 0.5) / total;
-      const distance = Math.abs(progress - center);
-      // Gentle blend factor (1.08) so neighbouring cards overlap softly.
-      let expand = clamp(1 - distance * total * 1.08);
-      expand = smoothstep(expand); // soft start / smooth middle / soft finish
-
-      // Details lag slightly behind size for a more premium reveal.
-      const detail = clamp((expand - 0.18) / 0.82);
-
-      card.style.setProperty("--expand", expand.toFixed(4));
-      card.style.setProperty("--detail", detail.toFixed(4));
-      card.setAttribute("aria-expanded", expand > 0.55 ? "true" : "false");
-
-      if (expand > focusValue) {
-        focusValue = expand;
-        focusIndex = index;
-      }
+      const isActive = index === activeIndex;
+      card.classList.toggle("is-active", isActive);
+      card.setAttribute("aria-expanded", isActive ? "true" : "false");
     });
-
-    dots.forEach((dot, i) => dot.classList.toggle("is-active", i === focusIndex));
+    dots.forEach((dot, i) => dot.classList.toggle("is-active", i === activeIndex));
   }
 
-  // rAF loop: ease currentProgress toward targetProgress, then idle.
-  function animate() {
-    currentProgress += (targetProgress - currentProgress) * SMOOTHING;
+  cards.forEach((card, index) => {
+    // Hover (mouse / pen) expands the card and collapses the others.
+    // Touch is ignored — on mobile every card is expanded via CSS, so there
+    // is no hover dependency there.
+    card.addEventListener("pointerenter", (event) => {
+      if (event.pointerType === "touch" || mobile.matches) return;
+      setActiveCard(index);
+    });
+    // Keyboard focus mirrors hover so the section works without a mouse.
+    card.addEventListener("focusin", () => {
+      if (mobile.matches) return;
+      setActiveCard(index);
+    });
+  });
 
-    if (Math.abs(targetProgress - currentProgress) > 0.0005) {
-      updateCards(currentProgress);
-      rafId = requestAnimationFrame(animate);
-    } else {
-      currentProgress = targetProgress;
-      updateCards(currentProgress);
-      rafId = null;
-    }
-  }
-
-  function requestUpdate() {
-    if (!section) return;
-
-    // Stacked / reduced motion: every card fully expanded, no animation loop.
-    if (reduceMotion.matches || mobile.matches) {
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
-      applyStacked();
-      return;
-    }
-
-    calculateTargetProgress();
-    if (rafId === null) {
-      rafId = requestAnimationFrame(animate);
-    }
-  }
-
-  // Initial paint (snap to current scroll position without easing-in).
-  if (reduceMotion.matches || mobile.matches) {
-    applyStacked();
-  } else {
-    currentProgress = calculateTargetProgress();
-    updateCards(currentProgress);
-  }
-
-  window.addEventListener("scroll", requestUpdate, { passive: true });
-  window.addEventListener("resize", requestUpdate);
-  reduceMotion.addEventListener("change", requestUpdate);
-  mobile.addEventListener("change", requestUpdate);
+  // First card open by default.
+  setActiveCard(0);
 </script>
 
 <style>
+  /* Normal page content — no scroll-controlled height, no sticky pinning. */
   .how-it-works-scroll {
     position: relative;
-    min-height: 380vh;
+    min-height: auto;
     background: var(--bg, #ffffff);
   }
 
   .how-it-works-sticky {
-    position: sticky;
-    top: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
+    position: relative;
+    min-height: auto;
   }
 
   .how-inner {
@@ -258,9 +180,9 @@ const steps = [
   .how-card {
     --expand: 0;
     --detail: 0;
-    /* Calmer sizing — gentle scale/opacity range so switches don't feel jumpy.
-       JS lerp-smooths --expand, so these follow scroll live (no long CSS
-       transition on width/scale/opacity). */
+    /* Compact by default; --expand/--detail are flipped to 1 by the
+       .is-active class (set on hover / focus), and CSS transitions animate
+       the resolved size, opacity, transform, color and shadow. */
     flex: calc(0.9 + var(--expand) * 1.35);
     opacity: calc(0.76 + var(--expand) * 0.24);
     transform: scale(calc(0.975 + var(--expand) * 0.035));
@@ -279,12 +201,26 @@ const steps = [
       0 8px 24px rgba(16, 17, 18, 0.04),
       0 calc(var(--expand) * 28px) calc(var(--expand) * 70px) rgba(0, 245, 212, calc(var(--expand) * 0.14));
     overflow: hidden;
-    /* Short, linear smoothing only on non-scroll-driven (color/shadow) props */
+    cursor: default;
     transition:
-      border-color 180ms ease,
-      box-shadow 180ms ease,
-      background 180ms ease;
+      flex 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 260ms ease,
+      transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 240ms ease,
+      box-shadow 240ms ease,
+      background 240ms ease;
     will-change: flex-grow, opacity, transform;
+  }
+
+  .how-card:focus-visible {
+    outline: 2px solid var(--accent, #00f5d4);
+    outline-offset: 3px;
+  }
+
+  /* Active = hovered / focused card. */
+  .how-card.is-active {
+    --expand: 1;
+    --detail: 1;
   }
 
   .how-card-top {
@@ -305,6 +241,11 @@ const steps = [
     background: color-mix(in srgb, var(--accent-soft, rgba(0, 245, 212, 0.14)) calc(100% - var(--expand) * 100%), var(--accent, #00f5d4) calc(var(--expand) * 100%));
     border: 1px solid color-mix(in srgb, var(--border, #e6ecec) calc(100% - var(--expand) * 100%), transparent calc(var(--expand) * 100%));
     color: var(--text, #101112);
+    transition:
+      width 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      height 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      background 240ms ease,
+      border-color 240ms ease;
   }
 
   .how-card-step {
@@ -313,6 +254,7 @@ const steps = [
     letter-spacing: 0.04em;
     /* Faint → strong text color with expand */
     color: color-mix(in srgb, var(--faint, #9aa3a6) calc(100% - var(--expand) * 100%), var(--text, #101112) calc(var(--expand) * 100%));
+    transition: color 240ms ease;
   }
 
   .how-card-title {
@@ -321,6 +263,7 @@ const steps = [
     font-size: calc(18px + var(--expand) * 4px);
     font-weight: 700;
     line-height: 1.22;
+    transition: font-size 300ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /* ── Detail content: revealed via --detail (lags --expand for a premium feel) */
@@ -329,6 +272,10 @@ const steps = [
     max-height: calc(var(--detail) * 280px);
     transform: translateY(calc((1 - var(--detail)) * 16px));
     overflow: hidden;
+    transition:
+      opacity 260ms ease,
+      max-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 300ms ease;
   }
 
   .how-card-detail {
@@ -422,15 +369,8 @@ const steps = [
     }
   }
 
-  /* ── Reduced motion: static, all cards expanded ───────────────────────── */
+  /* ── Reduced motion: static, all cards expanded, no transitions ───────── */
   @media (prefers-reduced-motion: reduce) {
-    .how-it-works-scroll {
-      min-height: auto;
-    }
-    .how-it-works-sticky {
-      position: relative;
-      min-height: auto;
-    }
     .how-cards {
       flex-wrap: wrap;
     }
@@ -440,6 +380,13 @@ const steps = [
       flex: 1 1 260px;
       opacity: 1 !important;
       transform: none !important;
+    }
+    .how-card,
+    .how-card-ico,
+    .how-card-step,
+    .how-card-title,
+    .how-card-details {
+      transition: none !important;
     }
     .how-card-details {
       opacity: 1 !important;
