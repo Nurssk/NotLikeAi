@@ -32,26 +32,6 @@
   --radius-control: 999px;
 }
 
-/* ── Dark theme (toggle) ─────────────────────────────────────────────── */
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #050607;
-  --surface: #0B0F10;
-  --soft-bg: #0B0F10;
-  --surface-2: #111719;
-  --text: #F4F7F7;
-  --muted: #A3ADAD;
-  --muted-2: #6F7A7A;
-  --faint: #6F7A7A;
-  --border: rgba(255, 255, 255, 0.10);
-  --border-strong: rgba(255, 255, 255, 0.18);
-  --accent-soft: rgba(0, 245, 212, 0.13);
-  --card: #0E1416;
-  --card-hover: #131B1E;
-  --success: #00F5D4;
-  --danger: #FF6B6B;
-  --shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
-}
 
 * {
   box-sizing: border-box;
@@ -2260,17 +2240,12 @@ h1 {
   left: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  /* Light theme (default): the crowd art is dark ink on a light background, so
-     no filter. Dark theme inverts it to light below. */
+  /* The crowd art is dark ink on a light background — no filter needed. */
   filter: none;
 }
 
-:root[data-theme="dark"] .hero-bg canvas {
-  filter: invert(1) brightness(1.6);
-}
-
 /* ── Readability gradient: protects the top where the H1 + buttons sit,
-   fading to transparent so the crowd stays visible. Light by default. ───── */
+   fading to transparent so the crowd stays visible. ─────────────────────── */
 .hero-overlay {
   position: absolute;
   inset: 0;
@@ -2281,15 +2256,6 @@ h1 {
     rgba(255, 255, 255, 0.82) 0%,
     rgba(255, 255, 255, 0.40) 28%,
     rgba(255, 255, 255, 0) 56%
-  );
-}
-
-:root[data-theme="dark"] .hero-overlay {
-  background: linear-gradient(
-    180deg,
-    rgba(5, 6, 7, 0.88) 0%,
-    rgba(5, 6, 7, 0.45) 30%,
-    rgba(5, 6, 7, 0) 58%
   );
 }
 

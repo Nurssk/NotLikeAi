@@ -7,8 +7,6 @@ import WaitlistSection from "../components/sections/WaitlistSection.astro";
 import QASection from "../components/sections/QASection.astro";
 import Footer from "../components/Footer.astro";
 import GlobalClickSpark from "../components/GlobalClickSpark";
-import SmoothScroll from "../components/SmoothScroll.astro";
-import ThemeToggle from "../components/ThemeToggle";
 ---
 
 <html lang="en">
@@ -20,16 +18,6 @@ import ThemeToggle from "../components/ThemeToggle";
       content="Design Humanizer is a Chrome extension that helps developers turn generic AI-generated UI into deliberate, structured, and usable layouts."
     />
     <title>Design Humanizer</title>
-    <script is:inline>
-      (function () {
-        try {
-          var t = localStorage.getItem("theme");
-          document.documentElement.dataset.theme = t === "dark" ? "dark" : "light";
-        } catch (e) {
-          document.documentElement.dataset.theme = "light";
-        }
-      })();
-    </script>
     <link rel="icon" type="image/svg+xml" href="/logo/icon-d.svg" />
     <link rel="apple-touch-icon" href="/logo/app-icon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,8 +25,6 @@ import ThemeToggle from "../components/ThemeToggle";
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <SmoothScroll />
-    <ThemeToggle client:load />
     <main>
       <Hero />
       <HowItWorks />
