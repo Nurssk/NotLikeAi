@@ -1,22 +1,27 @@
 :root {
-  color-scheme: light;
-  --bg: #FFFFFF;
-  --surface: #FFFFFF;
-  --soft-bg: #F8FAFA;
-  --text: #101112;
-  --muted: #5F666A;
-  --faint: #9AA3A6;
-  --border: #E6ECEC;
-  --border-strong: #101112;
+  /* ── Dark theme (default) ──────────────────────────────────────────── */
+  color-scheme: dark;
+  --bg: #050607;
+  --surface: #0B0F10;
+  --soft-bg: #0B0F10;
+  --surface-2: #111719;
+  --text: #F4F7F7;
+  --muted: #A3ADAD;
+  --muted-2: #6F7A7A;
+  --faint: #6F7A7A;
+  --border: rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.18);
   --accent: #00F5D4;
   --accent-strong: #00DDC0;
   --accent-hover: #00DDC0;
-  --accent-soft: rgba(0, 245, 212, 0.14);
+  --accent-soft: rgba(0, 245, 212, 0.13);
   --accent-border: rgba(0, 245, 212, 0.42);
-  --card: #FFFFFF;
-  --success: #101112;
-  --danger: #c0392b;
-  --shadow: 0 18px 45px rgba(16, 17, 18, 0.08);
+  --on-accent: #05100E; /* readable dark text on the turquoise accent */
+  --card: #0E1416;
+  --card-hover: #131B1E;
+  --success: #00F5D4;
+  --danger: #FF6B6B;
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
   --accent-shadow: 0 18px 45px rgba(0, 245, 212, 0.18);
   --container: 1200px;
   --font-display: "Montserrat", system-ui, sans-serif;
@@ -25,6 +30,27 @@
   --space-section: 108px;
   --radius-card: 28px;
   --radius-control: 999px;
+}
+
+/* ── Light theme (toggle) ────────────────────────────────────────────── */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --soft-bg: #F8FAFA;
+  --surface-2: #F8FAFA;
+  --text: #101112;
+  --muted: #5F666A;
+  --muted-2: #9AA3A6;
+  --faint: #9AA3A6;
+  --border: #E6ECEC;
+  --border-strong: #101112;
+  --accent-soft: rgba(0, 245, 212, 0.14);
+  --card: #FFFFFF;
+  --card-hover: #F8FAFA;
+  --success: #101112;
+  --danger: #c0392b;
+  --shadow: 0 18px 45px rgba(16, 17, 18, 0.08);
 }
 
 * {
@@ -53,6 +79,11 @@ a {
 button,
 input {
   font: inherit;
+}
+
+input::placeholder {
+  color: var(--muted-2);
+  opacity: 1;
 }
 
 svg {
@@ -174,34 +205,34 @@ svg {
 
 .btn-primary {
   background: var(--accent);
-  color: var(--text);
-  border-color: rgba(16, 17, 18, 0.12);
-  box-shadow: 0 4px 14px rgba(0, 245, 212, 0.35);
+  color: var(--on-accent, #05100E);
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(0, 245, 212, 0.28);
 }
 
 .btn-primary:hover {
   background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(0, 245, 212, 0.45);
+  box-shadow: 0 6px 20px rgba(0, 245, 212, 0.4);
 }
 
 .hero-actions .btn-primary {
-  box-shadow: 0 4px 14px rgba(0, 245, 212, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 245, 212, 0.28);
 }
 
 .btn-secondary {
-  background: #FFFFFF;
+  background: var(--card-hover);
   color: var(--text);
-  border-color: #DDE5E5;
+  border-color: var(--border);
 }
 
 .btn-secondary:hover {
-  background: var(--soft-bg);
-  border-color: var(--faint);
+  background: var(--surface-2);
+  border-color: var(--border-strong);
 }
 
 .btn-inverted {
   background: var(--accent);
-  color: var(--text);
+  color: var(--on-accent, #05100E);
   border-color: transparent;
   box-shadow: 0 4px 14px rgba(0, 245, 212, 0.35);
   font-weight: 700;
@@ -2229,15 +2260,31 @@ h1 {
   left: 0 !important;
   width: 100% !important;
   height: 100% !important;
+  /* Dark theme: the crowd art is dark ink — invert it to light so it reads
+     on the dark background. Light theme restores it below. */
+  filter: invert(1) brightness(1.6);
 }
 
-/* ── Light readability gradient: only protects the top where the H1 + buttons
-   sit; fades to fully transparent so the crowd stays clearly visible. ────── */
+:root[data-theme="light"] .hero-bg canvas {
+  filter: none;
+}
+
+/* ── Readability gradient: protects the top where the H1 + buttons sit,
+   fading to transparent so the crowd stays visible. Dark by default. ────── */
 .hero-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(5, 6, 7, 0.88) 0%,
+    rgba(5, 6, 7, 0.45) 30%,
+    rgba(5, 6, 7, 0) 58%
+  );
+}
+
+:root[data-theme="light"] .hero-overlay {
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.82) 0%,
@@ -2769,9 +2816,9 @@ h1 {
   margin-bottom: 18px;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(0, 245, 212, 0.22);
-  border: 1px solid var(--border);
-  color: #0A6B5D;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -2928,11 +2975,11 @@ h1 {
 }
 
 .faq-item {
-  border: 1px solid #DDE8E8;
+  border: 1px solid var(--border);
   border-radius: 16px;
   background: var(--card);
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(16, 17, 18, 0.04);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
   transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
@@ -2986,7 +3033,7 @@ h1 {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid #D7E3E3;
+  border: 1px solid var(--border);
   background: var(--soft-bg);
   justify-self: end;
   transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
@@ -3088,7 +3135,7 @@ h1 {
   align-items: center;
   justify-content: center;
   padding: 0 16px;
-  border: 1px solid #DDE8E8;
+  border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--card);
   color: var(--text);
@@ -3126,7 +3173,7 @@ h1 {
 }
 
 .faq-nav-action:hover {
-  color: #0A6B5D;
+  color: var(--accent);
 }
 
 .faq-list-column {
@@ -3198,11 +3245,12 @@ h1 {
   font-size: 13px;
 }
 
-/* Footer */
+/* Footer — kept consistently dark in both themes (text + logo are light) */
 .site-footer {
-  background: var(--text);
+  background: #0B0F10;
   color: #EEF3F3;
   padding: 72px 0 40px;
+  border-top: 1px solid var(--border);
 }
 .site-footer-inner {
   width: min(100% - 48px, 1200px);
@@ -3221,10 +3269,10 @@ h1 {
   font-weight: 800;
 }
 .site-footer .footer-brand-mark {
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  background: var(--accent);
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  display: block;
 }
 .site-footer .footer-tagline {
   margin: 16px 0 0;

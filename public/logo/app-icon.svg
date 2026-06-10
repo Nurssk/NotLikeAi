@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none" role="img" aria-label="Humanize UI app icon">
+  <!-- White rounded tile (clean on any backdrop) -->
+  <rect width="512" height="512" rx="115" fill="#FFFFFF"/>
+  <rect x="0.5" y="0.5" width="511" height="511" rx="114.5" stroke="#E6ECEC"/>
+  <!-- Icon D centered (48x48 grid scaled to ~318px, offset to center) -->
+  <g transform="translate(97 97) scale(6.625)">
+    <rect x="8" y="6" width="9.5" height="36" rx="3" fill="#101112"/>
+    <rect x="30.5" y="6" width="9.5" height="36" rx="3" fill="#101112"/>
+    <rect x="8" y="20.5" width="32" height="7" rx="2.5" fill="#00F5D4"/>
+  </g>
+</svg>

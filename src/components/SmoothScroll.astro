@@ -1,0 +1,101 @@
+---
+/**
+ * SmoothScroll.astro
+ *
+ * Site-wide smooth (inertial) scrolling via Lenis. Lenis animates the real
+ * document scroll position, so `position: sticky` and scroll-progress math
+ * (hero MVP zoom, How-it-works cards) keep working — they just feel smoother.
+ *
+ * - Respects prefers-reduced-motion (Lenis is not started).
+ * - In-page anchor links scroll smoothly via lenis.scrollTo.
+ * - No wheel hijacking beyond Lenis' own easing; native touch scroll preserved.
+ */
+---
+
+<script>
+  import Lenis from "lenis";
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  if (!reduceMotion.matches) {
+    const lenis = new Lenis({
+      // Soft, cinematic easing (expoOut) — augen.pro-like inertia.
+      duration: 1.15,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 0.9,
+      touchMultiplier: 1.1,
+    });
+
+    // Expose for other scripts if ever needed (debug / programmatic scroll).
+    (window as unknown as { lenis?: unknown }).lenis = lenis;
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Smoothly scroll in-page anchor links that target an element on this page.
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement | null;
+      const link = target?.closest<HTMLAnchorElement>('a[href*="#"]');
+      if (!link) return;
+
+      const url = link.getAttribute("href") || "";
+      const hashIndex = url.indexOf("#");
+      if (hashIndex === -1) return;
+
+      const path = url.slice(0, hashIndex);
+      // Only handle links pointing at the current page (e.g. "#how" or "/#how").
+      const samePage = path === "" || path === "/" || path === window.location.pathname;
+      if (!samePage) return;
+
+      const id = url.slice(hashIndex + 1);
+      if (!id) return;
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      e.preventDefault();
+      lenis.scrollTo(el, { offset: 0 });
+      history.pushState(null, "", `#${id}`);
+    });
+
+    // Stop smoothing if the user switches to reduced motion mid-session.
+    reduceMotion.addEventListener("change", (ev) => {
+      if (ev.matches) lenis.destroy();
+    });
+  }
+</script>
+
+<style is:global>
+  /* Lenis recommended base styles (inlined to avoid extra import paths). */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  /* While Lenis is active, native smooth-behavior must be off so it doesn't
+     re-smooth Lenis' per-frame scroll updates. (When Lenis is disabled —
+     reduced motion — the `lenis` class is absent and native `scroll-behavior:
+     smooth` from global.css still handles anchor jumps.) */
+  html.lenis {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
+  }
+</style>

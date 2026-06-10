@@ -40,15 +40,17 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const spring = { type: "spring", stiffness: 260, damping: 22, mass: 1 } as const;
 
+/* Theme-aware: reference CSS variables so the button follows dark/light. */
 const COLORS = {
-  accent: "#00F5D4",
-  accentStrong: "#00DDC0",
-  text: "#101112",
-  surface: "#FFFFFF",
-  border: "#E6ECEC",
-  muted: "#5F666A",
-  danger: "#C0392B",
-  success: "#101112",
+  accent: "var(--accent)",
+  accentStrong: "var(--accent-hover)",
+  text: "var(--text)",
+  onAccent: "var(--on-accent, #05100E)",
+  surface: "var(--card)",
+  border: "var(--border)",
+  muted: "var(--muted)",
+  danger: "var(--danger, #FF6B6B)",
+  success: "var(--text)",
 };
 
 export default function WaitlistMorphButton({
@@ -360,10 +362,10 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    border: "1px solid rgba(16, 17, 18, 0.12)",
+    border: "1px solid rgba(0, 245, 212, 0.5)",
     borderRadius: 999,
     background: COLORS.accent,
-    color: COLORS.text,
+    color: COLORS.onAccent,
     fontWeight: 700,
     fontSize: 15,
     fontFamily: "inherit",

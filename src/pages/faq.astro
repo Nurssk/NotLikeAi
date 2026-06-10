@@ -3,6 +3,8 @@ import "../styles/global.css";
 import FAQAccordion from "../components/FAQAccordion.astro";
 import Footer from "../components/Footer.astro";
 import GlobalClickSpark from "../components/GlobalClickSpark";
+import SmoothScroll from "../components/SmoothScroll.astro";
+import ThemeToggle from "../components/ThemeToggle";
 
 const faqItems = [
   {
@@ -103,11 +105,25 @@ const categories = ["All", "Product", "Workflow", "Chrome Extension", "Privacy",
       content="FAQ about Design Humanizer, the Chrome extension for improving AI-made UI."
     />
     <title>FAQ | Design Humanizer</title>
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem("theme");
+          document.documentElement.dataset.theme = t === "light" ? "light" : "dark";
+        } catch (e) {
+          document.documentElement.dataset.theme = "dark";
+        }
+      })();
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/logo/icon-d.svg" />
+    <link rel="apple-touch-icon" href="/logo/app-icon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <SmoothScroll />
+    <ThemeToggle client:load />
     <main class="faq-page">
       <section class="faq-body-section" aria-labelledby="faq-list-heading" data-faq-filter-root>
         <div class="lp-container faq-body-grid">
