@@ -9,16 +9,17 @@ import WaitlistMorphButton from "./WaitlistMorphButton";
       <CrowdCanvasWrapper client:only="react" rows={15} cols={7} />
     </div>
 
-    <div class="hero-scroll-stage">
-      <div class="hero-left">
-        <h1 class="hero-catch">Be unique. Don’t look AI-made.</h1>
-        <p class="hero-sub">
-          Design Humanizer helps turn generic AI-generated interfaces into cleaner, more intentional product screens.
-        </p>
+    <div class="hero-content">
+      <h1 class="hero-title">
+        <span class="hero-title-word">Be</span>
+        <span class="hero-title-word">Unique</span>
+      </h1>
+      <p class="hero-subtitle">
+        Design Humanizer helps turn generic AI-generated interfaces into cleaner, more intentional product screens.
+      </p>
 
-        <div class="hero-actions">
-          <WaitlistMorphButton client:visible size="lg" />
-        </div>
+      <div class="hero-actions">
+        <WaitlistMorphButton client:load size="lg" />
       </div>
     </div>
   </div>
