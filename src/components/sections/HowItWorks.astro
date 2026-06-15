@@ -31,7 +31,6 @@ const steps = [
   <div class="how-it-works-sticky">
     <div class="how-inner">
       <div class="how-head">
-        <span class="lp-label">Process</span>
         <h2 class="how-title">How it works</h2>
         <p class="how-sub">
           Design Humanizer reads your AI-generated page, finds what feels generic, and shows how to make it feel designed.
@@ -40,7 +39,7 @@ const steps = [
 
       <div class="how-cards" data-how-cards>
         {steps.map((step, i) => (
-          <article class:list={["how-card", { "is-active": i === 0 }]} data-how-card tabindex="0" aria-expanded={i === 0 ? "true" : "false"}>
+          <article class="how-card" data-how-card tabindex="0" aria-expanded="false">
             <div class="how-card-top">
               <span class="how-card-ico" aria-hidden="true">
                 {step.icon === "scan" && (
@@ -87,7 +86,7 @@ const steps = [
 
       <div class="how-progress" aria-hidden="true">
         {steps.map((_, i) => (
-          <span class:list={["how-dot", { "is-active": i === 0 }]} data-how-dot></span>
+          <span class="how-dot" data-how-dot></span>
         ))}
       </div>
     </div>
@@ -95,55 +94,123 @@ const steps = [
 </section>
 
 <script>
+  const section = document.querySelector<HTMLElement>(".how-it-works-scroll");
   const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-how-card]"));
   const dots = Array.from(document.querySelectorAll<HTMLElement>("[data-how-dot]"));
   const mobile = window.matchMedia("(max-width: 768px)");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let targetProgress = 0;
+  let currentProgress = 0;
+  let rafId: number | null = null;
+  let hasSynced = false;
+  const ease = 0.055;
 
-  function setActiveCard(activeIndex: number) {
-    cards.forEach((card, index) => {
-      const isActive = index === activeIndex;
-      card.classList.toggle("is-active", isActive);
-      card.setAttribute("aria-expanded", isActive ? "true" : "false");
+  const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+  const smoothstep = (t: number) => t * t * (3 - 2 * t);
+
+  function setStaticExpanded() {
+    cards.forEach((card) => {
+      card.style.setProperty("--expand", "1");
+      card.style.setProperty("--detail", "1");
+      card.setAttribute("aria-expanded", "true");
     });
-    dots.forEach((dot, i) => dot.classList.toggle("is-active", i === activeIndex));
+    dots.forEach((dot, index) => dot.classList.toggle("is-active", index === 0));
+  }
+
+  function updateCards(progress: number) {
+    const total = cards.length;
+    let activeIndex = 0;
+    let activeExpand = -1;
+
+    cards.forEach((card, index) => {
+      const center = (index + 0.5) / total;
+      const distance = Math.abs(progress - center);
+      let expand = clamp(1 - distance * total * 1.08, 0, 1);
+      expand = smoothstep(expand);
+      const detail = clamp((expand - 0.18) / 0.82, 0, 1);
+
+      if (expand > activeExpand) {
+        activeExpand = expand;
+        activeIndex = index;
+      }
+
+      card.style.setProperty("--expand", expand.toFixed(4));
+      card.style.setProperty("--detail", detail.toFixed(4));
+      card.setAttribute("aria-expanded", expand > 0.55 ? "true" : "false");
+    });
+
+    dots.forEach((dot, index) => dot.classList.toggle("is-active", index === activeIndex));
+  }
+
+  function readTargetProgress() {
+    if (!section) return 0;
+    const rect = section.getBoundingClientRect();
+    const max = section.offsetHeight - window.innerHeight;
+    return max <= 0 ? 0 : clamp(-rect.top / max);
+  }
+
+  function animate() {
+    rafId = null;
+
+    if (mobile.matches || reduceMotion.matches) {
+      setStaticExpanded();
+      return;
+    }
+
+    currentProgress += (targetProgress - currentProgress) * ease;
+    if (Math.abs(targetProgress - currentProgress) < 0.0008) currentProgress = targetProgress;
+    updateCards(currentProgress);
+
+    if (currentProgress !== targetProgress) {
+      rafId = window.requestAnimationFrame(animate);
+    }
+  }
+
+  function requestUpdate() {
+    targetProgress = readTargetProgress();
+    if (!hasSynced) {
+      currentProgress = targetProgress;
+      hasSynced = true;
+      updateCards(currentProgress);
+    }
+    if (rafId === null) rafId = window.requestAnimationFrame(animate);
   }
 
   cards.forEach((card, index) => {
-    // Hover (mouse / pen) expands the card and collapses the others.
-    // Touch is ignored — on mobile every card is expanded via CSS, so there
-    // is no hover dependency there.
-    card.addEventListener("pointerenter", (event) => {
-      if (event.pointerType === "touch" || mobile.matches) return;
-      setActiveCard(index);
-    });
-    // Keyboard focus mirrors hover so the section works without a mouse.
     card.addEventListener("focusin", () => {
-      if (mobile.matches) return;
-      setActiveCard(index);
+      if (mobile.matches || reduceMotion.matches) return;
+      targetProgress = clamp((index + 0.5) / cards.length);
+      if (rafId === null) rafId = window.requestAnimationFrame(animate);
     });
   });
 
-  // First card open by default.
-  setActiveCard(0);
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate);
+  mobile.addEventListener("change", requestUpdate);
+  reduceMotion.addEventListener("change", requestUpdate);
+  requestUpdate();
 </script>
 
 <style>
-  /* Normal page content — no scroll-controlled height, no sticky pinning. */
   .how-it-works-scroll {
     position: relative;
-    min-height: auto;
+    min-height: 380vh;
     background: var(--bg, #ffffff);
   }
 
   .how-it-works-sticky {
-    position: relative;
-    min-height: auto;
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
   }
 
   .how-inner {
     width: min(100% - 48px, 1200px);
     margin: 0 auto;
-    padding: clamp(64px, 9vh, 120px) 0;
+    padding: clamp(64px, 8vh, 96px) 0;
   }
 
   .how-head {
@@ -153,7 +220,7 @@ const steps = [
   }
 
   .how-title {
-    margin: 16px 0 0;
+    margin: 0;
     color: var(--text, #101112);
     font-family: var(--font-display, "Montserrat", system-ui, sans-serif);
     font-size: clamp(34px, 5vw, 60px);
@@ -173,16 +240,13 @@ const steps = [
   /* ── Cards row: each card driven by its own --expand (0..1) ───────────── */
   .how-cards {
     display: flex;
-    gap: 18px;
+    gap: 20px;
     align-items: stretch;
   }
 
   .how-card {
     --expand: 0;
     --detail: 0;
-    /* Compact by default; --expand/--detail are flipped to 1 by the
-       .is-active class (set on hover / focus), and CSS transitions animate
-       the resolved size, opacity, transform, color and shadow. */
     flex: calc(0.9 + var(--expand) * 1.35);
     opacity: calc(0.76 + var(--expand) * 0.24);
     transform: scale(calc(0.975 + var(--expand) * 0.035));
@@ -215,12 +279,6 @@ const steps = [
   .how-card:focus-visible {
     outline: 2px solid var(--accent, #00f5d4);
     outline-offset: 3px;
-  }
-
-  /* Active = hovered / focused card. */
-  .how-card.is-active {
-    --expand: 1;
-    --detail: 1;
   }
 
   .how-card-top {

@@ -9,18 +9,20 @@ type FAQItem = {
   answer?: string;
 };
 
-const { items, className = "", startOpenIndex = 0 } = Astro.props as {
+const { items, className = "", startOpenIndex = 0, featuredIndex } = Astro.props as {
   items: FAQItem[];
   className?: string;
   startOpenIndex?: number;
+  featuredIndex?: number;
 };
 ---
 
 <div class={`faq-accordion ${className}`} data-faq-accordion>
   {items.map((item, i) => (
     <details
-      class="faq-item"
+      class:list={["faq-item", { "is-featured": featuredIndex === i }]}
       data-faq-item
+      data-featured={featuredIndex === i ? "true" : undefined}
       data-category={item.category}
       data-id={item.id}
       open={i === startOpenIndex}

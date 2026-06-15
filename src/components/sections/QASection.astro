@@ -20,12 +20,10 @@ const qa = [
 <section id="qa" class="lp-section qa-preview-section">
   <div class="lp-container qa-preview-shell">
     <div class="qa-preview-copy">
-      <span class="lp-label">QUESTIONS</span>
-      <h2 class="qa-preview-title">Answers before you join</h2>
-      <p class="qa-preview-text">
-        Three quick answers before you try Design Humanizer. The full FAQ is available on a separate section so this
-        page stays focused.
-      </p>
+      <h2 class="qa-preview-title">
+        <span>Answers before</span>
+        <span>you join</span>
+      </h2>
 
       <div class="qa-preview-actions">
         <a class="btn btn-primary" href="/faq">Open full FAQ</a>
@@ -34,7 +32,7 @@ const qa = [
     </div>
 
     <div class="qa-preview-list">
-      <FAQAccordion items={qa} className="faq-accordion--preview" />
+      <FAQAccordion items={qa} className="faq-accordion--preview" startOpenIndex={1} featuredIndex={1} />
     </div>
   </div>
 </section>

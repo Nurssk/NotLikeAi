@@ -187,16 +187,16 @@ svg {
   background: var(--accent);
   color: var(--on-accent, #05100E);
   border-color: transparent;
-  box-shadow: 0 4px 14px rgba(0, 245, 212, 0.28);
+  box-shadow: 0 2px 8px rgba(16, 17, 18, 0.08);
 }
 
 .btn-primary:hover {
   background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(0, 245, 212, 0.4);
+  box-shadow: 0 2px 8px rgba(16, 17, 18, 0.1);
 }
 
 .hero-actions .btn-primary {
-  box-shadow: 0 4px 14px rgba(0, 245, 212, 0.28);
+  box-shadow: 0 2px 8px rgba(16, 17, 18, 0.08);
 }
 
 .btn-secondary {
@@ -214,13 +214,13 @@ svg {
   background: var(--accent);
   color: var(--on-accent, #05100E);
   border-color: transparent;
-  box-shadow: 0 4px 14px rgba(0, 245, 212, 0.35);
+  box-shadow: 0 2px 8px rgba(16, 17, 18, 0.08);
   font-weight: 700;
 }
 
 .btn-inverted:hover {
   background: var(--accent-strong);
-  box-shadow: 0 6px 20px rgba(0, 245, 212, 0.45);
+  box-shadow: 0 2px 8px rgba(16, 17, 18, 0.1);
 }
 
 .hero-section {
@@ -2191,7 +2191,7 @@ h1 {
   /*
    * Crowd canvas is hidden via `.hero-bg canvas { display: none }` below.
    * The hero keeps its fullscreen frame but with no motion; overlay + white
-   * background remain so the placeholder sits on a calm canvas.
+   * background remain so the headline and CTA sit on a calm canvas.
    */
   .hero-scroll-fade {
     display: none;
@@ -2209,11 +2209,12 @@ h1 {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   Skiper39 fullscreen hero background + empty MVP placeholder
+   Skiper39 fullscreen hero background
    ════════════════════════════════════════════════════════════════════════ */
 
-/* ── Background layer: the crowd animation fills the whole hero ──────────── */
-.hero-bg {
+/* ── Background layer: Skiper crowd animation fills the hero ─────────────── */
+.hero-bg,
+.hero-skiper-bg {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -2234,86 +2235,16 @@ h1 {
  * The canvas resize() reads clientWidth/clientHeight, so explicit sizing is
  * required for it to fill the background and anchor the crowd to the bottom.
  */
-.hero-bg canvas {
+.hero-bg canvas,
+.hero-skiper-bg canvas {
   position: absolute !important;
   bottom: 0 !important;
   left: 0 !important;
   width: 100% !important;
   height: 100% !important;
+  display: block;
   /* The crowd art is dark ink on a light background — no filter needed. */
   filter: none;
-}
-
-/* ── Readability gradient: protects the top where the H1 + buttons sit,
-   fading to transparent so the crowd stays visible. ─────────────────────── */
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.82) 0%,
-    rgba(255, 255, 255, 0.40) 28%,
-    rgba(255, 255, 255, 0) 56%
-  );
-}
-
-/* ── Foreground: Split Hero — copy (left, top-aligned) + MVP showcase (right) */
-.hero-foreground {
-  position: relative;
-  z-index: 2;
-  min-height: 100vh;
-  display: flex;
-  /* Top-align so the copy sits high, away from the lowered crowd */
-  align-items: flex-start;
-  padding: clamp(96px, 12vh, 140px) 0 72px;
-}
-
-/* Hero uses a wider container than the rest of the site so the layout feels
-   full-width. min(100% - 48px, …) keeps 24px gutters → no horizontal scroll. */
-.hero-foreground .container {
-  width: min(100% - 48px, 1520px);
-}
-
-/* Right-dominant split: text far left, MVP far right.
-   minmax(0, …) keeps both columns shrinkable so there is never overflow. */
-.hero-foreground .hero-split {
-  display: grid;
-  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
-  gap: clamp(56px, 7vw, 120px);
-  align-items: start;
-  width: 100%;
-}
-
-.hero-foreground .hero-content {
-  max-width: 480px;
-  /* Center the copy within the open left area (between the page edge and the
-     MVP card) horizontally, and against the tall MVP card vertically. */
-  justify-self: center;
-  align-self: center;
-  text-align: left;
-}
-
-.hero-foreground h1 {
-  max-width: 100%;
-  margin: 0 0 36px;
-  text-align: left;
-  font-size: clamp(44px, 5vw, 76px);
-  font-weight: 800;
-  line-height: 1.05;
-}
-
-.hero-foreground .hero-copy {
-  max-width: 540px;
-  margin: 0;
-  text-align: left;
-  font-size: 17px;
-}
-
-.hero-foreground .hero-actions {
-  justify-content: flex-start;
-  margin-top: 32px;
 }
 
 /* Visible, accessible keyboard focus on the hero CTAs */
@@ -2322,192 +2253,84 @@ h1 {
   outline-offset: 3px;
 }
 
-/* ── Product showcase column: fills the right side fully ─────────────────── */
-.hero-showcase {
-  display: flex;
-  align-self: stretch;
-  width: 100%;
+.hero-actions .btn-primary {
+  box-shadow: 0 2px 8px rgba(16, 17, 18, 0.08);
 }
 
-/* ── MVP placeholder: holds the embedded MVP preview (extension panel) ───── */
-.mvp-placeholder {
-  position: relative;
-  width: 100%;
-  /* Large, dominant card that occupies the right column */
-  height: clamp(560px, 68vh, 760px);
-  margin: 0;
-  border-radius: 40px;
-  /* Warm fill shows behind the embedded preview / on any uncovered edge */
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(230, 236, 236, 0.95);
-  box-shadow: 0 34px 90px rgba(16, 17, 18, 0.14);
-  /* Clip the embedded product UI to the rounded card */
-  overflow: hidden;
-  transition: transform 220ms ease, box-shadow 220ms ease;
-}
-
-/* Subtle hover lift — respects reduced-motion via the block below */
-.mvp-placeholder:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 42px 100px rgba(16, 17, 18, 0.18);
-}
-
-/* ── Responsive ─────────────────────────────────────────────────────────── */
-@media (max-width: 980px) {
-  /* Collapse to a clean, centered single column: text first, card below */
-  .hero-foreground {
-    align-items: stretch;
-    padding: clamp(88px, 12vh, 120px) 0 56px;
-  }
-
-  .hero-foreground .hero-split {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-
-  .hero-foreground .hero-content {
-    max-width: 680px;
-    margin: 0 auto;
-    text-align: center;
-  }
-
-  .hero-foreground h1,
-  .hero-foreground .hero-copy {
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .hero-foreground .hero-actions {
-    justify-content: center;
-  }
-
-  .mvp-placeholder {
-    height: clamp(400px, 52vh, 480px);
-    border-radius: 30px;
-  }
-
-  /* Keep the crowd clearly visible on small screens too (just slightly
-     softened so the stacked H1 + buttons stay readable) */
-  .hero-bg {
-    opacity: 0.8;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero-foreground {
-    padding: 96px 0 48px;
-  }
-
-  .mvp-placeholder {
-    height: 420px;
-    border-radius: 28px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-bg canvas {
-    display: none;
-  }
-
-  /* No motion on the showcase card when reduced motion is requested */
-  .mvp-placeholder {
-    transition: none;
-  }
-
-  .mvp-placeholder:hover {
-    transform: none;
-  }
+.hero-actions .btn-primary:hover {
+  box-shadow: 0 2px 8px rgba(16, 17, 18, 0.1);
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   MVP scroll transition
+   Centered hero with fullscreen Skiper background
    ════════════════════════════════════════════════════════════════════════ */
 
 .hero-mvp-scroll {
-  --progress: 0;
   position: relative;
-  min-height: 220vh;
+  min-height: 100vh;
+  min-height: 100svh;
   background: var(--bg);
+  overflow: hidden;
 }
 
 .hero-mvp-scroll .hero-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  position: relative;
   min-height: 100svh;
   padding: 0;
-  display: block;
+  display: flex;
+  align-items: center;
   overflow: hidden;
   background: var(--bg);
 }
 
 .hero-scroll-stage {
   position: relative;
-  z-index: 2;
-  width: min(100% - 48px, 1520px);
-  height: 100%;
+  z-index: 5;
+  width: min(100% - 48px, 1180px);
+  min-height: 100svh;
   margin: 0 auto;
+  padding: clamp(72px, 10vh, 104px) 0 clamp(36px, 6vh, 64px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .hero-left {
-  position: absolute;
-  /* Vertically centered so the heading reads as balanced/centered */
-  top: 50%;
-  left: clamp(0px, 2vw, 32px);
-  z-index: 3;
-  width: min(540px, 42vw);
-  transform: translate3d(calc(var(--progress) * -38px), calc(-50% - (var(--progress) * 48px)), 0);
-  opacity: clamp(0, calc(1 - (var(--progress) * 1.35)), 1);
-  transition: opacity 120ms linear;
-  will-change: opacity, transform;
+  position: relative;
+  z-index: 5;
+  width: min(100%, 820px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 /* Catchphrase (replaces the old large hero heading) — large, wraps within column */
 .hero-left .hero-catch {
-  max-width: 100%;
-  margin: 0 0 20px;
-  text-align: left;
-  font-size: clamp(38px, 4vw, 60px);
+  max-width: 820px;
+  margin: 0 0 16px;
+  text-align: center;
+  font-size: clamp(40px, 6.6vw, 82px);
   font-weight: 800;
-  line-height: 1.04;
-  letter-spacing: -0.015em;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 .hero-left .hero-sub {
-  max-width: 500px;
-  margin: 0 0 34px;
+  max-width: 660px;
+  margin: 0 0 28px;
   color: var(--muted);
-  font-size: 19px;
-  line-height: 1.6;
+  text-align: center;
+  font-size: clamp(16px, 1.8vw, 19px);
+  line-height: 1.65;
 }
 
 .hero-left .hero-actions {
-  justify-content: flex-start;
+  justify-content: center;
   margin: 0;
-}
-
-.mvp-transition-shell {
-  position: absolute;
-  /* Collapsed: sits lower (just below center); expands back to centered (50%) */
-  top: calc(48% + (var(--progress) * 2%));
-  /* Collapsed: tucked to the right edge (top-right); expands to full edge (24px) */
-  right: calc(clamp(20px, 4vw, 72px) - (var(--progress) * (clamp(20px, 4vw, 72px) - 24px)));
-  z-index: 4;
-  width: calc(clamp(620px, 49vw, 840px) + (var(--progress) * (min(1440px, calc(100vw - 96px)) - clamp(620px, 49vw, 840px))));
-  height: calc(clamp(600px, 74vh, 820px) + (var(--progress) * (min(820px, calc(100vh - 112px)) - clamp(600px, 74vh, 820px))));
-  border-radius: calc(40px - (var(--progress) * 8px));
-  border: 1px solid rgba(230, 236, 236, 0.95);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 34px 90px rgba(16, 17, 18, calc(0.14 + (var(--progress) * 0.06)));
-  overflow: hidden;
-  transform: translate3d(0, -50%, 0);
-  transform-origin: center center;
-  will-change: width, height, border-radius;
-}
-
-.mvp-transition-shell.is-expanded {
-  border-radius: 32px;
 }
 
 .product-explanation {
@@ -2599,71 +2422,19 @@ h1 {
 }
 
 @media (max-width: 1180px) {
-  .hero-left {
-    width: min(420px, 35vw);
-  }
-
-  .mvp-transition-shell {
-    width: calc(clamp(580px, 56vw, 800px) + (var(--progress) * (calc(100vw - 80px) - clamp(580px, 56vw, 800px))));
-    height: calc(clamp(540px, 70vh, 740px) + (var(--progress) * (calc(100vh - 112px) - clamp(540px, 70vh, 740px))));
-  }
-
   .product-card-grid-five {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 980px) {
-  .hero-mvp-scroll {
-    min-height: 200vh;
-  }
-
   .hero-scroll-stage {
     width: min(100% - 40px, 900px);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 38px;
-    padding: 44px 0 42px;
-  }
-
-  .hero-left {
-    position: relative;
-    top: auto;
-    left: auto;
-    width: min(100%, 720px);
-    margin: 0 auto;
-    text-align: center;
-    transform: translate3d(0, calc(var(--progress) * -32px), 0);
+    padding: clamp(76px, 10vh, 96px) 0 48px;
   }
 
   .hero-left h1 {
-    text-align: center;
-    margin-right: auto;
-    margin-left: auto;
     font-size: clamp(32px, 6vw, 48px);
-  }
-
-  .hero-left .hero-sub {
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-  }
-
-  .hero-left .hero-actions {
-    justify-content: center;
-  }
-
-  .mvp-transition-shell {
-    position: relative;
-    top: auto;
-    right: auto;
-    width: min(100%, 760px);
-    height: clamp(420px, 52vh, 560px);
-    margin: 0 auto;
-    transform:
-      translate3d(0, calc(var(--progress) * -4vh), 0)
-      scale(calc(1 + (var(--progress) * 0.22)));
   }
 
   .product-card-grid,
@@ -2673,15 +2444,9 @@ h1 {
 }
 
 @media (max-width: 640px) {
-  .hero-mvp-scroll {
-    min-height: 178vh;
-  }
-
   .hero-scroll-stage {
     width: min(100% - 28px, 520px);
-    justify-content: flex-start;
-    padding: 40px 0 28px;
-    gap: 28px;
+    padding: 74px 0 34px;
   }
 
   .hero-left h1 {
@@ -2692,16 +2457,12 @@ h1 {
   .hero-left .hero-actions {
     align-items: stretch;
     flex-direction: column;
+    width: 100%;
+    max-width: 360px;
   }
 
-  .mvp-transition-shell {
+  .hero-left .hero-actions > * {
     width: 100%;
-    height: min(56vh, 440px);
-    min-height: 370px;
-    border-radius: calc(28px - (var(--progress) * 4px));
-    transform:
-      translate3d(0, calc(var(--progress) * -2vh), 0)
-      scale(calc(1 + (var(--progress) * 0.08)));
   }
 
   .product-explanation {
@@ -2724,25 +2485,9 @@ h1 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-mvp-scroll {
-    min-height: auto;
-  }
-
-  .hero-mvp-scroll .hero-sticky {
-    position: relative;
-    height: auto;
-    min-height: 100svh;
-  }
-
-  .hero-left,
-  .mvp-transition-shell {
-    opacity: 1;
-    transition: none;
-    will-change: auto;
-  }
-
-  .mvp-transition-shell {
-    transform: none;
+  .hero-bg canvas,
+  .hero-skiper-bg canvas {
+    display: none;
   }
 }
 
@@ -2894,45 +2639,48 @@ h1 {
 }
 
 .qa-preview-shell {
+  width: min(100% - 48px, 1120px);
   display: grid;
-  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.35fr);
-  gap: clamp(36px, 6vw, 88px);
-  align-items: center;
-  padding: clamp(42px, 6vw, 72px);
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.2fr);
+  gap: clamp(30px, 4.5vw, 64px);
+  align-items: start;
+  padding: clamp(30px, 4.5vw, 52px);
   border: 1px solid var(--border);
-  border-radius: 32px;
+  border-radius: 24px;
   background: rgba(255, 255, 255, 0.86);
   box-shadow: var(--shadow);
 }
 
 .qa-preview-title {
   margin: 0;
-  max-width: 520px;
+  max-width: 480px;
   color: var(--text);
   font-family: var(--font-display);
-  font-size: clamp(36px, 6vw, 68px);
+  font-size: clamp(30px, 4.6vw, 50px);
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: 0;
 }
 
-.qa-preview-text {
-  margin: 24px 0 0;
-  max-width: 520px;
-  color: var(--muted);
-  font-size: clamp(16px, 1.6vw, 20px);
-  line-height: 1.65;
+.qa-preview-title span {
+  display: block;
 }
 
 .qa-preview-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 12px;
-  margin-top: 34px;
+  margin-top: 26px;
+}
+
+.qa-preview-actions .btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .qa-preview-list {
   min-width: 0;
+  align-self: start;
 }
 
 .faq-accordion {
@@ -2947,6 +2695,17 @@ h1 {
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
   transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+@keyframes faq-panel-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .faq-item[hidden] {
@@ -3036,6 +2795,7 @@ h1 {
   display: grid;
   grid-template-rows: 1fr;
   padding: 0 20px 24px 108px;
+  transform-origin: top;
 }
 
 .faq-item-panel p {
@@ -3046,6 +2806,43 @@ h1 {
   color: var(--muted);
   font-size: 17px;
   line-height: 1.7;
+}
+
+.faq-item[open] .faq-item-panel {
+  animation: faq-panel-reveal 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@supports selector(::details-content) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+
+  .faq-item::details-content {
+    block-size: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      block-size 340ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 220ms ease;
+    transition-behavior: allow-discrete;
+  }
+
+  .faq-item[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-item,
+  .faq-item::details-content,
+  .faq-item-panel,
+  .faq-item-toggle,
+  .faq-item-toggle::before,
+  .faq-item-toggle::after {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
 }
 
 .faq-accordion--preview .faq-item-panel {
@@ -3071,6 +2868,7 @@ h1 {
   position: sticky;
   top: 28px;
   display: grid;
+  align-content: start;
   min-height: 340px;
   padding: 28px;
   border: 1px solid var(--border);
@@ -3144,23 +2942,10 @@ h1 {
 
 .faq-list-column {
   min-width: 0;
-}
-
-.faq-list-label-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 24px;
-  align-items: center;
-  margin-bottom: 22px;
-}
-
-.faq-list-label-row .lp-label {
-  margin-bottom: 0;
-}
-
-.faq-list-label-row span[aria-hidden="true"] {
-  height: 1px;
-  background: var(--border);
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .faq-list-title {
@@ -3193,22 +2978,10 @@ h1 {
   text-align: center;
 }
 .lp-waitlist .lp-title { margin: 0 auto; max-width: 720px; }
-.lp-waitlist-text {
-  margin: 20px auto 0;
-  max-width: 620px;
-  color: var(--muted);
-  font-size: 17px;
-  line-height: 1.7;
-}
 .lp-waitlist-action {
   display: flex;
   justify-content: center;
   margin-top: 34px;
-}
-.lp-waitlist-note {
-  margin: 18px 0 0;
-  color: var(--faint);
-  font-size: 13px;
 }
 
 /* Footer — kept consistently dark in both themes (text + logo are light) */
@@ -3282,7 +3055,7 @@ h1 {
     grid-template-columns: 1fr;
   }
   .qa-preview-shell {
-    padding: 36px;
+    padding: 30px;
   }
   .faq-nav-card {
     position: static;
@@ -3310,12 +3083,17 @@ h1 {
     padding-bottom: 64px;
   }
   .qa-preview-shell {
-    width: min(100% - 24px, 1200px);
-    padding: 28px 20px;
-    border-radius: 24px;
+    width: min(100% - 28px, 1120px);
+    padding: 24px 18px;
+    border-radius: 20px;
   }
   .qa-preview-actions .btn {
-    width: 100%;
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    padding-right: 12px;
+    padding-left: 12px;
+    font-size: 13px;
   }
   .faq-item > summary {
     grid-template-columns: 44px minmax(0, 1fr) 38px;
