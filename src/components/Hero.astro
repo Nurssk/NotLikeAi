@@ -16,8 +16,12 @@ import WaitlistMorphButton from "./WaitlistMorphButton";
       fully STOP at 25% and 75% of its path, swap to wink_peep for 2s, then
       resume. The up/down walking bounce stays CSS on .hero-peeps-walker.
     -->
-    <div class="hero-peeps-runner" aria-hidden="true">
-      <img class="hero-peeps-walker" src="/images/peeps/peeps.png" alt="" />
+    <div class="hero-peeps-y" aria-hidden="true">
+      <div class="hero-peeps-runner">
+        <div class="hero-peeps-walker">
+          <img class="hero-peep-sprite" src="/images/peeps/peeps.png" alt="" />
+        </div>
+      </div>
     </div>
 
     <div class="hero-content">
@@ -39,9 +43,10 @@ import WaitlistMorphButton from "./WaitlistMorphButton";
 
 <script>
   const runner = document.querySelector<HTMLElement>(".hero-peeps-runner");
-  const img = document.querySelector<HTMLImageElement>(".hero-peeps-walker");
+  const walker = document.querySelector<HTMLElement>(".hero-peeps-walker");
+  const img = document.querySelector<HTMLImageElement>(".hero-peep-sprite");
 
-  if (runner && img) {
+  if (runner && walker && img) {
     const normalSrc = "/images/peeps/peeps.png";
     const winkSrc = "/images/peeps/wink_peep.png";
 
@@ -53,6 +58,16 @@ import WaitlistMorphButton from "./WaitlistMorphButton";
     // Preload the wink sprite so the swap is instant.
     const preload = new Image();
     preload.src = winkSrc;
+
+    // Swap sprite + toggle the "is-winking" class (CSS smoothly scales it 25%).
+    const showNormal = () => {
+      img!.src = normalSrc;
+      walker!.classList.remove("is-winking");
+    };
+    const showWink = () => {
+      img!.src = winkSrc;
+      walker!.classList.add("is-winking");
+    };
 
     let rafId = 0;
     let startTime: number | null = null;
@@ -76,7 +91,7 @@ import WaitlistMorphButton from "./WaitlistMorphButton";
           return;
         }
         // Wink finished: swap back and account for the paused time.
-        img!.src = normalSrc;
+        showNormal();
         totalPausedTime += winkDuration;
         pausedUntil = null;
       }
@@ -91,13 +106,13 @@ import WaitlistMorphButton from "./WaitlistMorphButton";
         winked25 = false;
         winked75 = false;
         progress = 0;
-        img!.src = normalSrc;
+        showNormal();
       }
 
       // Wink at 25%: stop, swap to wink sprite for 2s.
       if (!winked25 && progress >= 0.25) {
         winked25 = true;
-        img!.src = winkSrc;
+        showWink();
         pausedUntil = time + winkDuration;
         rafId = requestAnimationFrame(animate);
         return;
@@ -106,7 +121,7 @@ import WaitlistMorphButton from "./WaitlistMorphButton";
       // Wink at 75%: stop, swap to wink sprite for 2s.
       if (!winked75 && progress >= 0.75) {
         winked75 = true;
-        img!.src = winkSrc;
+        showWink();
         pausedUntil = time + winkDuration;
         rafId = requestAnimationFrame(animate);
         return;
@@ -122,7 +137,7 @@ import WaitlistMorphButton from "./WaitlistMorphButton";
       if (reduceMotion.matches) {
         // Static: normal sprite, no movement, no wink.
         cancelAnimationFrame(rafId);
-        img!.src = normalSrc;
+        showNormal();
         runner!.style.transform = "";
         return;
       }
@@ -131,7 +146,7 @@ import WaitlistMorphButton from "./WaitlistMorphButton";
       pausedUntil = null;
       winked25 = false;
       winked75 = false;
-      img!.src = normalSrc;
+      showNormal();
       rafId = requestAnimationFrame(animate);
     }
 

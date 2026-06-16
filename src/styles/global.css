@@ -2247,21 +2247,54 @@ h1 {
    A single sprite that walks left → right. Horizontal movement is driven by JS
    (see Hero.astro) so it can fully STOP for the 2s wink; the up/down bounce
    stays CSS. Farthest background layer (z-index 0), full opacity. */
-.hero-peeps-runner {
+/* Vertical placement only — raised so the peep sits near the TOP of the crowd
+   band (peeking from the back row). Kept separate from the runner so the JS can
+   own runner.style.transform (translateX) without a CSS transform fighting it.
+   z-index 0 puts it in the BACKGROUND — behind the crowd canvas (1) and far
+   behind the hero content (10). */
+.hero-peeps-y {
   position: absolute;
   left: 0;
-  bottom: clamp(120px, 20vh, 240px);
-  z-index: 0; /* farthest background layer — all hero content sits above */
+  right: 0;
+  bottom: clamp(80px, 16vh, 175px);
+  top: auto;
+  z-index: 0;
   opacity: 1;
   pointer-events: none;
   user-select: none;
+}
+
+/* Horizontal movement only (JS sets runner.style.transform = translateX(...)).
+   width:max-content keeps offsetWidth == the sprite width so the travel math
+   in Hero.astro is unchanged. */
+.hero-peeps-runner {
+  display: block;
+  width: max-content;
+  opacity: 1;
   will-change: transform;
 }
 
+/* Walker = the scaling wrapper; the sprite inside carries the bounce. Keeping
+   scale and bounce on separate elements lets both use `transform` without
+   fighting. Grows from the feet so the wink "stands taller". */
 .hero-peeps-walker {
   display: block;
   width: clamp(150px, 15vw, 244px);
   max-width: none;
+  transform-origin: bottom center;
+  transform: scale(1);
+  transition: transform 320ms ease;
+  will-change: transform;
+}
+
+/* During the wink, smoothly morph 25% bigger. */
+.hero-peeps-walker.is-winking {
+  transform: scale(1.25);
+}
+
+.hero-peep-sprite {
+  display: block;
+  width: 100%;
   height: auto;
   opacity: 1;
   animation: peepsWalkBounce 1.25s ease-in-out infinite;
@@ -2491,10 +2524,6 @@ h1 {
 }
 
 @media (max-width: 768px) {
-  .hero-peeps-runner {
-    bottom: clamp(90px, 16vh, 160px);
-  }
-
   .hero-peeps-walker {
     width: clamp(112px, 30vw, 172px);
   }
@@ -2502,13 +2531,19 @@ h1 {
 
 @media (prefers-reduced-motion: reduce) {
   .hero-peeps-runner,
-  .hero-peeps-walker {
+  .hero-peeps-walker,
+  .hero-peep-sprite {
     animation: none !important;
   }
 
+  /* Static + centred horizontally (JS clears the inline translateX). */
   .hero-peeps-runner {
-    left: 50%;
-    transform: translateX(-50%);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-peeps-walker {
+    transform: scale(1);
   }
 }
 
