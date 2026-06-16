@@ -47,6 +47,7 @@ body {
   margin: 0;
   color: var(--text);
   background: var(--bg);
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -2242,17 +2243,46 @@ h1 {
   filter: none;
 }
 
-.hero-peeps-static {
+.hero-peeps-runner {
   position: absolute;
-  left: 50%;
-  bottom: clamp(16px, 6vh, 56px);
+  left: 0;
+  bottom: clamp(96px, 16vh, 150px);
   z-index: 0;
-  width: clamp(220px, 24vw, 340px);
-  max-width: none;
-  height: auto;
-  transform: translateX(-50%);
   pointer-events: none;
   user-select: none;
+  animation: peepsMoveRight 18s linear infinite;
+  will-change: transform;
+}
+
+.hero-peeps-walker {
+  display: block;
+  width: clamp(180px, 16.8vw, 264px);
+  max-width: none;
+  height: auto;
+  opacity: 1;
+  animation: peepsWalkBounce 1.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes peepsMoveRight {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100vw);
+  }
+}
+
+@keyframes peepsWalkBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 /* Visible, accessible keyboard focus on the hero CTAs */
@@ -2293,7 +2323,7 @@ h1 {
 
 .hero-content {
   position: relative;
-  z-index: 5;
+  z-index: 10;
   width: min(100% - 48px, 1200px);
   max-width: 1200px;
   margin: 0 auto;
@@ -2441,9 +2471,24 @@ h1 {
 }
 
 @media (max-width: 768px) {
-  .hero-peeps-static {
-    width: clamp(190px, 58vw, 260px);
-    bottom: 10px;
+  .hero-peeps-runner {
+    bottom: 84px;
+  }
+
+  .hero-peeps-walker {
+    width: clamp(144px, 43.2vw, 216px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-peeps-runner,
+  .hero-peeps-walker {
+    animation: none !important;
+  }
+
+  .hero-peeps-runner {
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
