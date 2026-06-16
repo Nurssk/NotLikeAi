@@ -2243,35 +2243,29 @@ h1 {
   filter: none;
 }
 
+/* ── The walking peep ──────────────────────────────────────────────────────
+   A single sprite that walks left → right. Horizontal movement is driven by JS
+   (see Hero.astro) so it can fully STOP for the 2s wink; the up/down bounce
+   stays CSS. Farthest background layer (z-index 0), full opacity. */
 .hero-peeps-runner {
   position: absolute;
   left: 0;
-  bottom: clamp(96px, 16vh, 150px);
-  z-index: 0;
+  bottom: clamp(120px, 20vh, 240px);
+  z-index: 0; /* farthest background layer — all hero content sits above */
+  opacity: 1;
   pointer-events: none;
   user-select: none;
-  animation: peepsMoveRight 18s linear infinite;
   will-change: transform;
 }
 
 .hero-peeps-walker {
   display: block;
-  width: clamp(180px, 16.8vw, 264px);
+  width: clamp(150px, 15vw, 244px);
   max-width: none;
   height: auto;
   opacity: 1;
-  animation: peepsWalkBounce 1.5s ease-in-out infinite;
+  animation: peepsWalkBounce 1.25s ease-in-out infinite;
   will-change: transform;
-}
-
-@keyframes peepsMoveRight {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100vw);
-  }
 }
 
 @keyframes peepsWalkBounce {
@@ -2309,6 +2303,7 @@ h1 {
   min-height: 100svh;
   background: var(--bg);
   overflow: hidden;
+  isolation: isolate;
 }
 
 .hero-mvp-scroll .hero-sticky {
@@ -2321,17 +2316,38 @@ h1 {
   background: var(--bg);
 }
 
+/* Soft white wash so the headline stays legible over the busy crowd, while
+   keeping the centre (crowd + walking peep) clear. Sits above the canvas (1)
+   and the walker (2) at the very top/bottom edges only. */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  /* Top wash only — keeps the headline legible. No bottom fog: the crowd
+     stays crisp all the way to the bottom edge. */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(255, 255, 255, 0) 28%
+  );
+}
+
 .hero-content {
   position: relative;
   z-index: 10;
   width: min(100% - 48px, 1200px);
   max-width: 1200px;
   margin: 0 auto;
-  padding-top: clamp(60px, 10vh, 120px);
+  padding-top: clamp(56px, 9vh, 104px);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+}
+
+.hero-label {
+  margin-bottom: 22px;
 }
 
 .hero-title {
@@ -2340,27 +2356,31 @@ h1 {
   margin: 0;
   color: var(--text);
   text-align: center;
-  font-size: clamp(72px, 13vw, 190px);
+  font-size: clamp(64px, 13vw, 176px);
   font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.07em;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
 }
 
 .hero-title-word {
-  display: inline;
+  display: block;
 }
 
 .hero-subtitle {
-  max-width: 760px;
+  max-width: 640px;
   margin: 24px auto 0;
   color: var(--muted);
   text-align: center;
-  font-size: clamp(18px, 2vw, 28px);
-  line-height: 1.45;
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.5;
 }
 
 .hero-content .hero-actions {
   margin-top: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
   justify-content: center;
 }
 
@@ -2472,11 +2492,11 @@ h1 {
 
 @media (max-width: 768px) {
   .hero-peeps-runner {
-    bottom: 84px;
+    bottom: clamp(90px, 16vh, 160px);
   }
 
   .hero-peeps-walker {
-    width: clamp(144px, 43.2vw, 216px);
+    width: clamp(112px, 30vw, 172px);
   }
 }
 
@@ -2500,8 +2520,8 @@ h1 {
   }
 
   .hero-title {
-    font-size: clamp(56px, 15.5vw, 80px);
-    letter-spacing: -0.055em;
+    font-size: clamp(56px, 17vw, 92px);
+    letter-spacing: -0.04em;
   }
 
   .hero-title-word {

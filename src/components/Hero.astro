@@ -8,26 +8,134 @@ import WaitlistMorphButton from "./WaitlistMorphButton";
     <div class="hero-bg hero-skiper-bg" aria-hidden="true">
       <CrowdCanvasWrapper client:only="react" rows={15} cols={7} />
     </div>
+
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <!--
+      Single walking peep. Horizontal movement is JS-driven (below) so it can
+      fully STOP at 25% and 75% of its path, swap to wink_peep for 2s, then
+      resume. The up/down walking bounce stays CSS on .hero-peeps-walker.
+    -->
     <div class="hero-peeps-runner" aria-hidden="true">
-      <img
-        class="hero-peeps-walker"
-        src="/images/peeps/peeps.png"
-        alt=""
-      />
+      <img class="hero-peeps-walker" src="/images/peeps/peeps.png" alt="" />
     </div>
 
     <div class="hero-content">
       <h1 class="hero-title">
-        <span class="hero-title-word">Be</span>
-        <span class="hero-title-word">Unique</span>
+        <span class="hero-title-word">Be Unique</span>
       </h1>
+
       <p class="hero-subtitle">
-        Design Humanizer helps turn generic AI-generated interfaces into cleaner, more intentional product screens.
+        Design Humanizer helps turn generic AI-generated interfaces into cleaner,
+        more intentional product screens.
       </p>
 
       <div class="hero-actions">
-        <WaitlistMorphButton client:load size="lg" />
+        <WaitlistMorphButton client:visible size="lg" />
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  const runner = document.querySelector<HTMLElement>(".hero-peeps-runner");
+  const img = document.querySelector<HTMLImageElement>(".hero-peeps-walker");
+
+  if (runner && img) {
+    const normalSrc = "/images/peeps/peeps.png";
+    const winkSrc = "/images/peeps/wink_peep.png";
+
+    const moveDuration = 15000; // ms for a full left → right pass
+    const winkDuration = 2000; // ms the wink (paused) lasts
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    // Preload the wink sprite so the swap is instant.
+    const preload = new Image();
+    preload.src = winkSrc;
+
+    let rafId = 0;
+    let startTime: number | null = null;
+    let totalPausedTime = 0;
+    let pausedUntil: number | null = null;
+    let winked25 = false;
+    let winked75 = false;
+
+    function travel() {
+      // total horizontal distance: from just off the left to fully off the right
+      return window.innerWidth + (runner!.offsetWidth || 0);
+    }
+
+    function animate(time: number) {
+      if (startTime === null) startTime = time;
+
+      // Currently paused for a wink — hold position, keep waiting.
+      if (pausedUntil !== null) {
+        if (time < pausedUntil) {
+          rafId = requestAnimationFrame(animate);
+          return;
+        }
+        // Wink finished: swap back and account for the paused time.
+        img!.src = normalSrc;
+        totalPausedTime += winkDuration;
+        pausedUntil = null;
+      }
+
+      const elapsed = time - startTime - totalPausedTime;
+      let progress = elapsed / moveDuration;
+
+      // Loop finished — reset to the left and start over.
+      if (progress >= 1) {
+        startTime = time;
+        totalPausedTime = 0;
+        winked25 = false;
+        winked75 = false;
+        progress = 0;
+        img!.src = normalSrc;
+      }
+
+      // Wink at 25%: stop, swap to wink sprite for 2s.
+      if (!winked25 && progress >= 0.25) {
+        winked25 = true;
+        img!.src = winkSrc;
+        pausedUntil = time + winkDuration;
+        rafId = requestAnimationFrame(animate);
+        return;
+      }
+
+      // Wink at 75%: stop, swap to wink sprite for 2s.
+      if (!winked75 && progress >= 0.75) {
+        winked75 = true;
+        img!.src = winkSrc;
+        pausedUntil = time + winkDuration;
+        rafId = requestAnimationFrame(animate);
+        return;
+      }
+
+      const x = -100 + progress * travel();
+      runner!.style.transform = `translateX(${x}px)`;
+
+      rafId = requestAnimationFrame(animate);
+    }
+
+    function start() {
+      if (reduceMotion.matches) {
+        // Static: normal sprite, no movement, no wink.
+        cancelAnimationFrame(rafId);
+        img!.src = normalSrc;
+        runner!.style.transform = "";
+        return;
+      }
+      startTime = null;
+      totalPausedTime = 0;
+      pausedUntil = null;
+      winked25 = false;
+      winked75 = false;
+      img!.src = normalSrc;
+      rafId = requestAnimationFrame(animate);
+    }
+
+    reduceMotion.addEventListener("change", start);
+    start();
+  }
+</script>
