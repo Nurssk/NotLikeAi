@@ -362,7 +362,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    border: "1px solid rgba(220, 174, 58, 0.5)",
+    border: "1px solid rgba(129, 216, 208, 0.5)",
     borderRadius: 999,
     background: COLORS.accent,
     color: COLORS.onAccent,

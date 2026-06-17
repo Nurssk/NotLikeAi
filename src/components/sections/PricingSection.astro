@@ -1,92 +1,326 @@
 ---
 const plans = [
   {
-    name: "Min",
+    id: "minimal",
+    name: "Minimal",
     price: "$10",
     period: "/month",
-    limit: "50 screenshots per week",
-    description: "For testing the product and improving small projects.",
-    features: [
-      "50 screenshots weekly",
-      "AI-made UI analysis",
-      "Design improvement suggestions",
-      "Basic preview feedback",
-    ],
-    button: "Start with Min",
-    buttonClass: "btn-secondary",
+    screenshots: "50",
+    limit: "screenshots per week",
+    href: "/api/checkout?plan=minimal",
   },
   {
+    id: "popular",
     name: "Popular",
-    badge: "Popular",
     price: "$25",
     period: "/month",
-    limit: "200 screenshots per month",
-    description:
-      "For active builders who review landing pages, dashboards, and MVP screens.",
-    features: [
-      "200 screenshots monthly",
-      "Priority UI analysis",
-      "More design suggestions",
-      "Better for active projects",
-    ],
-    button: "Choose Popular",
-    buttonClass: "btn-primary",
-    popular: true,
+    screenshots: "200",
+    limit: "screenshots per month",
+    href: "/api/checkout?plan=popular",
   },
   {
-    name: "Max",
+    id: "maximum",
+    name: "Maximum",
     price: "$40",
     period: "/month",
-    limit: "400 screenshots per month",
-    description: "For teams and power users who need more frequent design reviews.",
-    features: [
-      "400 screenshots monthly",
-      "High-volume UI analysis",
-      "Best for multiple projects",
-      "Extended usage limit",
-    ],
-    button: "Go Max",
-    buttonClass: "btn-secondary",
+    screenshots: "450",
+    limit: "screenshots per month",
+    href: "/api/checkout?plan=max",
   },
+];
+
+const features = [
+  { label: "AI UI analysis", plans: ["minimal", "popular", "maximum"] },
+  { label: "Design improvement suggestions", plans: ["minimal", "popular", "maximum"] },
+  { label: "Chrome extension access", plans: ["minimal", "popular", "maximum"] },
+  { label: "Priority UI analysis", plans: ["popular", "maximum"] },
+  { label: "Multiple projects", plans: ["maximum"] },
+  { label: "Extended usage limit", plans: ["maximum"] },
 ];
 ---
 
 <section id="pricing" class="lp-section pricing-section" aria-labelledby="pricing-title">
-  <div class="lp-container">
-    <div class="lp-head lp-head--center">
-      <h2 id="pricing-title" class="lp-title">Choose your plan</h2>
-      <p class="lp-text">Start small or scale your UI reviews as your product grows.</p>
-    </div>
+  <div class="pricing-shell">
+    <div class="pricing-flow" data-pricing-flow data-selected-plan="popular">
+      <script type="application/json" data-pricing-data set:html={JSON.stringify({ plans, features })}></script>
 
-    <div class="pricing-grid" aria-label="Pricing plans">
-      {
-        plans.map((plan) => (
-          <article class:list={["pricing-card", { "is-popular": plan.popular }]}>
-            <div class="pricing-card-head">
-              <h3>{plan.name}</h3>
-              {plan.badge && <span class="pricing-badge">{plan.badge}</span>}
+      <div class="pricing-flow-view is-active" data-flow-view="plans">
+        <aside class="pricing-flow-left" aria-label="Selected plan details">
+          <div class="pricing-benefits-copy">
+            <h3>Check out these benefits</h3>
+            <p>Attributes update as you switch plans.</p>
+          </div>
+
+          <div class="pricing-feature-table">
+            <div class="pricing-feature-head">
+              <span>Attributes</span>
+              <strong>Included</strong>
             </div>
 
-            <div class="pricing-price-row">
-              <span class="pricing-price">{plan.price}</span>
-              <span class="pricing-period">{plan.period}</span>
+            {
+              features.map((feature) => (
+                <div class="pricing-feature-row" data-feature-row data-available={feature.plans.join(" ")}>
+                  <span>{feature.label}</span>
+                  <span class="pricing-feature-check" data-feature-check aria-hidden="true"></span>
+                </div>
+              ))
+            }
+          </div>
+        </aside>
+
+        <div class="pricing-flow-main">
+          <div class="pricing-main-copy">
+            <h2 id="pricing-title">Choose your plan</h2>
+          </div>
+
+          <div class="pricing-choice-stack">
+            <div class="pricing-choice-list" role="group" aria-label="Pricing plans">
+              {
+                plans.map((plan) => (
+                  <button
+                    class:list={["pricing-choice", { "is-selected": plan.id === "popular" }]}
+                    type="button"
+                    data-plan-choice
+                    data-plan-id={plan.id}
+                    aria-pressed={plan.id === "popular" ? "true" : "false"}
+                  >
+                    <span class="pricing-choice-radio" aria-hidden="true"></span>
+                    <span class="pricing-choice-name">{plan.name}</span>
+                    <span class="pricing-choice-price">{plan.price}<small>{plan.period}</small></span>
+                  </button>
+                ))
+              }
             </div>
 
-            <p class="pricing-limit">{plan.limit}</p>
-            <p class="pricing-description">{plan.description}</p>
+            <div class="pricing-summary-card" aria-live="polite">
+              <div class="pricing-summary-copy">
+                <span>Screenshots</span>
+                <span>included</span>
+              </div>
+              <div class="pricing-summary-count">
+                <strong data-screenshot-count data-current-value="0">0</strong>
+                <span data-screenshot-limit>screenshots per month</span>
+              </div>
+            </div>
 
-            <ul class="pricing-features" aria-label={`${plan.name} features`}>
-              {plan.features.map((feature) => <li>{feature}</li>)}
-            </ul>
+            <button class="btn btn-primary pricing-buy-button" type="button" data-buy-now>
+              Buy Now
+            </button>
+          </div>
+        </div>
+      </div>
 
-            <a class:list={["btn", "pricing-button", plan.buttonClass]} href="#product">
-              {plan.button}
-            </a>
-          </article>
-        ))
-      }
+      <div class="pricing-flow-view pricing-checkout-view" data-flow-view="checkout" aria-hidden="true">
+        <aside class="checkout-summary">
+          <button class="checkout-back" type="button" data-back-to-plans aria-label="Back to plan selection">
+            ×
+          </button>
+          <div class="checkout-product">
+            <div class="checkout-product-icon" aria-hidden="true">DH</div>
+            <div>
+              <h3><span data-checkout-plan-name>Minimal</span> plan</h3>
+              <p data-checkout-plan-limit>Monthly subscription</p>
+            </div>
+          </div>
+
+          <div class="checkout-lines">
+            <div>
+              <span>Subtotal</span>
+              <strong data-checkout-price>$10</strong>
+            </div>
+            <div>
+              <span>Billed now</span>
+              <strong data-checkout-price-repeat>$10</strong>
+            </div>
+          </div>
+
+          <a href="#" class="checkout-link">Add promocode</a>
+          <a href="#" class="checkout-link">Add VAT number</a>
+
+          <p class="checkout-secure">Your payment data is encrypted and secure.</p>
+        </aside>
+
+        <div class="checkout-form">
+          <h3>Enter payment details</h3>
+
+          <div class="payment-methods" aria-label="Payment method">
+            <label><input type="radio" name="pricing-payment" checked /> <span>Visa</span></label>
+            <label><input type="radio" name="pricing-payment" /> <span>PayPal</span></label>
+            <label><input type="radio" name="pricing-payment" /> <span>Apple Pay</span></label>
+          </div>
+
+          <div class="checkout-field">
+            <label for="pricing-email">Email</label>
+            <input id="pricing-email" type="email" autocomplete="email" placeholder="you@example.com" />
+          </div>
+
+          <div class="checkout-grid">
+            <div class="checkout-field">
+              <label for="pricing-card-number">Card number</label>
+              <input id="pricing-card-number" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" />
+            </div>
+            <div class="checkout-field">
+              <label for="pricing-expiration">Expiration date</label>
+              <input id="pricing-expiration" inputmode="numeric" autocomplete="cc-exp" placeholder="MM / YY" />
+            </div>
+          </div>
+
+          <div class="checkout-grid">
+            <div class="checkout-field">
+              <label for="pricing-cardholder">Cardholder name</label>
+              <input id="pricing-cardholder" autocomplete="cc-name" placeholder="Name on card" />
+            </div>
+            <div class="checkout-field">
+              <label for="pricing-security">Security code</label>
+              <input id="pricing-security" inputmode="numeric" autocomplete="cc-csc" placeholder="CVC" />
+            </div>
+          </div>
+
+          <div class="checkout-field">
+            <label for="pricing-country">Country</label>
+            <select id="pricing-country" autocomplete="country-name">
+              <option>United States</option>
+              <option>Kazakhstan</option>
+              <option>Ukraine</option>
+              <option>United Kingdom</option>
+            </select>
+          </div>
+
+          <a class="btn btn-primary checkout-upgrade" href="/api/checkout?plan=minimal" data-checkout-submit>
+            Upgrade
+          </a>
+        </div>
+      </div>
     </div>
-
-    <p class="pricing-note">Need more screenshots? Contact us for a custom plan.</p>
   </div>
 </section>
+
+<script>
+  document.querySelectorAll("[data-pricing-flow]").forEach((flow) => {
+    const data = JSON.parse(flow.querySelector("[data-pricing-data]")?.textContent || "{}");
+    const plans = data.plans || [];
+    const planMap = new Map(plans.map((plan) => [plan.id, plan]));
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let selectedPlanId = flow.getAttribute("data-selected-plan") || plans[0]?.id || "popular";
+    let screenshotAnimationFrame = 0;
+
+    const setText = (selector, value) => {
+      const node = flow.querySelector(selector);
+      if (node) node.textContent = value;
+    };
+
+    const setScreenshotCount = (value) => {
+      const counter = flow.querySelector("[data-screenshot-count]");
+      if (!counter) return;
+
+      const nextValue = Math.max(0, Math.round(value));
+      counter.textContent = nextValue.toLocaleString();
+      counter.setAttribute("data-current-value", String(nextValue));
+    };
+
+    const animateScreenshotCount = (plan) => {
+      const counter = flow.querySelector("[data-screenshot-count]");
+      const target = Number(plan.screenshots);
+      if (!counter || Number.isNaN(target)) return;
+
+      const limit = flow.querySelector("[data-screenshot-limit]");
+      if (limit) limit.textContent = plan.limit;
+
+      window.cancelAnimationFrame(screenshotAnimationFrame);
+
+      const currentValue = Number(counter.getAttribute("data-current-value") || counter.textContent || "0");
+      if (reduceMotion || currentValue === target) {
+        setScreenshotCount(target);
+        return;
+      }
+
+      const startValue = Number.isNaN(currentValue) ? 0 : currentValue;
+      const distance = target - startValue;
+      const duration = Math.min(1000, Math.max(620, Math.abs(distance) * 2.2));
+      const startTime = window.performance.now();
+      const easeOutCubic = (value) => 1 - Math.pow(1 - value, 3);
+
+      const tick = (time) => {
+        const progress = Math.min((time - startTime) / duration, 1);
+        const eased = easeOutCubic(progress);
+        setScreenshotCount(startValue + distance * eased);
+
+        if (progress < 1) {
+          screenshotAnimationFrame = window.requestAnimationFrame(tick);
+        } else {
+          setScreenshotCount(target);
+        }
+      };
+
+      screenshotAnimationFrame = window.requestAnimationFrame(tick);
+    };
+
+    const updateFeatureChecks = (planId) => {
+      flow.querySelectorAll("[data-feature-row]").forEach((row) => {
+        const availablePlans = (row.getAttribute("data-available") || "").split(" ");
+        const isAvailable = availablePlans.includes(planId);
+        const check = row.querySelector("[data-feature-check]");
+
+        row.classList.toggle("is-muted", !isAvailable);
+        if (check) {
+          check.classList.toggle("is-off", !isAvailable);
+        }
+      });
+    };
+
+    const selectPlan = (planId) => {
+      const plan = planMap.get(planId);
+      if (!plan) return;
+
+      selectedPlanId = planId;
+      flow.dataset.selectedPlan = planId;
+
+      flow.querySelectorAll("[data-plan-choice]").forEach((choice) => {
+        const isSelected = choice.getAttribute("data-plan-id") === planId;
+        choice.classList.toggle("is-selected", isSelected);
+        choice.setAttribute("aria-pressed", String(isSelected));
+      });
+
+      animateScreenshotCount(plan);
+      setText("[data-checkout-plan-name]", plan.name);
+      setText("[data-checkout-plan-limit]", "Monthly subscription");
+      setText("[data-checkout-price]", plan.price);
+      setText("[data-checkout-price-repeat]", plan.price);
+
+      const checkoutSubmit = flow.querySelector("[data-checkout-submit]");
+      if (checkoutSubmit instanceof HTMLAnchorElement) {
+        checkoutSubmit.href = plan.href;
+      }
+
+      updateFeatureChecks(planId);
+    };
+
+    const showCheckout = () => {
+      flow.classList.add("is-checkout");
+      flow.querySelector("[data-flow-view='plans']")?.setAttribute("aria-hidden", "true");
+      flow.querySelector("[data-flow-view='checkout']")?.setAttribute("aria-hidden", "false");
+      flow.querySelector("[data-flow-view='checkout']")?.classList.add("is-active");
+      flow.querySelector("[data-flow-view='plans']")?.classList.remove("is-active");
+      flow.querySelector("#pricing-email")?.focus();
+    };
+
+    const showPlans = () => {
+      flow.classList.remove("is-checkout");
+      flow.querySelector("[data-flow-view='plans']")?.setAttribute("aria-hidden", "false");
+      flow.querySelector("[data-flow-view='checkout']")?.setAttribute("aria-hidden", "true");
+      flow.querySelector("[data-flow-view='plans']")?.classList.add("is-active");
+      flow.querySelector("[data-flow-view='checkout']")?.classList.remove("is-active");
+    };
+
+    flow.querySelectorAll("[data-plan-choice]").forEach((choice) => {
+      choice.addEventListener("click", () => {
+        selectPlan(choice.getAttribute("data-plan-id") || selectedPlanId);
+      });
+    });
+
+    flow.querySelector("[data-buy-now]")?.addEventListener("click", showCheckout);
+    flow.querySelector("[data-back-to-plans]")?.addEventListener("click", showPlans);
+
+    selectPlan(selectedPlanId);
+  });
+</script>
