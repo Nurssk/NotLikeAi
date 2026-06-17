@@ -3088,7 +3088,61 @@ h1 {
 }
 
 .pricing-flow-view[data-flow-view="plans"] {
+  position: relative;
+  overflow: hidden;
   grid-template-columns: minmax(360px, 0.9fr) minmax(520px, 1.1fr);
+}
+
+.pricing-flow-view[data-flow-view="plans"]::after {
+  content: "";
+  position: absolute;
+  inset: 8% auto 8% 44%;
+  z-index: 6;
+  width: 2px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, transparent, rgba(129, 216, 208, 0.6), transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 901px) {
+    .pricing-flow-view[data-flow-view="plans"].is-active .pricing-flow-left {
+      animation: pricingConnectLeft both cubic-bezier(0.22, 1, 0.36, 1);
+      animation-timeline: view(block);
+      animation-range: entry 0% cover 28%;
+      will-change: transform, opacity, filter;
+    }
+
+    .pricing-flow-view[data-flow-view="plans"].is-active .pricing-flow-main {
+      animation: pricingConnectRight both cubic-bezier(0.22, 1, 0.36, 1);
+      animation-timeline: view(block);
+      animation-range: entry 4% cover 32%;
+      will-change: transform, opacity, filter;
+    }
+
+    .pricing-flow-view[data-flow-view="plans"].is-active::after {
+      animation: pricingConnectSeam both cubic-bezier(0.22, 1, 0.36, 1);
+      animation-timeline: view(block);
+      animation-range: entry 12% cover 34%;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (max-width: 900px) {
+    .pricing-flow-view[data-flow-view="plans"].is-active .pricing-flow-left {
+      animation: pricingConnectStack both cubic-bezier(0.22, 1, 0.36, 1);
+      animation-timeline: view(block);
+      animation-range: entry 0% cover 24%;
+      will-change: transform, opacity, filter;
+    }
+
+    .pricing-flow-view[data-flow-view="plans"].is-active .pricing-flow-main {
+      animation: pricingConnectStack both cubic-bezier(0.22, 1, 0.36, 1);
+      animation-timeline: view(block);
+      animation-range: entry 8% cover 34%;
+      will-change: transform, opacity, filter;
+    }
+  }
 }
 
 .pricing-benefits-copy {
@@ -3569,6 +3623,70 @@ h1 {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes pricingConnectLeft {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translate3d(-86px, 0, 0) scale(0.985);
+  }
+  68% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(5px, 0, 0) scale(1);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes pricingConnectRight {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translate3d(86px, 0, 0) scale(0.985);
+  }
+  68% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(-5px, 0, 0) scale(1);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes pricingConnectSeam {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.24);
+  }
+  36% {
+    opacity: 0.95;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes pricingConnectStack {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translate3d(0, 28px, 0) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -4056,6 +4174,9 @@ h1 {
   .pricing-flow-view[data-flow-view="plans"],
   .pricing-checkout-view {
     grid-template-columns: 1fr;
+  }
+  .pricing-flow-view[data-flow-view="plans"]::after {
+    display: none;
   }
   .pricing-flow-view {
     min-height: 0;
