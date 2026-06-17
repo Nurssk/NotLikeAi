@@ -1,0 +1,92 @@
+---
+const plans = [
+  {
+    name: "Min",
+    price: "$10",
+    period: "/month",
+    limit: "50 screenshots per week",
+    description: "For testing the product and improving small projects.",
+    features: [
+      "50 screenshots weekly",
+      "AI-made UI analysis",
+      "Design improvement suggestions",
+      "Basic preview feedback",
+    ],
+    button: "Start with Min",
+    buttonClass: "btn-secondary",
+  },
+  {
+    name: "Popular",
+    badge: "Popular",
+    price: "$25",
+    period: "/month",
+    limit: "200 screenshots per month",
+    description:
+      "For active builders who review landing pages, dashboards, and MVP screens.",
+    features: [
+      "200 screenshots monthly",
+      "Priority UI analysis",
+      "More design suggestions",
+      "Better for active projects",
+    ],
+    button: "Choose Popular",
+    buttonClass: "btn-primary",
+    popular: true,
+  },
+  {
+    name: "Max",
+    price: "$40",
+    period: "/month",
+    limit: "400 screenshots per month",
+    description: "For teams and power users who need more frequent design reviews.",
+    features: [
+      "400 screenshots monthly",
+      "High-volume UI analysis",
+      "Best for multiple projects",
+      "Extended usage limit",
+    ],
+    button: "Go Max",
+    buttonClass: "btn-secondary",
+  },
+];
+---
+
+<section id="pricing" class="lp-section pricing-section" aria-labelledby="pricing-title">
+  <div class="lp-container">
+    <div class="lp-head lp-head--center">
+      <h2 id="pricing-title" class="lp-title">Choose your plan</h2>
+      <p class="lp-text">Start small or scale your UI reviews as your product grows.</p>
+    </div>
+
+    <div class="pricing-grid" aria-label="Pricing plans">
+      {
+        plans.map((plan) => (
+          <article class:list={["pricing-card", { "is-popular": plan.popular }]}>
+            <div class="pricing-card-head">
+              <h3>{plan.name}</h3>
+              {plan.badge && <span class="pricing-badge">{plan.badge}</span>}
+            </div>
+
+            <div class="pricing-price-row">
+              <span class="pricing-price">{plan.price}</span>
+              <span class="pricing-period">{plan.period}</span>
+            </div>
+
+            <p class="pricing-limit">{plan.limit}</p>
+            <p class="pricing-description">{plan.description}</p>
+
+            <ul class="pricing-features" aria-label={`${plan.name} features`}>
+              {plan.features.map((feature) => <li>{feature}</li>)}
+            </ul>
+
+            <a class:list={["btn", "pricing-button", plan.buttonClass]} href="#product">
+              {plan.button}
+            </a>
+          </article>
+        ))
+      }
+    </div>
+
+    <p class="pricing-note">Need more screenshots? Contact us for a custom plan.</p>
+  </div>
+</section>

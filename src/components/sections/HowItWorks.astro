@@ -259,11 +259,11 @@ const steps = [
     padding: 26px;
     border-radius: 28px;
     background: var(--card, #ffffff);
-    border: 1px solid color-mix(in srgb, var(--border, #e6ecec) calc(100% - var(--expand) * 100%), rgba(0, 245, 212, 0.85) calc(var(--expand) * 100%));
+    border: 1px solid color-mix(in srgb, var(--border, #e6ecec) calc(100% - var(--expand) * 100%), rgba(220, 174, 58, 0.85) calc(var(--expand) * 100%));
     /* Soft depth that grows with expand */
     box-shadow:
       0 8px 24px rgba(16, 17, 18, 0.04),
-      0 calc(var(--expand) * 28px) calc(var(--expand) * 70px) rgba(0, 245, 212, calc(var(--expand) * 0.14));
+      0 calc(var(--expand) * 28px) calc(var(--expand) * 70px) rgba(220, 174, 58, calc(var(--expand) * 0.14));
     overflow: hidden;
     cursor: default;
     transition:
@@ -277,7 +277,7 @@ const steps = [
   }
 
   .how-card:focus-visible {
-    outline: 2px solid var(--accent, #00f5d4);
+    outline: 2px solid var(--accent, #dcae3a);
     outline-offset: 3px;
   }
 
@@ -296,7 +296,7 @@ const steps = [
     flex: 0 0 auto;
     border-radius: 14px;
     /* Tile fills with accent as --expand grows */
-    background: color-mix(in srgb, var(--accent-soft, rgba(0, 245, 212, 0.14)) calc(100% - var(--expand) * 100%), var(--accent, #00f5d4) calc(var(--expand) * 100%));
+    background: color-mix(in srgb, var(--accent-soft, rgba(220, 174, 58, 0.14)) calc(100% - var(--expand) * 100%), var(--accent, #dcae3a) calc(var(--expand) * 100%));
     border: 1px solid color-mix(in srgb, var(--border, #e6ecec) calc(100% - var(--expand) * 100%), transparent calc(var(--expand) * 100%));
     color: var(--text, #101112);
     transition:
@@ -370,7 +370,7 @@ const steps = [
     width: 10px;
     height: 10px;
     border-radius: 999px;
-    background: var(--accent, #00f5d4);
+    background: var(--accent, #dcae3a);
     border: 1px solid rgba(16, 17, 18, 0.12);
   }
 
@@ -392,7 +392,7 @@ const steps = [
 
   .how-dot.is-active {
     width: 26px;
-    background: var(--accent, #00f5d4);
+    background: var(--accent, #dcae3a);
   }
 
   /* ── Mobile: vertical stack, all details visible, no scroll-driven expand ─ */

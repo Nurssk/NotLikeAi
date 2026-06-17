@@ -95,12 +95,12 @@ const findings = [
     --product-bg: #FFFFFF;
     --product-surface: #F8FAFA;
     --product-card: #FFFFFF;
-    --product-card-elevated: #ECFBF8;
-    --product-primary: #00F5D4;
-    --product-primary-bright: #0A6B5D; /* readable amber for text on light */
-    --product-primary-deep: #00DDC0;
+    --product-card-elevated: #FFF8EA;
+    --product-primary: #dcae3a;
+    --product-primary-bright: #7A5A10; /* readable gold text on light */
+    --product-primary-deep: #c99b2f;
     --product-border: rgba(230, 236, 236, 0.95);
-    --product-border-strong: rgba(0, 221, 192, 0.7);
+    --product-border-strong: rgba(201, 155, 47, 0.7);
     --product-text: #101112;
     --product-muted: #5F666A;
     --product-soft: #9AA3A6;
@@ -118,7 +118,7 @@ const findings = [
     border-radius: 28px;
     background: var(--product-bg);
     border: 1px solid var(--product-border);
-    box-shadow: 0 28px 80px rgba(16, 17, 18, 0.18), 0 0 44px rgba(0, 245, 212, 0.14);
+    box-shadow: 0 28px 80px rgba(16, 17, 18, 0.18), 0 0 44px rgba(220, 174, 58, 0.14);
     overflow: hidden;
     opacity: var(--reveal);
     transform: translateX(calc((1 - var(--reveal)) * 120%));
@@ -143,7 +143,7 @@ const findings = [
     gap: 10px;
     padding: 14px 16px;
     background:
-      radial-gradient(circle at 80% 0%, rgba(0, 245, 212, 0.32), transparent 120px),
+      radial-gradient(circle at 80% 0%, rgba(220, 174, 58, 0.32), transparent 120px),
       linear-gradient(135deg, var(--product-primary-deep) 0%, var(--product-primary) 100%);
     color: #101112;
   }
@@ -231,7 +231,7 @@ const findings = [
     color: #101112;
     font-size: 13px;
     font-weight: 800;
-    box-shadow: 0 12px 26px rgba(0, 221, 192, 0.4);
+    box-shadow: 0 12px 26px rgba(201, 155, 47, 0.4);
     cursor: default;
   }
 
@@ -269,7 +269,7 @@ const findings = [
     height: 18px;
     padding: 0 5px;
     border-radius: 999px;
-    background: rgba(0, 245, 212, 0.22);
+    background: rgba(220, 174, 58, 0.22);
     color: var(--product-primary-bright);
     font-size: 10px;
     font-weight: 800;
@@ -329,7 +329,7 @@ const findings = [
 
   .ext-weak .ext-section-flag {
     color: #101112;
-    background: rgba(0, 245, 212, 0.5);
+    background: rgba(220, 174, 58, 0.5);
   }
 
   /* Findings */

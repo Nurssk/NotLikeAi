@@ -2,7 +2,7 @@
 import "../styles/global.css";
 import Analytics from '@vercel/analytics/astro'
 import Hero from "../components/Hero.astro";
-import HowItWorks from "../components/sections/HowItWorks.astro";
+import PricingSection from "../components/sections/PricingSection.astro";
 import QASection from "../components/sections/QASection.astro";
 import Footer from "../components/Footer.astro";
 import GlobalClickSpark from "../components/GlobalClickSpark";
@@ -26,14 +26,14 @@ import GlobalClickSpark from "../components/GlobalClickSpark";
   <body>
     <main>
       <Hero />
-      <HowItWorks />
+      <PricingSection />
       <QASection />
     </main>
     <Footer />
     <!-- Site-wide click sparks (every section, incl. hero); pointer-events:none -->
     <GlobalClickSpark
       client:load
-      sparkColor="#00F5D4"
+      sparkColor="#dcae3a"
       sparkSize={12}
       sparkRadius={22}
       sparkCount={10}
