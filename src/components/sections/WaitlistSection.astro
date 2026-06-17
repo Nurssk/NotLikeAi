@@ -1,7 +1,6 @@
 ---
-// Reuse the existing morphing waitlist button (no second implementation).
 // Click sparks are now provided site-wide by <GlobalClickSpark /> in index.astro.
-import WaitlistMorphButton from "../WaitlistMorphButton";
+import StartButton from "../StartButton";
 ---
 
 <section id="waitlist" class="lp-section lp-waitlist">
@@ -9,7 +8,7 @@ import WaitlistMorphButton from "../WaitlistMorphButton";
     <h2 class="lp-title">Stop shipping first drafts.</h2>
 
     <div class="lp-waitlist-action">
-      <WaitlistMorphButton client:visible size="lg" />
+      <StartButton client:visible size="lg" />
     </div>
   </div>
 </section>

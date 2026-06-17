@@ -25,7 +25,7 @@ const plans = [
     period: "/month",
     screenshots: "450",
     limit: "screenshots per month",
-    href: "/api/checkout?plan=max",
+    href: "/api/checkout?plan=maximum",
   },
 ];
 
@@ -134,60 +134,22 @@ const features = [
             </div>
           </div>
 
-          <a href="#" class="checkout-link">Add promocode</a>
-          <a href="#" class="checkout-link">Add VAT number</a>
-
-          <p class="checkout-secure">Your payment data is encrypted and secure.</p>
+          <p class="checkout-secure">Discount codes and billing details are handled in Polar Checkout.</p>
         </aside>
 
         <div class="checkout-form">
-          <h3>Enter payment details</h3>
-
-          <div class="payment-methods" aria-label="Payment method">
-            <label><input type="radio" name="pricing-payment" checked /> <span>Visa</span></label>
-            <label><input type="radio" name="pricing-payment" /> <span>PayPal</span></label>
-            <label><input type="radio" name="pricing-payment" /> <span>Apple Pay</span></label>
-          </div>
+          <h3>Continue to secure checkout</h3>
+          <p class="checkout-note">
+            Payment is handled by Polar. Your card details are entered on Polar's hosted checkout page.
+          </p>
 
           <div class="checkout-field">
-            <label for="pricing-email">Email</label>
+            <label for="pricing-email">Email <span>optional</span></label>
             <input id="pricing-email" type="email" autocomplete="email" placeholder="you@example.com" />
           </div>
 
-          <div class="checkout-grid">
-            <div class="checkout-field">
-              <label for="pricing-card-number">Card number</label>
-              <input id="pricing-card-number" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" />
-            </div>
-            <div class="checkout-field">
-              <label for="pricing-expiration">Expiration date</label>
-              <input id="pricing-expiration" inputmode="numeric" autocomplete="cc-exp" placeholder="MM / YY" />
-            </div>
-          </div>
-
-          <div class="checkout-grid">
-            <div class="checkout-field">
-              <label for="pricing-cardholder">Cardholder name</label>
-              <input id="pricing-cardholder" autocomplete="cc-name" placeholder="Name on card" />
-            </div>
-            <div class="checkout-field">
-              <label for="pricing-security">Security code</label>
-              <input id="pricing-security" inputmode="numeric" autocomplete="cc-csc" placeholder="CVC" />
-            </div>
-          </div>
-
-          <div class="checkout-field">
-            <label for="pricing-country">Country</label>
-            <select id="pricing-country" autocomplete="country-name">
-              <option>United States</option>
-              <option>Kazakhstan</option>
-              <option>Ukraine</option>
-              <option>United Kingdom</option>
-            </select>
-          </div>
-
           <a class="btn btn-primary checkout-upgrade" href="/api/checkout?plan=minimal" data-checkout-submit>
-            Upgrade
+            Continue to Polar
           </a>
         </div>
       </div>
@@ -320,6 +282,20 @@ const features = [
 
     flow.querySelector("[data-buy-now]")?.addEventListener("click", showCheckout);
     flow.querySelector("[data-back-to-plans]")?.addEventListener("click", showPlans);
+    flow.querySelector("[data-checkout-submit]")?.addEventListener("click", (event) => {
+      const submit = event.currentTarget;
+      if (!(submit instanceof HTMLAnchorElement)) return;
+
+      const emailInput = flow.querySelector("#pricing-email");
+      if (!(emailInput instanceof HTMLInputElement)) return;
+
+      const email = emailInput.value.trim();
+      if (!email) return;
+
+      const href = new URL(submit.href);
+      href.searchParams.set("email", email);
+      submit.href = href.toString();
+    });
 
     selectPlan(selectedPlanId);
   });

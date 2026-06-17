@@ -16,7 +16,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "../lib/firestore";
 
 interface WaitlistMorphButtonProps {
   buttonText?: string;

@@ -1,7 +1,9 @@
 ---
 import "../styles/global.css";
 import Analytics from '@vercel/analytics/astro'
+import Header from "../components/Header.astro";
 import Hero from "../components/Hero.astro";
+import HowItWorks from "../components/sections/HowItWorks.astro";
 import PricingSection from "../components/sections/PricingSection.astro";
 import QASection from "../components/sections/QASection.astro";
 import Footer from "../components/Footer.astro";
@@ -24,8 +26,10 @@ import GlobalClickSpark from "../components/GlobalClickSpark";
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <Header />
     <main>
       <Hero />
+      <HowItWorks />
       <PricingSection />
       <QASection />
     </main>
