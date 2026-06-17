@@ -1,9 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" role="img" aria-label="Humanize UI">
   <style>
-    .ink { fill: #101112; }
-    @media (prefers-color-scheme: dark) { .ink { fill: #FFFFFF; } }
+    .ink { color: #101112; }
+    @media (prefers-color-scheme: dark) {
+      .ink { color: #FFFFFF; }
+    }
   </style>
-  <rect class="ink" x="8" y="6" width="9.5" height="36" rx="3"/>
-  <rect class="ink" x="30.5" y="6" width="9.5" height="36" rx="3"/>
-  <rect x="8" y="20.5" width="32" height="7" rx="2.5" fill="#dcae3a"/>
+  <path class="ink" d="M6 16V12C6 8.7 8.7 6 12 6H16" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+  <path class="ink" d="M32 6H36C39.3 6 42 8.7 42 12V16" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+  <path class="ink" d="M42 32V36C42 39.3 39.3 42 36 42H32" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+  <path class="ink" d="M16 42H12C8.7 42 6 39.3 6 36V32" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+  <rect x="15" y="15" width="18" height="18" rx="4.5" fill="#81D8D0"/>
+  <rect class="ink" x="19.5" y="21" width="9" height="2.8" rx="1.4" fill="currentColor"/>
+  <rect class="ink" x="19.5" y="26" width="5.5" height="2.8" rx="1.4" fill="currentColor"/>
 </svg>

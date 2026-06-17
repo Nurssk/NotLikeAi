@@ -33,7 +33,9 @@ const { items, className = "", startOpenIndex = 0, featuredIndex } = Astro.props
         <span class="faq-item-toggle" aria-hidden="true"></span>
       </summary>
       <div class="faq-item-panel">
-        <p>{item.answer ?? item.a}</p>
+        <div class="faq-item-panel-inner">
+          <p>{item.answer ?? item.a}</p>
+        </div>
       </div>
     </details>
   ))}
@@ -44,86 +46,101 @@ const { items, className = "", startOpenIndex = 0, featuredIndex } = Astro.props
     if (accordion.dataset.faqBound === "true") return;
     accordion.dataset.faqBound = "true";
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const panelAnimations = new WeakMap<HTMLElement, Animation>();
+    const innerAnimations = new WeakMap<HTMLElement, Animation>();
 
     const getPanel = (item: HTMLDetailsElement) => item.querySelector<HTMLElement>(".faq-item-panel");
+    const getInner = (item: HTMLDetailsElement) => item.querySelector<HTMLElement>(".faq-item-panel-inner");
 
-    const finishPanelAnimation = (
-      item: HTMLDetailsElement,
-      panel: HTMLElement,
-      mode: "open" | "close",
-    ) => {
-      let finished = false;
-      const done = () => {
-        if (finished || item.dataset.faqAnimating !== mode) return;
-        finished = true;
-        if (mode === "close") item.open = false;
-        delete item.dataset.faqAnimating;
-        item.classList.remove("is-opening", "is-closing");
-        panel.style.height = "";
-        panel.style.opacity = "";
-        panel.style.transform = "";
-      };
+    const resetPanel = (item: HTMLDetailsElement, panel: HTMLElement, inner: HTMLElement) => {
+      panelAnimations.delete(panel);
+      innerAnimations.delete(inner);
+      delete item.dataset.faqAnimating;
+      item.classList.remove("is-opening", "is-closing");
+      panel.style.height = "";
+      panel.style.overflow = "";
+    };
 
-      const onEnd = (event: TransitionEvent) => {
-        if (event.propertyName === "height") done();
-      };
+    const stopCurrentAnimation = (panel: HTMLElement, inner: HTMLElement) => {
+      const currentHeight = panel.getBoundingClientRect().height;
+      panelAnimations.get(panel)?.cancel();
+      innerAnimations.get(inner)?.cancel();
+      panel.style.height = `${currentHeight}px`;
+      return currentHeight;
+    };
 
-      panel.addEventListener("transitionend", onEnd, { once: true });
-      window.setTimeout(done, mode === "close" ? 1050 : 760);
+    const animateItem = (item: HTMLDetailsElement, shouldOpen: boolean) => {
+      const panel = getPanel(item);
+      const inner = getInner(item);
+      if (!panel || !inner) return;
+
+      if (reduceMotion) {
+        item.open = shouldOpen;
+        return;
+      }
+
+      const startHeight = item.open ? stopCurrentAnimation(panel, inner) : 0;
+      if (shouldOpen) item.open = true;
+
+      item.dataset.faqAnimating = shouldOpen ? "open" : "close";
+      item.classList.toggle("is-opening", shouldOpen);
+      item.classList.toggle("is-closing", !shouldOpen);
+      panel.style.overflow = "hidden";
+      panel.style.height = `${startHeight}px`;
+
+      const targetHeight = shouldOpen ? panel.scrollHeight : 0;
+      const panelAnimation = panel.animate(
+        [{ height: `${startHeight}px` }, { height: `${targetHeight}px` }],
+        {
+          duration: shouldOpen ? 520 : 620,
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          fill: "forwards",
+        },
+      );
+      const startsPartiallyOpen = shouldOpen && startHeight > 4;
+      const innerAnimation = inner.animate(
+        [
+          {
+            opacity: startsPartiallyOpen || !shouldOpen ? 1 : 0,
+            transform: startsPartiallyOpen || !shouldOpen ? "translateY(0)" : "translateY(-6px)",
+          },
+          {
+            opacity: shouldOpen ? 1 : 0,
+            transform: shouldOpen ? "translateY(0)" : "translateY(-4px)",
+          },
+        ],
+        {
+          duration: shouldOpen ? 440 : 560,
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          fill: "forwards",
+        },
+      );
+
+      panelAnimations.set(panel, panelAnimation);
+      innerAnimations.set(inner, innerAnimation);
+
+      panelAnimation.finished
+        .then(() => {
+          if (panelAnimations.get(panel) !== panelAnimation || item.dataset.faqAnimating !== (shouldOpen ? "open" : "close")) return;
+          if (!shouldOpen) item.open = false;
+          resetPanel(item, panel, inner);
+        })
+        .catch(() => undefined);
     };
 
     const openItem = (item: HTMLDetailsElement) => {
-      const panel = getPanel(item);
-      if (!panel || item.open && item.dataset.faqAnimating !== "close") return;
+      if (item.open && item.dataset.faqAnimating !== "close") return;
 
       accordion.querySelectorAll<HTMLDetailsElement>("details[open]").forEach((openItem) => {
         if (openItem !== item) closeItem(openItem);
       });
 
-      if (reduceMotion) {
-        item.open = true;
-        return;
-      }
-
-      item.open = true;
-      item.dataset.faqAnimating = "open";
-      item.classList.remove("is-closing");
-      item.classList.add("is-opening");
-      panel.style.height = "0px";
-      panel.style.opacity = "0";
-      panel.style.transform = "translateY(-8px)";
-
-      window.requestAnimationFrame(() => {
-        panel.style.height = `${panel.scrollHeight}px`;
-        panel.style.opacity = "1";
-        panel.style.transform = "translateY(0)";
-        finishPanelAnimation(item, panel, "open");
-      });
+      animateItem(item, true);
     };
 
     const closeItem = (item: HTMLDetailsElement) => {
-      const panel = getPanel(item);
-      if (!panel || !item.open) return;
-
-      if (reduceMotion) {
-        item.open = false;
-        return;
-      }
-
-      item.dataset.faqAnimating = "close";
-      item.classList.remove("is-opening");
-      item.classList.add("is-closing");
-      panel.style.height = `${panel.scrollHeight}px`;
-      panel.style.opacity = "1";
-      panel.style.transform = "translateY(0)";
-      panel.offsetHeight;
-
-      window.requestAnimationFrame(() => {
-        panel.style.height = "0px";
-        panel.style.opacity = "0";
-        panel.style.transform = "translateY(-4px)";
-        finishPanelAnimation(item, panel, "close");
-      });
+      if (!item.open || item.dataset.faqAnimating === "close") return;
+      animateItem(item, false);
     };
 
     accordion.querySelectorAll<HTMLDetailsElement>("[data-faq-item]").forEach((item) => {
