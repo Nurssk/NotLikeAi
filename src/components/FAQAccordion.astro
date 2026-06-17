@@ -43,18 +43,99 @@ const { items, className = "", startOpenIndex = 0, featuredIndex } = Astro.props
   document.querySelectorAll<HTMLElement>("[data-faq-accordion]").forEach((accordion) => {
     if (accordion.dataset.faqBound === "true") return;
     accordion.dataset.faqBound = "true";
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    accordion.addEventListener(
-      "toggle",
-      (event) => {
-        const item = event.target;
-        if (!(item instanceof HTMLDetailsElement) || !item.open) return;
+    const getPanel = (item: HTMLDetailsElement) => item.querySelector<HTMLElement>(".faq-item-panel");
 
-        accordion.querySelectorAll<HTMLDetailsElement>("details[open]").forEach((openItem) => {
-          if (openItem !== item) openItem.removeAttribute("open");
-        });
-      },
-      true,
-    );
+    const finishPanelAnimation = (
+      item: HTMLDetailsElement,
+      panel: HTMLElement,
+      mode: "open" | "close",
+    ) => {
+      let finished = false;
+      const done = () => {
+        if (finished || item.dataset.faqAnimating !== mode) return;
+        finished = true;
+        if (mode === "close") item.open = false;
+        delete item.dataset.faqAnimating;
+        item.classList.remove("is-opening", "is-closing");
+        panel.style.height = "";
+        panel.style.opacity = "";
+        panel.style.transform = "";
+      };
+
+      const onEnd = (event: TransitionEvent) => {
+        if (event.propertyName === "height") done();
+      };
+
+      panel.addEventListener("transitionend", onEnd, { once: true });
+      window.setTimeout(done, mode === "close" ? 1050 : 760);
+    };
+
+    const openItem = (item: HTMLDetailsElement) => {
+      const panel = getPanel(item);
+      if (!panel || item.open && item.dataset.faqAnimating !== "close") return;
+
+      accordion.querySelectorAll<HTMLDetailsElement>("details[open]").forEach((openItem) => {
+        if (openItem !== item) closeItem(openItem);
+      });
+
+      if (reduceMotion) {
+        item.open = true;
+        return;
+      }
+
+      item.open = true;
+      item.dataset.faqAnimating = "open";
+      item.classList.remove("is-closing");
+      item.classList.add("is-opening");
+      panel.style.height = "0px";
+      panel.style.opacity = "0";
+      panel.style.transform = "translateY(-8px)";
+
+      window.requestAnimationFrame(() => {
+        panel.style.height = `${panel.scrollHeight}px`;
+        panel.style.opacity = "1";
+        panel.style.transform = "translateY(0)";
+        finishPanelAnimation(item, panel, "open");
+      });
+    };
+
+    const closeItem = (item: HTMLDetailsElement) => {
+      const panel = getPanel(item);
+      if (!panel || !item.open) return;
+
+      if (reduceMotion) {
+        item.open = false;
+        return;
+      }
+
+      item.dataset.faqAnimating = "close";
+      item.classList.remove("is-opening");
+      item.classList.add("is-closing");
+      panel.style.height = `${panel.scrollHeight}px`;
+      panel.style.opacity = "1";
+      panel.style.transform = "translateY(0)";
+      panel.offsetHeight;
+
+      window.requestAnimationFrame(() => {
+        panel.style.height = "0px";
+        panel.style.opacity = "0";
+        panel.style.transform = "translateY(-4px)";
+        finishPanelAnimation(item, panel, "close");
+      });
+    };
+
+    accordion.querySelectorAll<HTMLDetailsElement>("[data-faq-item]").forEach((item) => {
+      const summary = item.querySelector("summary");
+      summary?.addEventListener("click", (event) => {
+        event.preventDefault();
+        if (item.open && item.dataset.faqAnimating !== "close") {
+          closeItem(item);
+        } else {
+          openItem(item);
+        }
+      });
+    });
   });
 </script>
