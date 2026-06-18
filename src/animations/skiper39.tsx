@@ -297,6 +297,11 @@ const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
       createPeeps();
       resize();
       gsap.ticker.add(render);
+      render();
+
+      window.requestAnimationFrame(() => {
+        window.dispatchEvent(new CustomEvent("hero:crowd-ready"));
+      });
     };
 
     img.onload = init;

@@ -24,6 +24,13 @@
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const startedAt = window.performance.now();
     const minVisibleMs = reduceMotion ? 240 : 1450;
+    const maxWaitMs = 7600;
+    const criticalImages = [
+      "/logo/icon-d.svg",
+      "/images/peeps/all-peeps.png",
+      "/images/peeps/peeps.png",
+      "/images/peeps/wink_peep.png",
+    ];
     let progress = 1;
     let rafId = 0;
     let isCompleting = false;
@@ -39,10 +46,67 @@
     const loop = () => {
       if (isCompleting) return;
 
-      progress += (94 - progress) * 0.026;
+      progress += (92 - progress) * 0.024;
       renderProgress(progress);
       rafId = window.requestAnimationFrame(loop);
     };
+
+    const timeout = (ms: number) =>
+      new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+
+    const waitForWindowLoad = () =>
+      document.readyState === "complete"
+        ? Promise.resolve()
+        : new Promise<void>((resolve) => window.addEventListener("load", () => resolve(), { once: true }));
+
+    const waitForFonts = () => {
+      if (!("fonts" in document)) return Promise.resolve();
+      return Promise.race([document.fonts.ready.then(() => undefined), timeout(2200)]);
+    };
+
+    const waitForImage = (src: string) =>
+      new Promise<void>((resolve) => {
+        const image = new Image();
+        image.decoding = "async";
+        image.onload = () => resolve();
+        image.onerror = () => resolve();
+        image.src = src;
+
+        if (image.complete) resolve();
+      });
+
+    const waitForEvent = (eventName: string, ms: number) =>
+      new Promise<void>((resolve) => {
+        let settled = false;
+        const done = () => {
+          if (settled) return;
+          settled = true;
+          window.removeEventListener(eventName, done);
+          resolve();
+        };
+
+        window.addEventListener(eventName, done, { once: true });
+        window.setTimeout(done, ms);
+      });
+
+    const waitForNextPaint = () =>
+      new Promise<void>((resolve) => {
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => resolve());
+        });
+      });
+
+    const waitForCriticalAssets = () =>
+      Promise.race([
+        Promise.all([
+          waitForWindowLoad(),
+          waitForFonts(),
+          ...criticalImages.map(waitForImage),
+          waitForEvent("hero:crowd-ready", 4800),
+          waitForEvent("waitlist:morph-ready", 4800),
+        ]).then(() => waitForNextPaint()),
+        timeout(maxWaitMs),
+      ]);
 
     const finish = () => {
       if (isCompleting) return;
@@ -79,12 +143,6 @@
 
     renderProgress(progress);
     rafId = window.requestAnimationFrame(loop);
-
-    if (document.readyState === "complete") {
-      finish();
-    } else {
-      window.addEventListener("load", finish, { once: true });
-      window.setTimeout(finish, 4200);
-    }
+    waitForCriticalAssets().then(finish);
   }
 </script>

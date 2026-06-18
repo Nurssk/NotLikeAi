@@ -74,6 +74,10 @@ export default function WaitlistMorphButton({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("waitlist:morph-ready"));
+  }, []);
+
   // Close when clicking outside the form
   useEffect(() => {
     if (!isExpanded) return;
