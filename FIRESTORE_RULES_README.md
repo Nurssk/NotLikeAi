@@ -28,7 +28,33 @@ Writes from the landing page should work within a few seconds.
   other people's emails. This is why the frontend does **not** read before
   writing.
 - **Deletes are disabled.**
+- **Polar/payment collections stay locked** from browser clients. Polar checkout
+  uses the server route and `POLAR_ACCESS_TOKEN`; it does not need Firestore
+  browser write access.
+- **Authenticated user collections stay locked** until there is a concrete
+  account/profile flow. The waitlist does not require Google sign-in.
 - Every other collection stays fully locked.
+
+## If it still does not save
+
+Check the browser console:
+
+- `permission-denied`: the published Firebase Console rules do not match this
+  file, or Firestore App Check enforcement is enabled without App Check being
+  initialized in the client.
+- `failed-precondition`: the Firestore database may not exist yet for the
+  configured project.
+- `unavailable` / network errors: browser extension, ad blocker, network, or
+  Firebase service connectivity.
+
+Also verify production environment variables in Vercel:
+
+- `PUBLIC_FIREBASE_PROJECT_ID` must point to the same Firebase project where you
+  published the rules.
+- `PUBLIC_FIREBASE_API_KEY`, `PUBLIC_FIREBASE_AUTH_DOMAIN`,
+  `PUBLIC_FIREBASE_APP_ID`, and related public Firebase values must be present.
+- Keep `POLAR_ACCESS_TOKEN` server-only. Do **not** rename it to
+  `PUBLIC_POLAR_ACCESS_TOKEN`.
 
 ## Notes
 

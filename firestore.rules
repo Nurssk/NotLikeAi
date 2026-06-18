@@ -14,24 +14,62 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function waitlistFields() {
+      return [
+        'email',
+        'normalizedEmail',
+        'source',
+        'page',
+        'userAgent',
+        'createdAt',
+        'updatedAt'
+      ];
+    }
 
-    match /waitlist/{docId} {
-      allow create, update: if
-        request.resource.data.keys().hasOnly([
-          'email',
-          'normalizedEmail',
-          'source',
-          'page',
-          'userAgent',
-          'createdAt',
-          'updatedAt'
-        ])
+    function isValidWaitlistWrite() {
+      return request.resource.data.keys().hasOnly(waitlistFields())
+        && request.resource.data.keys().hasAll(waitlistFields())
         && request.resource.data.email is string
         && request.resource.data.normalizedEmail is string
+        && request.resource.data.page is string
+        && request.resource.data.userAgent is string
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp
         && request.resource.data.source == 'landing'
+        && request.resource.data.email.size() > 3
+        && request.resource.data.email.size() <= 254
         && request.resource.data.normalizedEmail.size() <= 254;
+    }
 
+    match /waitlist/{docId} {
+      // Public landing-page signup only. No authentication is required here.
+      // The frontend writes with serverTimestamp(), which evaluates to a
+      // timestamp in rules.
+      allow create, update: if isValidWaitlistWrite();
+
+      // Never expose the public email list to browser clients.
       allow read, delete: if false;
+    }
+
+    // Payment / Polar state must be written only by trusted server code
+    // or webhook handlers using an Admin SDK. Browser clients get no access.
+    match /polar/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /payments/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /subscriptions/{document=**} {
+      allow read, write: if false;
+    }
+
+    // Keep authenticated user data locked until the app has a concrete
+    // account/profile flow. Do not mix auth documents with public waitlist
+    // writes.
+    match /users/{userId}/{document=**} {
+      allow read, write: if false;
     }
 
     // Everything else stays locked.
