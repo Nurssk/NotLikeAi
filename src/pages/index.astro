@@ -9,22 +9,92 @@ import PricingSection from "../components/sections/PricingSection.astro";
 import QASection from "../components/sections/QASection.astro";
 import Footer from "../components/Footer.astro";
 import GlobalClickSpark from "../components/GlobalClickSpark";
+
+const siteUrl = "https://www.beuniq.design";
+const pageTitle = "BeUniq Design | Humanize AI-Generated UI Design";
+const pageDescription =
+  "Humanize AI-generated UI with Design Humanizer. Analyze screenshots, detect generic layouts, and improve visual hierarchy, spacing, and product design quality.";
+const pageKeywords = [
+  "humanize design UI",
+  "humanize UI",
+  "AI UI design",
+  "AI-generated UI",
+  "design humanizer",
+  "UI design feedback",
+  "screenshot UI analysis",
+  "Chrome extension for UI design",
+  "improve AI design",
+  "product design review",
+];
+
+const softwareSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Design Humanizer",
+  alternateName: "BeUniq Design",
+  applicationCategory: "DesignApplication",
+  operatingSystem: "Chrome",
+  url: siteUrl,
+  description: pageDescription,
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Minimal",
+      price: "10",
+      priceCurrency: "USD",
+      availability: "https://schema.org/PreOrder",
+    },
+    {
+      "@type": "Offer",
+      name: "Popular",
+      price: "25",
+      priceCurrency: "USD",
+      availability: "https://schema.org/PreOrder",
+    },
+    {
+      "@type": "Offer",
+      name: "Maximum",
+      price: "40",
+      priceCurrency: "USD",
+      availability: "https://schema.org/PreOrder",
+    },
+  ],
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "BeUniq Design",
+  url: siteUrl,
+  description: pageDescription,
+};
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Design Humanizer is a Chrome extension that helps developers turn generic AI-generated UI into deliberate, structured, and usable layouts."
-    />
-    <title>Design Humanizer</title>
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="keywords" content={pageKeywords.join(", ")} />
+    <meta name="author" content="BeUniq Design" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href={siteUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="BeUniq Design" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={siteUrl} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
     <link rel="icon" type="image/svg+xml" href="/logo/icon-d.svg" />
     <link rel="apple-touch-icon" href="/logo/app-icon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script type="application/ld+json" set:html={JSON.stringify(softwareSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)}></script>
   </head>
   <body>
     <Preloader />

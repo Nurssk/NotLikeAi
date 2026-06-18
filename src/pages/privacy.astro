@@ -6,6 +6,11 @@ import GlobalClickSpark from "../components/GlobalClickSpark";
 
 const lastUpdated = "June 15, 2026";
 const contactEmail = "sarsennbaj.n@gmail.com";
+const siteUrl = "https://www.beuniq.design";
+const pageUrl = `${siteUrl}/privacy`;
+const pageTitle = "Privacy Policy | BeUniq Design";
+const pageDescription =
+  "Privacy Policy for Design Humanizer by BeUniq Design, including waitlist, Firebase, website analytics, and future Chrome extension data handling.";
 
 const sections = [
   {
@@ -165,11 +170,18 @@ const sections = [
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Privacy Policy for Design Humanizer, a tool for improving AI-generated UI."
-    />
-    <title>Privacy Policy — Design Humanizer</title>
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="BeUniq Design" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={pageUrl} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
     <link rel="icon" type="image/svg+xml" href="/logo/icon-d.svg" />
     <link rel="apple-touch-icon" href="/logo/app-icon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
