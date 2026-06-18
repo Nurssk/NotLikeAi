@@ -1,7 +1,6 @@
 ---
 import PillNav from "./PillNav";
 import StartButton from "./StartButton";
-import GradualBlur from "./GradualBlur";
 
 const navItems = [
   { label: "How it works", href: "/#how" },
@@ -14,22 +13,6 @@ const activeHref = Astro.url.pathname === "/faq" ? "/faq" : undefined;
 ---
 
 <header class="site-header" data-header>
-  <GradualBlur
-    client:load
-    className="site-header-gradual-blur"
-    target="parent"
-    position="top"
-    height="8rem"
-    strength={2.4}
-    divCount={8}
-    curve="bezier"
-    exponential={true}
-    opacity={0.88}
-    zIndex={0}
-    style={{
-      background: "linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.78) 48%, rgba(255, 255, 255, 0) 100%)",
-    }}
-  />
   <div class="container header-inner">
     <PillNav
       client:load

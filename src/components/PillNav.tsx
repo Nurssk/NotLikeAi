@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
 
 export type PillNavItem = {
   label: string;
@@ -42,17 +41,28 @@ const PillNav: React.FC<PillNavProps> = ({
 }) => {
   const resolvedPillTextColor = pillTextColor ?? baseColor;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const gsapRef = useRef<any>(null);
   const circleRefs = useRef<Array<HTMLSpanElement | null>>([]);
-  const tlRefs = useRef<Array<gsap.core.Timeline | null>>([]);
-  const activeTweenRefs = useRef<Array<gsap.core.Tween | null>>([]);
+  const tlRefs = useRef<Array<any | null>>([]);
+  const activeTweenRefs = useRef<Array<any | null>>([]);
   const logoImgRef = useRef<HTMLImageElement | null>(null);
-  const logoTweenRef = useRef<gsap.core.Tween | null>(null);
+  const logoTweenRef = useRef<any | null>(null);
   const hamburgerRef = useRef<HTMLButtonElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const navItemsRef = useRef<HTMLDivElement | null>(null);
   const logoRef = useRef<HTMLAnchorElement | null>(null);
 
   useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
+
+    void (async () => {
+      const gsapModule = await import("gsap");
+      if (cancelled) return;
+
+      const gsap = gsapModule.gsap ?? gsapModule.default;
+      gsapRef.current = gsap;
+
     const layout = () => {
       circleRefs.current.forEach((circle) => {
         if (!circle?.parentElement) return;
@@ -133,11 +143,19 @@ const PillNav: React.FC<PillNavProps> = ({
       }
     }
 
-    return () => {
+      cleanup = () => {
       window.removeEventListener("resize", onResize);
       tlRefs.current.forEach((tl) => tl?.kill());
       activeTweenRefs.current.forEach((tween) => tween?.kill());
       logoTweenRef.current?.kill();
+      };
+    })().catch((error) => {
+      console.error("[PillNav] Failed to load GSAP:", error);
+    });
+
+    return () => {
+      cancelled = true;
+      cleanup?.();
     };
   }, [items, ease, initialLoadAnimation]);
 
@@ -167,6 +185,8 @@ const PillNav: React.FC<PillNavProps> = ({
 
   const handleLogoEnter = () => {
     if (!logoImgRef.current) return;
+    const gsap = gsapRef.current;
+    if (!gsap) return;
 
     logoTweenRef.current?.kill();
     gsap.set(logoImgRef.current, { rotate: 0 });
@@ -179,6 +199,9 @@ const PillNav: React.FC<PillNavProps> = ({
   };
 
   const animateMobileMenu = (open: boolean) => {
+    const gsap = gsapRef.current;
+    if (!gsap) return;
+
     const hamburger = hamburgerRef.current;
     const menu = mobileMenuRef.current;
 

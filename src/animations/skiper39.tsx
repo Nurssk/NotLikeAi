@@ -1,6 +1,5 @@
 "use client";
 
-import gsap from "gsap";
 import React, { useEffect, useRef } from "react";
 
 interface CrowdCanvasProps {
@@ -13,6 +12,14 @@ const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
+
+    void (async () => {
+      const gsapModule = await import("gsap");
+      if (cancelled) return;
+
+      const gsap = gsapModule.gsap ?? gsapModule.default;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -298,14 +305,22 @@ const CrowdCanvas = ({ src, rows = 15, cols = 7 }: CrowdCanvasProps) => {
     const handleResize = () => resize();
     window.addEventListener("resize", handleResize);
 
-    return () => {
+      cleanup = () => {
       window.removeEventListener("resize", handleResize);
       gsap.ticker.remove(render);
       crowd.forEach((peep) => {
         if (peep.walk) peep.walk.kill();
       });
+      };
+    })().catch((error) => {
+      console.error("[CrowdCanvas] Failed to load GSAP:", error);
+    });
+
+    return () => {
+      cancelled = true;
+      cleanup?.();
     };
-  }, []);
+  }, [src, rows, cols]);
   return (
     <canvas ref={canvasRef} className="absolute bottom-0 h-[90vh] w-full" />
   );

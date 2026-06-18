@@ -106,10 +106,6 @@ svg {
   gap: 24px;
 }
 
-.site-header-gradual-blur {
-  pointer-events: none;
-}
-
 .brand {
   display: inline-flex;
   align-items: center;
