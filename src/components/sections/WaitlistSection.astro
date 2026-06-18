@@ -1,6 +1,6 @@
 ---
 // Click sparks are now provided site-wide by <GlobalClickSpark /> in index.astro.
-import StartButton from "../StartButton";
+import WaitlistMorphButton from "../WaitlistMorphButton";
 ---
 
 <section id="waitlist" class="lp-section lp-waitlist">
@@ -8,7 +8,7 @@ import StartButton from "../StartButton";
     <h2 class="lp-title">Stop shipping first drafts.</h2>
 
     <div class="lp-waitlist-action">
-      <StartButton client:visible size="lg" />
+      <WaitlistMorphButton client:visible size="lg" buttonText="Join waitlist" />
     </div>
   </div>
 </section>

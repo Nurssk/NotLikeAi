@@ -230,7 +230,25 @@ const features = [
       });
     };
 
-    const selectPlan = (planId) => {
+    const setChoiceImpact = (choice, event) => {
+      if (!(choice instanceof HTMLElement)) return;
+
+      const rect = choice.getBoundingClientRect();
+      let x = rect.width / 2;
+      let y = rect.height / 2;
+
+      if (event instanceof MouseEvent && event.detail !== 0) {
+        x = event.clientX - rect.left;
+        y = event.clientY - rect.top;
+      }
+
+      const radius = Math.hypot(Math.max(x, rect.width - x), Math.max(y, rect.height - y));
+      choice.style.setProperty("--ripple-x", `${x}px`);
+      choice.style.setProperty("--ripple-y", `${y}px`);
+      choice.style.setProperty("--ripple-size", `${Math.ceil(radius * 2)}px`);
+    };
+
+    const selectPlan = (planId, event) => {
       const plan = planMap.get(planId);
       if (!plan) return;
 
@@ -239,6 +257,9 @@ const features = [
 
       flow.querySelectorAll("[data-plan-choice]").forEach((choice) => {
         const isSelected = choice.getAttribute("data-plan-id") === planId;
+        if (isSelected && event instanceof MouseEvent && choice.getAttribute("aria-pressed") !== "true") {
+          setChoiceImpact(choice, event);
+        }
         choice.classList.toggle("is-selected", isSelected);
         choice.setAttribute("aria-pressed", String(isSelected));
       });
@@ -275,8 +296,10 @@ const features = [
     };
 
     flow.querySelectorAll("[data-plan-choice]").forEach((choice) => {
-      choice.addEventListener("click", () => {
-        selectPlan(choice.getAttribute("data-plan-id") || selectedPlanId);
+      choice.addEventListener("click", (event) => {
+        const nextPlanId = choice.getAttribute("data-plan-id") || selectedPlanId;
+        if (nextPlanId === selectedPlanId) return;
+        selectPlan(nextPlanId, event);
       });
     });
 

@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Analytics from '@vercel/analytics/astro'
 import Header from "../components/Header.astro";
+import Preloader from "../components/Preloader.astro";
 import Hero from "../components/Hero.astro";
 import HowItWorks from "../components/sections/HowItWorks.astro";
 import PricingSection from "../components/sections/PricingSection.astro";
@@ -26,6 +27,7 @@ import GlobalClickSpark from "../components/GlobalClickSpark";
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <Preloader />
     <Header />
     <main>
       <Hero />

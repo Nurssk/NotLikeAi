@@ -1,6 +1,6 @@
 ---
 import PillNav from "./PillNav";
-import StartButton from "./StartButton";
+import WaitlistMorphButton from "./WaitlistMorphButton";
 
 const navItems = [
   { label: "How it works", href: "/#how" },
@@ -28,7 +28,7 @@ const activeHref = Astro.url.pathname === "/faq" ? "/faq" : undefined;
       className="site-pill-nav"
     />
 
-    <StartButton client:load className="pill-nav-cta" size="sm" showStatus={false} variant="icon" />
+    <WaitlistMorphButton client:load className="header-waitlist-button" buttonText="Waitlist" />
   </div>
 </header>
 

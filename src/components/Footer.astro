@@ -2,29 +2,22 @@
 const links = [
   { label: "Q&A", href: "/#qa" },
   { label: "FAQ", href: "/faq" },
-  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "GitHub", href: "https://github.com/Nurssk/NotLikeAi" },
 ];
+
+const contactEmail = "sarsennbaj.n@gmail.com";
 ---
 
 <footer id="contact" class="site-footer">
   <div class="site-footer-inner">
-    <div>
-      <a class="footer-brand" href="/#product" aria-label="Design Humanizer home">
-        <img class="footer-brand-mark" src="/logo/icon-d.svg" alt="" width="28" height="28" />
-        <span>Design Humanizer</span>
-      </a>
-      <p class="footer-tagline">
-        A Chrome extension for turning AI-generated interfaces into intentional product design.
-      </p>
-    </div>
+    <a class="footer-statement" href="/#product" aria-label="Design Humanizer home">
+      Design Humanizer · Built for AI app builders.
+    </a>
 
     <nav class="footer-nav" aria-label="Footer">
       {links.map((link) => <a href={link.href}>{link.label}</a>)}
+      <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
     </nav>
-  </div>
-
-  <div class="site-footer-bottom">
-    <span>© 2026 Design Humanizer. All rights reserved.</span>
-    <span>Built for developers, indie hackers, and AI app builders.</span>
   </div>
 </footer>

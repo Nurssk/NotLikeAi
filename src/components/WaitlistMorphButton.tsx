@@ -24,6 +24,7 @@ interface WaitlistMorphButtonProps {
   submitText?: string;
   successText?: string;
   size?: "md" | "lg";
+  className?: string;
   onSubmit?: (email: string) => void;
 }
 
@@ -59,6 +60,7 @@ export default function WaitlistMorphButton({
   submitText = "Join",
   successText = "You're on the list",
   size = "md",
+  className,
   onSubmit,
 }: WaitlistMorphButtonProps) {
   const lg = size === "lg";
@@ -162,7 +164,12 @@ export default function WaitlistMorphButton({
   };
 
   return (
-    <div ref={containerRef} style={styles.root}>
+    <div
+      ref={containerRef}
+      className={className}
+      data-expanded={isExpanded ? "true" : "false"}
+      style={styles.root}
+    >
       <AnimatePresence mode="popLayout" initial={false}>
         {isDone ? (
           /* ── Success state ─────────────────────────────────────────── */
@@ -261,11 +268,15 @@ export default function WaitlistMorphButton({
               aria-expanded={isExpanded}
             >
               {!isExpanded && (
-                <span style={styles.bell} aria-hidden="true">
+                <span style={styles.expandIcon} aria-hidden="true">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M8 1.6a3.3 3.3 0 0 0-3.3 3.3c0 3.2-1.2 4.3-1.2 4.3h9s-1.2-1.1-1.2-4.3A3.3 3.3 0 0 0 8 1.6Z"
-                      stroke="#111111" strokeWidth="1.4" strokeLinejoin="round" />
-                    <path d="M6.7 12.2a1.4 1.4 0 0 0 2.6 0" stroke="#111111" strokeWidth="1.4" strokeLinecap="round" />
+                    <path
+                      d="M6 3.5L10.5 8L6 12.5"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </span>
               )}
@@ -383,6 +394,15 @@ const styles: Record<string, React.CSSProperties> = {
   ctaSmall: {
     padding: "10px 20px",
     minHeight: 40,
+  },
+  expandIcon: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 18,
+    height: 18,
+    flex: "0 0 auto",
+    color: COLORS.onAccent,
   },
   success: {
     display: "inline-flex",

@@ -1,0 +1,90 @@
+<div class="site-preloader" data-preloader aria-live="polite" aria-label="Loading beuniq.design">
+  <div class="preloader-lockup" aria-hidden="true">
+    <img class="preloader-logo" src="/logo/icon-d.svg" alt="" width="56" height="56" />
+    <div class="preloader-wordmark">
+      <span class="preloader-bracket preloader-bracket--left">[</span>
+      <span class="preloader-name">beuniq.design</span>
+      <span class="preloader-bracket preloader-bracket--right">]</span>
+    </div>
+  </div>
+
+  <div class="preloader-progress" aria-hidden="true">
+    <span class="preloader-progress-fill" data-preloader-bar></span>
+    <span class="preloader-progress-count" data-preloader-count>1%</span>
+  </div>
+</div>
+
+<script>
+  const preloader = document.querySelector<HTMLElement>("[data-preloader]");
+  const progressBar = document.querySelector<HTMLElement>("[data-preloader-bar]");
+  const progressCount = document.querySelector<HTMLElement>("[data-preloader-count]");
+
+  if (preloader && progressBar && progressCount) {
+    const html = document.documentElement;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const startedAt = window.performance.now();
+    const minVisibleMs = reduceMotion ? 240 : 1450;
+    let progress = 1;
+    let rafId = 0;
+    let isCompleting = false;
+
+    html.classList.add("is-preloading");
+
+    const renderProgress = (value: number) => {
+      const normalized = Math.min(100, Math.max(1, Math.round(value)));
+      progressBar.style.transform = `scaleX(${normalized / 100})`;
+      progressCount.textContent = `${normalized}%`;
+    };
+
+    const loop = () => {
+      if (isCompleting) return;
+
+      progress += (94 - progress) * 0.026;
+      renderProgress(progress);
+      rafId = window.requestAnimationFrame(loop);
+    };
+
+    const finish = () => {
+      if (isCompleting) return;
+
+      isCompleting = true;
+      window.cancelAnimationFrame(rafId);
+
+      const elapsed = window.performance.now() - startedAt;
+      const wait = Math.max(0, minVisibleMs - elapsed);
+
+      window.setTimeout(() => {
+        const duration = reduceMotion ? 120 : 620;
+        const finishStartedAt = window.performance.now();
+        const start = progress;
+
+        const tick = (time: number) => {
+          const t = Math.min((time - finishStartedAt) / duration, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          renderProgress(start + (100 - start) * eased);
+
+          if (t < 1) {
+            window.requestAnimationFrame(tick);
+            return;
+          }
+
+          preloader.classList.add("is-done");
+          html.classList.remove("is-preloading");
+          window.setTimeout(() => preloader.remove(), reduceMotion ? 140 : 760);
+        };
+
+        window.requestAnimationFrame(tick);
+      }, wait);
+    };
+
+    renderProgress(progress);
+    rafId = window.requestAnimationFrame(loop);
+
+    if (document.readyState === "complete") {
+      finish();
+    } else {
+      window.addEventListener("load", finish, { once: true });
+      window.setTimeout(finish, 4200);
+    }
+  }
+</script>
