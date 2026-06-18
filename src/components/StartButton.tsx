@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { onAuthStateChanged, signInWithPopup } from "firebase/auth";
 import { auth, googleProvider, initFirebaseAnalytics } from "../lib/firebase";
+import Magnet from "./Magnet";
 
 const CHROME_WEBSTORE_URL =
   "https://chromewebstore.google.com/detail/mbbhjpbbehelagdnlmppgdhheceijfmm?utm_source=item-share-cb";
@@ -84,24 +85,40 @@ export default function StartButton({
     ? `${className} start-button--${size}${isIcon ? " start-button--icon" : ""}`
     : `start-button start-button--${size}${isIcon ? " start-button--icon" : ""}`;
 
+  const button = (
+    <button
+      type="button"
+      className={buttonClasses}
+      onClick={start}
+      disabled={isStarting}
+      aria-label={isStarting ? "Signing in with Google" : "Sign in with Google and open Chrome extension"}
+    >
+      {isIcon ? (
+        <>
+          <img className="start-button-chrome-logo" src="/logo/chrome-logo.png" alt="" aria-hidden="true" />
+          <span className="sr-only">{isStarting ? "Signing in..." : "Go to Chrome extension"}</span>
+        </>
+      ) : (
+        <span>{isStarting ? "Signing in..." : "Go to Chrome extension"}</span>
+      )}
+    </button>
+  );
+
   return (
     <span ref={rootRef} className={`start-button-shell start-button-shell--${size}`}>
-      <button
-        type="button"
-        className={buttonClasses}
-        onClick={start}
-        disabled={isStarting}
-        aria-label={isStarting ? "Signing in with Google" : "Sign in with Google and open Chrome extension"}
-      >
-        {isIcon ? (
-          <>
-            <img className="start-button-chrome-logo" src="/logo/chrome-logo.png" alt="" aria-hidden="true" />
-            <span className="sr-only">{isStarting ? "Signing in..." : "Go to Chrome extension"}</span>
-          </>
-        ) : (
-          <span>{isStarting ? "Signing in..." : "Go to Chrome extension"}</span>
-        )}
-      </button>
+      {size === "lg" ? (
+        <Magnet
+          padding={140}
+          disabled={isStarting}
+          magnetStrength={16}
+          wrapperClassName="start-button-magnet"
+          innerClassName="start-button-magnet-inner"
+        >
+          {button}
+        </Magnet>
+      ) : (
+        button
+      )}
       {showStatus && status ? (
         <span className="start-button-status" role="status" aria-live="polite">
           {status}

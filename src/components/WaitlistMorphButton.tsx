@@ -45,7 +45,7 @@ const COLORS = {
   accent: "var(--accent)",
   accentStrong: "var(--accent-hover)",
   text: "var(--text)",
-  onAccent: "var(--on-accent, #05100E)",
+  onAccent: "var(--on-accent, #FAF7F3)",
   surface: "var(--card)",
   border: "var(--border)",
   muted: "var(--muted)",
@@ -178,7 +178,7 @@ export default function WaitlistMorphButton({
           >
             <span style={styles.check} aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2.5 7.5l3 3 6-6.5" stroke="#101112" strokeWidth="2"
+                <path d="M2.5 7.5l3 3 6-6.5" stroke="#111111" strokeWidth="2"
                   strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
@@ -264,8 +264,8 @@ export default function WaitlistMorphButton({
                 <span style={styles.bell} aria-hidden="true">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M8 1.6a3.3 3.3 0 0 0-3.3 3.3c0 3.2-1.2 4.3-1.2 4.3h9s-1.2-1.1-1.2-4.3A3.3 3.3 0 0 0 8 1.6Z"
-                      stroke="#101112" strokeWidth="1.4" strokeLinejoin="round" />
-                    <path d="M6.7 12.2a1.4 1.4 0 0 0 2.6 0" stroke="#101112" strokeWidth="1.4" strokeLinecap="round" />
+                      stroke="#111111" strokeWidth="1.4" strokeLinejoin="round" />
+                    <path d="M6.7 12.2a1.4 1.4 0 0 0 2.6 0" stroke="#111111" strokeWidth="1.4" strokeLinecap="round" />
                   </svg>
                 </span>
               )}
@@ -362,7 +362,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    border: "1px solid rgba(129, 216, 208, 0.5)",
+    border: "1px solid rgba(17, 17, 17, 0.5)",
     borderRadius: 999,
     background: COLORS.accent,
     color: COLORS.onAccent,

@@ -96,15 +96,15 @@ const findings = [
     --product-surface: #F8FAFA;
     --product-card: #FFFFFF;
     --product-card-elevated: #F0FBFA;
-    --product-primary: #81D8D0;
+    --product-primary: #111111;
     --product-primary-bright: #227C76; /* readable Tiffany text on light */
-    --product-primary-deep: #6FCBC3;
+    --product-primary-deep: #000000;
     --product-border: rgba(230, 236, 236, 0.95);
-    --product-border-strong: rgba(111, 203, 195, 0.7);
-    --product-text: #101112;
+    --product-border-strong: rgba(17, 17, 17, 0.7);
+    --product-text: #111111;
     --product-muted: #5F666A;
     --product-soft: #9AA3A6;
-    --product-success: #101112; /* neutral dark for "OK" states */
+    --product-success: #111111; /* neutral dark for "OK" states */
 
     /* Scroll-driven reveal: enters from the right as --progress passes ~0.42 */
     --reveal: clamp(0, calc((var(--progress, 0) - 0.42) * 2.4), 1);
@@ -118,7 +118,7 @@ const findings = [
     border-radius: 28px;
     background: var(--product-bg);
     border: 1px solid var(--product-border);
-    box-shadow: 0 28px 80px rgba(16, 17, 18, 0.18), 0 0 44px rgba(129, 216, 208, 0.14);
+    box-shadow: 0 28px 80px rgba(16, 17, 18, 0.18), 0 0 44px rgba(17, 17, 17, 0.14);
     overflow: hidden;
     opacity: var(--reveal);
     transform: translateX(calc((1 - var(--reveal)) * 120%));
@@ -143,9 +143,9 @@ const findings = [
     gap: 10px;
     padding: 14px 16px;
     background:
-      radial-gradient(circle at 80% 0%, rgba(129, 216, 208, 0.32), transparent 120px),
+      radial-gradient(circle at 80% 0%, rgba(17, 17, 17, 0.32), transparent 120px),
       linear-gradient(135deg, var(--product-primary-deep) 0%, var(--product-primary) 100%);
-    color: #101112;
+    color: #111111;
   }
 
   .ext-brand {
@@ -167,7 +167,7 @@ const findings = [
     border: 1px solid rgba(16, 17, 18, 0.22);
     font-size: 12px;
     font-weight: 800;
-    color: #101112;
+    color: #111111;
   }
 
   .ext-brand-text {
@@ -206,7 +206,7 @@ const findings = [
     width: 6px;
     height: 6px;
     border-radius: 999px;
-    background: #101112;
+    background: #111111;
     box-shadow: 0 0 10px rgba(16, 17, 18, 0.35);
   }
 
@@ -228,10 +228,10 @@ const findings = [
     border: 0;
     border-radius: 13px;
     background: linear-gradient(90deg, var(--product-primary-deep), var(--product-primary));
-    color: #101112;
+    color: #111111;
     font-size: 13px;
     font-weight: 800;
-    box-shadow: 0 12px 26px rgba(111, 203, 195, 0.4);
+    box-shadow: 0 12px 26px rgba(17, 17, 17, 0.4);
     cursor: default;
   }
 
@@ -269,7 +269,7 @@ const findings = [
     height: 18px;
     padding: 0 5px;
     border-radius: 999px;
-    background: rgba(129, 216, 208, 0.22);
+    background: rgba(17, 17, 17, 0.22);
     color: var(--product-primary-bright);
     font-size: 10px;
     font-weight: 800;
@@ -328,8 +328,8 @@ const findings = [
   }
 
   .ext-weak .ext-section-flag {
-    color: #101112;
-    background: rgba(129, 216, 208, 0.5);
+    color: #111111;
+    background: rgba(17, 17, 17, 0.5);
   }
 
   /* Findings */
@@ -389,7 +389,7 @@ const findings = [
 
   .ext-btn-yellow {
     background: linear-gradient(90deg, var(--product-primary-deep), var(--product-primary));
-    color: #101112;
+    color: #111111;
   }
 
   .ext-btn-amber {

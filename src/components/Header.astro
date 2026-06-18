@@ -21,10 +21,10 @@ const activeHref = Astro.url.pathname === "/faq" ? "/faq" : undefined;
       items={navItems}
       activeHref={activeHref}
       homeHref="/#product"
-      baseColor="#101112"
-      pillColor="#81D8D0"
-      hoveredPillTextColor="#ffffff"
-      pillTextColor="#101112"
+      baseColor="#111111"
+      pillColor="#111111"
+      hoveredPillTextColor="#FAF7F3"
+      pillTextColor="#FAF7F3"
       className="site-pill-nav"
     />
 
@@ -34,10 +34,24 @@ const activeHref = Astro.url.pathname === "/faq" ? "/faq" : undefined;
 
 <script>
   const header = document.querySelector("[data-header]");
+
   const syncHeader = () => {
-    header?.classList.toggle("is-scrolled", window.scrollY > 8);
+    if (!header) return;
+
+    const hero = document.querySelector("#product");
+
+    if (!hero) {
+      const isLandingPage = window.location.pathname === "/";
+      header.classList.toggle("is-scrolled", !isLandingPage);
+      return;
+    }
+
+    const revealAt = hero.offsetTop + hero.getBoundingClientRect().height - 80;
+    header.classList.toggle("is-scrolled", window.scrollY >= revealAt);
   };
 
   syncHeader();
+  window.addEventListener("DOMContentLoaded", syncHeader, { once: true });
   window.addEventListener("scroll", syncHeader, { passive: true });
+  window.addEventListener("resize", syncHeader, { passive: true });
 </script>
