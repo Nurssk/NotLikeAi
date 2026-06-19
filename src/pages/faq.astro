@@ -4,6 +4,7 @@ import Analytics from "@vercel/analytics/astro";
 import FAQAccordion from "../components/FAQAccordion.astro";
 import Footer from "../components/Footer.astro";
 import GlobalClickSpark from "../components/GlobalClickSpark";
+import AmplitudeAnalytics from "../components/AmplitudeAnalytics.astro";
 
 const faqItems = [
   {
@@ -182,6 +183,7 @@ const faqSchema = {
       sparkCount={10}
       duration={520}
     />
+    <AmplitudeAnalytics />
     <Analytics />
     <script>
       const faqRoot = document.querySelector("[data-faq-filter-root]");

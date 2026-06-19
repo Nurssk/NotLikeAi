@@ -100,6 +100,14 @@ export default function WaitlistMorphButton({
   const open = () => {
     setIsExpanded(true);
     setError("");
+    window.dispatchEvent(
+      new CustomEvent("waitlist:opened", {
+        detail: {
+          size,
+          buttonText,
+        },
+      }),
+    );
   };
 
   const close = () => {
@@ -148,6 +156,15 @@ export default function WaitlistMorphButton({
       );
 
       onSubmit?.(value);
+      window.dispatchEvent(
+        new CustomEvent("waitlist:submitted", {
+          detail: {
+            size,
+            source: "landing",
+            emailDomain: normalizedEmail.split("@")[1] || "",
+          },
+        }),
+      );
       setResolvedSuccessText(successText);
       setIsExpanded(false);
       setEmail("");

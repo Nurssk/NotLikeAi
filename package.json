@@ -8,6 +8,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@amplitude/unified": "^1.1.16",
     "@astrojs/react": "^5.0.0",
     "@astrojs/vercel": "^9.0.5",
     "@polar-sh/sdk": "^0.48.1",

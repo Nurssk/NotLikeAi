@@ -3,6 +3,7 @@ import "../styles/global.css";
 import Analytics from "@vercel/analytics/astro";
 import Footer from "../components/Footer.astro";
 import GlobalClickSpark from "../components/GlobalClickSpark";
+import AmplitudeAnalytics from "../components/AmplitudeAnalytics.astro";
 
 const lastUpdated = "June 15, 2026";
 const contactEmail = "sarsennbaj.n@gmail.com";
@@ -241,6 +242,7 @@ const sections = [
       sparkCount={10}
       duration={520}
     />
+    <AmplitudeAnalytics />
     <Analytics />
   </body>
 </html>

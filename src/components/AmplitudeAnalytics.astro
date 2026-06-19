@@ -1,0 +1,119 @@
+<script>
+  import * as amplitude from "@amplitude/unified";
+
+  const AMPLITUDE_API_KEY = "b197eab4fe0e9da2e6683a7f239c01d5";
+  const globalState = window as typeof window & {
+    __beuniqAmplitudeReady?: boolean;
+    __beuniqAmplitudeBound?: boolean;
+    __beuniqAmplitudePromise?: Promise<void>;
+  };
+
+  const initAmplitude = () => {
+    if (globalState.__beuniqAmplitudePromise) return globalState.__beuniqAmplitudePromise;
+
+    globalState.__beuniqAmplitudePromise = amplitude
+      .initAll(AMPLITUDE_API_KEY, {
+        analytics: {
+          autocapture: true,
+        },
+        sessionReplay: {
+          sampleRate: 1,
+        },
+      })
+      .then(() => {
+        globalState.__beuniqAmplitudeReady = true;
+      })
+      .catch((error) => {
+        console.error("[amplitude] failed to initialize", error);
+      });
+
+    return globalState.__beuniqAmplitudePromise;
+  };
+
+  const track = (eventName: string, eventProperties: Record<string, unknown> = {}) => {
+    void initAmplitude().then(() => {
+      amplitude.track(eventName, {
+        path: window.location.pathname,
+        ...eventProperties,
+      });
+    });
+  };
+
+  const getPlanFromElement = (element: Element | null) => {
+    if (!(element instanceof HTMLElement)) return undefined;
+
+    const directPlan = element.dataset.planId;
+    if (directPlan) return directPlan;
+
+    if (element instanceof HTMLAnchorElement) {
+      try {
+        return new URL(element.href).searchParams.get("plan") || undefined;
+      } catch {
+        return undefined;
+      }
+    }
+
+    return undefined;
+  };
+
+  const bindTracking = () => {
+    if (globalState.__beuniqAmplitudeBound) return;
+    globalState.__beuniqAmplitudeBound = true;
+
+    track("Page Viewed", {
+      title: document.title,
+      url: window.location.href,
+    });
+
+    window.addEventListener("waitlist:opened", (event) => {
+      const detail = event instanceof CustomEvent ? event.detail : {};
+      track("Waitlist Opened", detail);
+    });
+
+    window.addEventListener("waitlist:submitted", (event) => {
+      const detail = event instanceof CustomEvent ? event.detail : {};
+      track("Waitlist Submitted", detail);
+    });
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const planChoice = target.closest("[data-plan-choice]");
+      if (planChoice) {
+        track("Pricing Plan Selected", {
+          plan: getPlanFromElement(planChoice),
+        });
+        return;
+      }
+
+      if (target.closest("[data-buy-now]")) {
+        const flow = target.closest("[data-pricing-flow]");
+        track("Pricing Buy Now Clicked", {
+          plan: flow instanceof HTMLElement ? flow.dataset.selectedPlan : undefined,
+        });
+        return;
+      }
+
+      const checkoutSubmit = target.closest("[data-checkout-submit]");
+      if (checkoutSubmit) {
+        track("Checkout Started", {
+          plan: getPlanFromElement(checkoutSubmit),
+        });
+        return;
+      }
+
+      const faqSummary = target.closest(".faq-item > summary");
+      if (faqSummary) {
+        const item = faqSummary.closest("[data-faq-item]");
+        const question = item?.querySelector(".faq-item-question")?.textContent?.trim();
+        track("FAQ Question Clicked", {
+          question,
+          willOpen: item instanceof HTMLDetailsElement ? !item.open : undefined,
+        });
+      }
+    });
+  };
+
+  void initAmplitude().then(bindTracking);
+</script>
