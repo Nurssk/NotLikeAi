@@ -144,8 +144,14 @@ const features = [
           </p>
 
           <div class="checkout-field">
-            <label for="pricing-email">Email <span>optional</span></label>
-            <input id="pricing-email" type="email" autocomplete="email" placeholder="you@example.com" />
+            <label for="pricing-email">Gmail for credits</label>
+            <input
+              id="pricing-email"
+              type="email"
+              autocomplete="email"
+              placeholder="you@gmail.com"
+              required
+            />
           </div>
 
           <a class="btn btn-primary checkout-upgrade" href="/api/checkout?plan=minimal" data-checkout-submit>
@@ -312,8 +318,12 @@ const features = [
       const emailInput = flow.querySelector("#pricing-email");
       if (!(emailInput instanceof HTMLInputElement)) return;
 
-      const email = emailInput.value.trim();
-      if (!email) return;
+      const email = emailInput.value.trim().toLowerCase();
+      if (!email || !emailInput.checkValidity()) {
+        event.preventDefault();
+        emailInput.reportValidity();
+        return;
+      }
 
       const href = new URL(submit.href);
       href.searchParams.set("email", email);
