@@ -408,6 +408,42 @@ const pageDescription =
 
     const codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const codeLength = 6;
+    const codeTtlMs = 10 * 60 * 1000;
+
+    const generateRawCode = () => {
+      let code = "";
+      const values = new Uint32Array(codeLength);
+      window.crypto.getRandomValues(values);
+
+      for (let index = 0; index < codeLength; index += 1) {
+        code += codeAlphabet[values[index] % codeAlphabet.length];
+      }
+
+      return code;
+    };
+
+    const saveCode = async ({ code, email }) => {
+      const normalizedEmail = email.trim().toLowerCase();
+      const [{ collection, doc, getDocs, query, where, writeBatch }, { db }] = await Promise.all([
+        import("firebase/firestore"),
+        import("../../lib/firestore"),
+      ]);
+
+      const codesRef = collection(db, "extensionAuthCodes");
+      const existing = await getDocs(query(codesRef, where("email", "==", normalizedEmail)));
+      const batch = writeBatch(db);
+
+      existing.docs.forEach((snapshot) => {
+        batch.delete(snapshot.ref);
+      });
+
+      batch.set(doc(codesRef), {
+        email: normalizedEmail,
+        code,
+      });
+
+      await batch.commit();
+    };
 
     const generateCode = async () => {
       if (isGenerating || !authUser) return;
@@ -431,32 +467,17 @@ const pageDescription =
           return;
         }
 
-        const idToken = await authUser.getIdToken(true);
-        const response = await fetch("/api/extension-auth/code", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
+        const code = generateRawCode();
+        await saveCode({
+          code,
+          email: authUser.email,
         });
-        const payload = await response.json().catch(() => ({}));
-
-        if (
-          !response.ok ||
-          typeof payload.code !== "string" ||
-          payload.code.length !== codeLength ||
-          !Array.from(payload.code).every((character) => codeAlphabet.includes(character))
-        ) {
-          setMessage("Could not create the extension code in Firebase. Please try again.", "error");
-          return;
-        }
-
-        const expiresInSeconds = typeof payload.expiresInSeconds === "number" ? payload.expiresInSeconds : 600;
-        const expiresAt = new Date(Date.now() + expiresInSeconds * 1000);
+        const expiresAt = new Date(Date.now() + codeTtlMs);
 
         showCode({
-          code: payload.code,
+          code,
           expiresAt: expiresAt.toISOString(),
-          email: typeof payload.email === "string" ? payload.email : authUser.email.trim().toLowerCase(),
+          email: authUser.email.trim().toLowerCase(),
         });
       } catch {
         setMessage("Could not create the extension code in Firebase. Please try again.", "error");
