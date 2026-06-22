@@ -14,8 +14,8 @@ export const extensionAuthCorsHeaders = {
   "Access-Control-Allow-Headers": "Authorization, Content-Type",
 };
 
-const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const CODE_LENGTH = 8;
+const CODE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const CODE_LENGTH = 6;
 const CODE_TTL_MS = 10 * 60 * 1000;
 const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60;
 const CODE_ATTEMPT_LIMIT = 5;
@@ -79,8 +79,6 @@ const getExtensionAuthSecret = () => {
 
 const sha256 = (value: string) => createHash("sha256").update(value).digest("hex");
 
-const hmacHex = (value: string) => createHmac("sha256", getExtensionAuthSecret()).update(value).digest("hex");
-
 const hmacBase64Url = (value: string) => base64UrlEncode(createHmac("sha256", getExtensionAuthSecret()).update(value).digest());
 
 const timingSafeEqualString = (left: string, right: string) => {
@@ -91,7 +89,7 @@ const timingSafeEqualString = (left: string, right: string) => {
 
 export const normalizeExtensionCode = (code: string) => code.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-export const formatExtensionCode = (code: string) => `${code.slice(0, 4)}-${code.slice(4)}`;
+export const formatExtensionCode = (code: string) => code;
 
 const generateRawCode = () => {
   let code = "";
@@ -199,7 +197,7 @@ export const createExtensionAuthCode = async (request: Request) => {
 
   const db = adminDb();
   let rawCode = generateRawCode();
-  let codeHash = hmacHex(`${verified.normalizedEmail}:${rawCode}`);
+  let codeHash = sha256(`${verified.normalizedEmail}:${rawCode}`);
   let codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(codeHash);
 
   for (let attempts = 0; attempts < 3; attempts += 1) {
@@ -207,7 +205,7 @@ export const createExtensionAuthCode = async (request: Request) => {
     if (!existing.exists) break;
 
     rawCode = generateRawCode();
-    codeHash = hmacHex(`${verified.normalizedEmail}:${rawCode}`);
+    codeHash = sha256(`${verified.normalizedEmail}:${rawCode}`);
     codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(codeHash);
   }
 
@@ -296,7 +294,7 @@ export const exchangeExtensionAuthCode = async (request: Request) => {
     return extensionAuthJsonResponse({ error: "rate_limited" }, { status: 429 });
   }
 
-  const codeHash = hmacHex(`${email}:${code}`);
+  const codeHash = sha256(`${email}:${code}`);
   const db = adminDb();
   const codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(codeHash);
 
