@@ -104,19 +104,6 @@ const pageDescription =
             </button>
           </form>
 
-          <div class="extension-code-panel" data-code-panel hidden>
-            <div>
-              <span>One-time code</span>
-              <strong data-extension-code>----</strong>
-              <p data-code-expiry>Expires in 10:00</p>
-            </div>
-            <button class="extension-copy-button" type="button" data-copy-code>Copy</button>
-          </div>
-
-          <button class="btn btn-primary extension-generate-button" type="button" data-generate-code hidden>
-            Generate extension code
-          </button>
-
           <p class="extension-auth-message" data-auth-message aria-live="polite">
             Log in or register with email and password. Verification is required before generating a code.
           </p>
@@ -266,8 +253,7 @@ const pageDescription =
   }
 
   .extension-google-button,
-  .extension-auth-submit,
-  .extension-generate-button {
+  .extension-auth-submit {
     width: 100%;
     min-height: 54px;
     border-radius: 10px;
@@ -379,59 +365,6 @@ const pageDescription =
     box-shadow: 0 0 0 3px rgba(16, 17, 18, 0.08);
   }
 
-  .extension-code-panel {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 16px;
-    padding: 18px;
-    border-radius: 12px;
-    background: #111111;
-    color: var(--on-accent);
-  }
-
-  .extension-code-panel[hidden],
-  .extension-generate-button[hidden] {
-    display: none;
-  }
-
-  .extension-code-panel span,
-  .extension-code-panel p {
-    color: rgba(250, 247, 243, 0.72);
-    font-size: 12px;
-    font-weight: 800;
-    line-height: 1.3;
-    text-transform: uppercase;
-  }
-
-  .extension-code-panel strong {
-    display: block;
-    margin: 6px 0;
-    font-family: var(--font-display);
-    font-size: clamp(30px, 4vw, 42px);
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    line-height: 1;
-  }
-
-  .extension-code-panel p {
-    margin: 0;
-    text-transform: none;
-  }
-
-  .extension-copy-button {
-    min-width: 76px;
-    min-height: 42px;
-    border: 0;
-    border-radius: 10px;
-    background: var(--on-accent);
-    color: #111111;
-    cursor: pointer;
-    font: inherit;
-    font-size: 14px;
-    font-weight: 900;
-  }
-
   .extension-auth-message {
     min-height: 40px;
     margin: 0;
@@ -451,9 +384,7 @@ const pageDescription =
 
   .extension-google-button:disabled,
   .extension-auth-switch button:disabled,
-  .extension-auth-submit:disabled,
-  .extension-generate-button:disabled,
-  .extension-copy-button:disabled {
+  .extension-auth-submit:disabled {
     cursor: wait;
     opacity: 0.64;
   }
@@ -486,13 +417,6 @@ const pageDescription =
       font-size: 15px;
     }
 
-    .extension-code-panel {
-      grid-template-columns: 1fr;
-    }
-
-    .extension-copy-button {
-      width: 100%;
-    }
   }
 </style>
 
@@ -507,19 +431,13 @@ const pageDescription =
     const passwordInput = authPage.querySelector("#extension-password");
     const submitButton = authPage.querySelector("[data-auth-submit]");
     const googleButton = authPage.querySelector("[data-google-auth]");
-    const generateButton = authPage.querySelector("[data-generate-code]");
-    const codePanel = authPage.querySelector("[data-code-panel]");
-    const codeNode = authPage.querySelector("[data-extension-code]");
-    const codeExpiryNode = authPage.querySelector("[data-code-expiry]");
-    const copyButton = authPage.querySelector("[data-copy-code]");
     let authMode = "login";
     let authUser = null;
     let authLoading = false;
     let authModulePromise = null;
     let authUnsubscribe = null;
-    let activeCode = "";
-    let codeExpiresAt = 0;
-    let codeTimer = 0;
+    let isRedirecting = false;
+    const codePagePath = "/extension/code";
 
     const setMessage = (message, tone = "neutral") => {
       if (!messageNode) return;
@@ -541,33 +459,10 @@ const pageDescription =
       if (submitButton) submitButton.textContent = label;
     };
 
-    const setCodeVisible = (visible) => {
-      if (codePanel instanceof HTMLElement) codePanel.hidden = !visible;
-    };
-
-    const setGenerateVisible = (visible) => {
-      if (generateButton instanceof HTMLElement) generateButton.hidden = !visible;
-    };
-
-    const updateCodeExpiry = () => {
-      if (!codeExpiryNode) return;
-      const seconds = Math.max(0, Math.ceil((codeExpiresAt - Date.now()) / 1000));
-      const minutes = Math.floor(seconds / 60);
-      const remainder = String(seconds % 60).padStart(2, "0");
-      codeExpiryNode.textContent = seconds > 0 ? `Expires in ${minutes}:${remainder}` : "Expired. Generate a new code.";
-      if (seconds <= 0) {
-        window.clearInterval(codeTimer);
-      }
-    };
-
-    const showCode = (code, expiresAt) => {
-      activeCode = code;
-      codeExpiresAt = Date.parse(expiresAt);
-      if (codeNode) codeNode.textContent = code;
-      setCodeVisible(true);
-      window.clearInterval(codeTimer);
-      updateCodeExpiry();
-      codeTimer = window.setInterval(updateCodeExpiry, 1000);
+    const redirectToCodePage = () => {
+      if (isRedirecting) return;
+      isRedirecting = true;
+      window.location.assign(codePagePath);
     };
 
     const authErrorMessage = (error) => {
@@ -594,13 +489,6 @@ const pageDescription =
       if (code === "auth/network-request-failed") return "Network error while contacting Firebase. Please try again.";
       if (code === "auth/api-key-not-valid") return "Firebase API key is not valid for this project.";
       return code ? `Authentication failed: ${code.replace("auth/", "")}.` : "Authentication failed. Please try again.";
-    };
-
-    const apiErrorMessage = (error) => {
-      if (error === "email_not_verified") return "Verify your email before generating an extension code.";
-      if (error === "rate_limited") return "Too many attempts. Wait a moment and try again.";
-      if (error === "missing_authorization" || error === "invalid_authorization") return "Log in again before generating a code.";
-      return "Could not generate an extension code. Please try again.";
     };
 
     const loadAuthModule = () => {
@@ -638,19 +526,23 @@ const pageDescription =
       }
 
       if (authUser?.email) {
-        if (heading) heading.textContent = isVerified ? "Generate code" : "Verify email";
-        if (subtitle) {
-          subtitle.textContent = isVerified
-            ? "Copy this one-time code into the Chrome extension."
-            : "Check your inbox before generating a Chrome extension code.";
+        if (isVerified) {
+          if (heading) heading.textContent = "Redirecting";
+          if (subtitle) subtitle.textContent = "Generating your Chrome extension code...";
+          setSubmitLabel("Signed in");
+          setMessage(`Signed in as ${authUser.email}. Redirecting to your code...`, "success");
+          redirectToCodePage();
+          return;
         }
-        setSubmitLabel(isVerified ? "Signed in" : "Send verification email");
-        setGenerateVisible(isVerified);
+
+        if (heading) heading.textContent = "Verify email";
+        if (subtitle) {
+          subtitle.textContent = "Check your inbox before generating a Chrome extension code.";
+        }
+        setSubmitLabel("Send verification email");
         setMessage(
-          isVerified
-            ? `Signed in as ${authUser.email}. Generate a code when the extension asks for one.`
-            : `Signed in as ${authUser.email}. Verify this email before generating a code.`,
-          isVerified ? "success" : "neutral",
+          `Signed in as ${authUser.email}. Verify this email before generating a code.`,
+          "neutral",
         );
       } else {
         if (heading) heading.textContent = authMode === "register" ? "Create account" : "Log in";
@@ -661,8 +553,6 @@ const pageDescription =
               : "Access the account you want to connect to the Chrome extension.";
         }
         setSubmitLabel(authMode === "register" ? "Create account" : "Log in");
-        setGenerateVisible(false);
-        setCodeVisible(false);
         setMessage(
           authMode === "register"
             ? "Create your account. We will email you a verification link before generating a code."
@@ -721,7 +611,11 @@ const pageDescription =
         provider.setCustomParameters({ prompt: "select_account" });
         const result = await signInWithPopup(auth, provider);
         authUser = result.user;
-        setMessage(`Signed in as ${result.user.email}. Generate a code when the extension asks for one.`, "success");
+        if (result.user.emailVerified) {
+          redirectToCodePage();
+        } else {
+          setMessage(`Signed in as ${result.user.email}. Verify this email before generating a code.`);
+        }
       } catch (error) {
         setMessage(authErrorMessage(error), "error");
       } finally {
@@ -764,7 +658,7 @@ const pageDescription =
             await signOut(auth);
             authUser = null;
           } else if (currentUser?.emailVerified) {
-            setMessage(`Signed in as ${currentUser.email}. Generate a code when the extension asks for one.`, "success");
+            redirectToCodePage();
             return;
           } else if (currentUser) {
             await sendEmailVerification(currentUser);
@@ -801,7 +695,7 @@ const pageDescription =
               : "Account created. Verification email sent. Check your inbox and spam folder.",
           );
         } else if (result.user.emailVerified) {
-          setMessage(`Signed in as ${result.user.email}. Generate a code when the extension asks for one.`, "success");
+          redirectToCodePage();
         } else {
           await sendEmailVerification(result.user);
           setMessage("Email is not verified yet. We sent a new verification link to your inbox.", "error");
@@ -811,58 +705,6 @@ const pageDescription =
       } finally {
         setLoading(false);
         updateAuthState();
-      }
-    });
-
-    generateButton?.addEventListener("click", async () => {
-      if (authLoading) return;
-      if (!authUser?.email) {
-        setMessage("Log in before generating a code.", "error");
-        return;
-      }
-
-      setLoading(true);
-      setMessage("Generating one-time code...");
-
-      try {
-        await authUser.reload();
-        if (!authUser.emailVerified) {
-          setMessage("Verify your email before generating an extension code.", "error");
-          return;
-        }
-
-        const idToken = await authUser.getIdToken(true);
-        const response = await fetch("/api/extension-auth/code", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        });
-        const payload = await response.json().catch(() => ({}));
-
-        if (!response.ok || typeof payload.code !== "string" || typeof payload.expiresAt !== "string") {
-          setMessage(apiErrorMessage(payload.error), "error");
-          return;
-        }
-
-        showCode(payload.code, payload.expiresAt);
-        setMessage("Code generated. Return to the Chrome extension and enter your email plus this code.", "success");
-      } catch {
-        setMessage("Could not generate an extension code. Please try again.", "error");
-      } finally {
-        setLoading(false);
-        updateAuthState();
-      }
-    });
-
-    copyButton?.addEventListener("click", async () => {
-      if (!activeCode) return;
-
-      try {
-        await navigator.clipboard.writeText(activeCode);
-        setMessage("Code copied. Paste it into the Chrome extension.", "success");
-      } catch {
-        setMessage("Copy failed. Select the code and copy it manually.", "error");
       }
     });
 
