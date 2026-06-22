@@ -138,25 +138,50 @@ const features = [
         </aside>
 
         <div class="checkout-form">
-          <h3>Continue to secure checkout</h3>
+          <h3>Log in before payment</h3>
           <p class="checkout-note">
-            Payment is handled by Polar. Your card details are entered on Polar's hosted checkout page.
+            Use the email you want to connect to Chrome extension credits. New accounts must verify email before payment.
           </p>
 
-          <div class="checkout-field">
-            <label for="pricing-email">Gmail for credits</label>
-            <input
-              id="pricing-email"
-              type="email"
-              autocomplete="email"
-              placeholder="you@gmail.com"
-              required
-            />
-          </div>
+          <div class="checkout-auth-panel" data-auth-panel>
+            <div class="checkout-auth-switch" role="tablist" aria-label="Account action">
+              <button class="is-active" type="button" data-auth-mode="login" aria-pressed="true">Log in</button>
+              <button type="button" data-auth-mode="register" aria-pressed="false">Register</button>
+            </div>
 
-          <a class="btn btn-primary checkout-upgrade" href="/api/checkout?plan=minimal" data-checkout-submit>
-            Continue to Polar
-          </a>
+            <form class="checkout-auth-form" data-auth-form>
+              <div class="checkout-field">
+                <label for="pricing-email">Email for credits</label>
+                <input
+                  id="pricing-email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="you@gmail.com"
+                  required
+                />
+              </div>
+
+              <div class="checkout-field checkout-password-field">
+                <label for="pricing-password">Password</label>
+                <input
+                  id="pricing-password"
+                  type="password"
+                  autocomplete="current-password"
+                  minlength="6"
+                  placeholder="6 characters minimum"
+                  required
+                />
+              </div>
+
+              <button class="btn btn-primary checkout-upgrade" type="submit" data-checkout-submit>
+                Pay Now
+              </button>
+            </form>
+
+            <p class="checkout-auth-message" data-auth-message aria-live="polite">
+              Log in or register with email and password. Verification is required before payment.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -170,6 +195,11 @@ const features = [
     const planMap = new Map(plans.map((plan) => [plan.id, plan]));
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let selectedPlanId = flow.getAttribute("data-selected-plan") || plans[0]?.id || "popular";
+    let authMode = "login";
+    let authUser = null;
+    let authLoading = false;
+    let authModulePromise = null;
+    let authUnsubscribe = null;
     let screenshotAnimationFrame = 0;
 
     const setText = (selector, value) => {
@@ -276,12 +306,159 @@ const features = [
       setText("[data-checkout-price]", plan.price);
       setText("[data-checkout-price-repeat]", plan.price);
 
-      const checkoutSubmit = flow.querySelector("[data-checkout-submit]");
-      if (checkoutSubmit instanceof HTMLAnchorElement) {
-        checkoutSubmit.href = plan.href;
+      updateFeatureChecks(planId);
+    };
+
+    const setAuthMessage = (message, isError = false) => {
+      const messageNode = flow.querySelector("[data-auth-message]");
+      if (!messageNode) return;
+      messageNode.textContent = message;
+      messageNode.classList.toggle("is-error", isError);
+    };
+
+    const setAuthLoading = (isLoading) => {
+      authLoading = isLoading;
+      flow.querySelectorAll("[data-auth-form] button").forEach((button) => {
+        if (button instanceof HTMLButtonElement) {
+          button.disabled = isLoading;
+        }
+      });
+    };
+
+    const getCheckoutUrl = (email) => {
+      const plan = planMap.get(selectedPlanId);
+      const href = new URL(plan?.href || "/api/checkout?plan=popular", window.location.origin);
+      href.searchParams.set("email", email.trim().toLowerCase());
+      return href.toString();
+    };
+
+    const redirectToPolar = (email) => {
+      window.location.href = getCheckoutUrl(email);
+    };
+
+    const setSubmitLabel = (label) => {
+      const submit = flow.querySelector("[data-checkout-submit]");
+      if (submit) submit.textContent = label;
+    };
+
+    const sendVerification = async (user, sendEmailVerification) => {
+      await sendEmailVerification(user);
+    };
+
+    const updateAuthState = () => {
+      const emailInput = flow.querySelector("#pricing-email");
+      const passwordInput = flow.querySelector("#pricing-password");
+      const isAuthenticated = Boolean(authUser?.email);
+      const isVerified = Boolean(authUser?.emailVerified);
+
+      flow.classList.toggle("is-authenticated", isAuthenticated);
+      flow.classList.toggle("is-email-verified", isVerified);
+
+      if (emailInput instanceof HTMLInputElement && authUser?.email) {
+        emailInput.value = authUser.email;
       }
 
-      updateFeatureChecks(planId);
+      if (passwordInput instanceof HTMLInputElement) {
+        passwordInput.required = !isAuthenticated;
+      }
+
+      if (authUser?.email) {
+        setSubmitLabel(isVerified ? "Pay Now" : "Send verification email");
+        setAuthMessage(
+          isVerified
+            ? `Email verified. Click Pay Now to continue to Polar.`
+            : `Signed in as ${authUser.email}. Verify this email before payment.`,
+        );
+      } else {
+        setSubmitLabel(authMode === "register" ? "Create account" : "Pay Now");
+        setAuthMessage(
+          authMode === "register"
+            ? "Create your account. We will send a verification email before payment."
+            : "Log in with a verified email to continue to Polar.",
+        );
+      }
+    };
+
+    const setAuthMode = (mode) => {
+      authMode = mode;
+      flow.querySelectorAll("[data-auth-mode]").forEach((button) => {
+        const isActive = button.getAttribute("data-auth-mode") === mode;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+
+      const passwordInput = flow.querySelector("#pricing-password");
+      if (passwordInput instanceof HTMLInputElement) {
+        passwordInput.autocomplete = mode === "register" ? "new-password" : "current-password";
+      }
+
+      setSubmitLabel(mode === "register" ? "Create account" : "Pay Now");
+      setAuthMessage(
+        mode === "register"
+          ? "Create your account. We will email you a verification link before payment."
+          : "Log in with a verified email to continue to Polar.",
+      );
+    };
+
+    const authErrorMessage = (error) => {
+      const code = typeof error === "object" && error && "code" in error ? error.code : "";
+      if (code === "auth/email-already-in-use") return "This email already has an account. Switch to Log in.";
+      if (
+        code === "auth/invalid-credential" ||
+        code === "auth/invalid-login-credentials" ||
+        code === "auth/user-not-found" ||
+        code === "auth/wrong-password"
+      ) {
+        return "No matching account found or password is incorrect. Switch to Register if this is your first time.";
+      }
+      if (code === "auth/weak-password") return "Use a password with at least 6 characters.";
+      if (code === "auth/too-many-requests") return "Too many attempts. Wait a moment and try again.";
+      if (code === "auth/invalid-email") return "Enter a valid email address.";
+      if (code === "auth/missing-password") return "Enter a password.";
+      if (code === "auth/user-disabled") return "This account is disabled.";
+      if (code === "auth/operation-not-allowed") return "This sign-in method is disabled in Firebase Authentication.";
+      if (code === "auth/unauthorized-domain") return "This domain is not allowed in Firebase Authentication settings.";
+      if (code === "auth/unauthorized-continue-uri") return "Firebase is not allowed to use this verification redirect domain.";
+      if (code === "auth/invalid-continue-uri") return "Firebase email verification redirect URL is invalid.";
+      if (code === "auth/network-request-failed") return "Network error while contacting Firebase. Please try again.";
+      if (code === "auth/api-key-not-valid") return "Firebase API key is not valid for this project.";
+      return code ? `Authentication failed: ${code.replace("auth/", "")}.` : "Authentication failed. Please try again.";
+    };
+
+    const authLoadErrorMessage = () => "Authentication could not load. Refresh the page and try again.";
+
+    const loadAuthModule = () => {
+      if (!authModulePromise) {
+        authModulePromise = Promise.all([import("firebase/auth"), import("../../lib/firebase")])
+          .then(([firebaseAuth, firebase]) => ({
+            createUserWithEmailAndPassword: firebaseAuth.createUserWithEmailAndPassword,
+            onAuthStateChanged: firebaseAuth.onAuthStateChanged,
+            sendEmailVerification: firebaseAuth.sendEmailVerification,
+            signOut: firebaseAuth.signOut,
+            signInWithEmailAndPassword: firebaseAuth.signInWithEmailAndPassword,
+            auth: firebase.auth,
+          }))
+          .catch((error) => {
+            authModulePromise = null;
+            throw error;
+          });
+      }
+
+      return authModulePromise;
+    };
+
+    const ensureAuthState = async () => {
+      if (authUnsubscribe) return;
+
+      try {
+        const { auth, onAuthStateChanged } = await loadAuthModule();
+        authUnsubscribe = onAuthStateChanged(auth, (user) => {
+          authUser = user;
+          updateAuthState();
+        });
+      } catch (error) {
+        setAuthMessage(authLoadErrorMessage(), true);
+      }
     };
 
     const showCheckout = () => {
@@ -291,6 +468,8 @@ const features = [
       flow.querySelector("[data-flow-view='checkout']")?.classList.add("is-active");
       flow.querySelector("[data-flow-view='plans']")?.classList.remove("is-active");
       flow.querySelector("#pricing-email")?.focus();
+      updateAuthState();
+      void ensureAuthState();
     };
 
     const showPlans = () => {
@@ -311,23 +490,97 @@ const features = [
 
     flow.querySelector("[data-buy-now]")?.addEventListener("click", showCheckout);
     flow.querySelector("[data-back-to-plans]")?.addEventListener("click", showPlans);
-    flow.querySelector("[data-checkout-submit]")?.addEventListener("click", (event) => {
-      const submit = event.currentTarget;
-      if (!(submit instanceof HTMLAnchorElement)) return;
+    flow.querySelectorAll("[data-auth-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const mode = button.getAttribute("data-auth-mode");
+        if (mode === "login" || mode === "register") {
+          setAuthMode(mode);
+        }
+      });
+    });
 
+    flow.querySelector("[data-auth-form]")?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (authLoading) return;
       const emailInput = flow.querySelector("#pricing-email");
+      const passwordInput = flow.querySelector("#pricing-password");
       if (!(emailInput instanceof HTMLInputElement)) return;
 
       const email = emailInput.value.trim().toLowerCase();
       if (!email || !emailInput.checkValidity()) {
-        event.preventDefault();
         emailInput.reportValidity();
         return;
       }
 
-      const href = new URL(submit.href);
-      href.searchParams.set("email", email);
-      submit.href = href.toString();
+      if (!(passwordInput instanceof HTMLInputElement) || !passwordInput.checkValidity()) {
+        passwordInput?.reportValidity();
+        return;
+      }
+
+      setAuthLoading(true);
+      setAuthMessage(authMode === "register" ? "Creating account..." : "Logging in...");
+
+      try {
+        const { auth, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, signOut } =
+          await loadAuthModule();
+        await ensureAuthState();
+
+        if (auth.currentUser?.email) {
+          await auth.currentUser.reload();
+          const currentUser = auth.currentUser;
+          authUser = currentUser;
+          const currentEmail = currentUser?.email?.toLowerCase();
+
+          if (currentUser && currentEmail !== email) {
+            await signOut(auth);
+            authUser = null;
+          } else if (currentUser?.emailVerified) {
+            redirectToPolar(currentUser.email);
+            return;
+          } else if (currentUser) {
+            await sendVerification(currentUser, sendEmailVerification);
+            setAuthMessage("Verification email sent. Check your inbox and spam folder, then log in again to continue.");
+            return;
+          }
+        }
+
+        let result;
+        let reusedExistingAccount = false;
+        try {
+          result = authMode === "register"
+            ? await createUserWithEmailAndPassword(auth, email, passwordInput.value)
+            : await signInWithEmailAndPassword(auth, email, passwordInput.value);
+        } catch (error) {
+          const code = typeof error === "object" && error && "code" in error ? error.code : "";
+
+          if (authMode === "register" && code === "auth/email-already-in-use") {
+            reusedExistingAccount = true;
+            result = await signInWithEmailAndPassword(auth, email, passwordInput.value);
+          } else {
+            throw error;
+          }
+        }
+
+        if (!result.user.email) {
+          setAuthMessage("Account does not have an email address.", true);
+        } else if (authMode === "register") {
+          await sendVerification(result.user, sendEmailVerification);
+          setAuthMessage(
+            reusedExistingAccount
+              ? "Account already exists. Verification email sent again. Check your inbox and spam folder."
+              : "Account created. Verification email sent. Check your inbox and spam folder.",
+          );
+        } else if (result.user.emailVerified) {
+          redirectToPolar(result.user.email);
+        } else {
+          await sendVerification(result.user, sendEmailVerification);
+          setAuthMessage("Email is not verified yet. We sent a new verification link to your inbox.", true);
+        }
+      } catch (error) {
+        setAuthMessage(authErrorMessage(error), true);
+      } finally {
+        setAuthLoading(false);
+      }
     });
 
     selectPlan(selectedPlanId);

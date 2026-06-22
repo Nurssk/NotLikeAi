@@ -47,10 +47,13 @@ service cloud.firestore {
         && request.auth.token.email.size() > 3;
     }
 
-    function isOwnCreditDocument() {
+    function isOwnCreditDocument(emailKey) {
       return hasAuthEmail()
+        && resource.data.keys().hasAll(['normalizedEmail', 'emailKey'])
         && resource.data.normalizedEmail is string
-        && resource.data.normalizedEmail == request.auth.token.email.lower();
+        && resource.data.emailKey is string
+        && resource.data.normalizedEmail == request.auth.token.email.lower()
+        && resource.data.emailKey == emailKey;
     }
 
     match /waitlist/{docId} {
@@ -81,7 +84,7 @@ service cloud.firestore {
     // Firebase Admin SDK. A signed-in Chrome extension user may read only the
     // document tied to their Google email.
     match /customerCredits/{emailKey} {
-      allow get: if isOwnCreditDocument();
+      allow get: if isOwnCreditDocument(emailKey);
       allow list, create, update, delete: if false;
     }
 

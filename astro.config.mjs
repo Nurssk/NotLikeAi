@@ -15,7 +15,16 @@ export default defineConfig({
       dedupe: ["react", "react-dom"],
     },
     optimizeDeps: {
-      include: ["react", "react-dom", "react/jsx-runtime", "motion/react"],
+      include: [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "motion/react",
+        "firebase/app",
+        "firebase/auth",
+        "firebase/firestore",
+        "firebase/analytics",
+      ],
     },
   },
 });

@@ -105,6 +105,7 @@ html.is-preloading body {
 .site-preloader.is-done {
   visibility: hidden;
   opacity: 0;
+  pointer-events: none;
 }
 
 .preloader-lockup {
@@ -3684,6 +3685,14 @@ h1 {
   display: none;
 }
 
+.pricing-flow.is-checkout .pricing-flow-view[data-flow-view="plans"] {
+  display: none;
+}
+
+.pricing-flow.is-checkout .pricing-flow-view[data-flow-view="checkout"] {
+  display: grid;
+}
+
 .pricing-flow-left,
 .checkout-summary {
   position: relative;
@@ -4195,6 +4204,65 @@ h1 {
   line-height: 1.55;
 }
 
+.checkout-auth-panel {
+  display: grid;
+  width: min(100%, 480px);
+  gap: 14px;
+}
+
+.checkout-auth-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(16, 17, 18, 0.06);
+}
+
+.checkout-auth-switch button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.checkout-auth-switch button {
+  background: transparent;
+}
+
+.checkout-auth-switch button.is-active {
+  background: #111111;
+  color: #ffffff;
+}
+
+.checkout-auth-switch button:disabled,
+.checkout-upgrade:disabled {
+  cursor: wait;
+  opacity: 0.64;
+}
+
+.checkout-auth-form {
+  display: grid;
+  gap: 14px;
+}
+
+.checkout-auth-message {
+  min-height: 20px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.checkout-auth-message.is-error {
+  color: #B42318;
+}
+
 .checkout-secure {
   margin: auto 0 0;
   color: var(--muted);
@@ -4244,13 +4312,21 @@ h1 {
 .checkout-field select {
   min-height: 50px;
   width: 100%;
-  border: 0;
+  border: 1px solid rgba(16, 17, 18, 0.12);
   border-radius: 10px;
-  background: rgba(250, 247, 243, 0.86);
+  background: rgba(255, 255, 255, 0.78);
   color: var(--text);
   font: inherit;
   font-size: 16px;
   padding: 0 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.checkout-field input:focus,
+.checkout-field select:focus {
+  border-color: rgba(16, 17, 18, 0.42);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(16, 17, 18, 0.08);
 }
 
 .checkout-grid {

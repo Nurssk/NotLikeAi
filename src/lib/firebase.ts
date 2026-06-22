@@ -1,5 +1,5 @@
 import { getApps, initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY ?? "AIzaSyCaWik40y-a2Q_RaYYduMDh-Se0ZpKCRdo",
@@ -32,11 +32,6 @@ const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 export { app };
 
 export const auth = getAuth(app);
-
-export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({
-  prompt: "select_account",
-});
 
 let analyticsPromise: Promise<unknown | null> | null = null;
 
