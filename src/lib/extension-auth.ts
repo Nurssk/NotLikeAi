@@ -34,6 +34,7 @@ type ExtensionSessionPayload = {
 type StoredCode = {
   userId?: string;
   email?: string;
+  emailKey?: string;
   normalizedEmail?: string;
   code?: string;
   expiresAt?: unknown;
@@ -92,8 +93,7 @@ export const normalizeExtensionCode = (code: string) => code.trim().toUpperCase(
 
 export const formatExtensionCode = (code: string) => code;
 
-export const extensionAuthCodeDocId = (email: string, code: string) =>
-  `${emailToCreditDocId(email)}_${normalizeExtensionCode(code)}`;
+export const extensionAuthCodeDocId = (email: string) => emailToCreditDocId(email);
 
 const generateRawCode = () => {
   let code = "";
@@ -200,21 +200,15 @@ export const createExtensionAuthCode = async (request: Request) => {
   }
 
   const db = adminDb();
-  let rawCode = generateRawCode();
-  let codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(extensionAuthCodeDocId(verified.normalizedEmail, rawCode));
-
-  for (let attempts = 0; attempts < 3; attempts += 1) {
-    const existing = await codeRef.get();
-    if (!existing.exists) break;
-
-    rawCode = generateRawCode();
-    codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(extensionAuthCodeDocId(verified.normalizedEmail, rawCode));
-  }
+  const rawCode = generateRawCode();
+  const emailKey = emailToCreditDocId(verified.normalizedEmail);
+  const codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(emailKey);
 
   const expiresAt = new Date(Date.now() + CODE_TTL_MS);
   await codeRef.set({
     userId: verified.decodedToken.uid,
     email: verified.decodedToken.email,
+    emailKey,
     normalizedEmail: verified.normalizedEmail,
     code: rawCode,
     expiresAt,
@@ -297,7 +291,7 @@ export const exchangeExtensionAuthCode = async (request: Request) => {
   }
 
   const db = adminDb();
-  const codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(extensionAuthCodeDocId(email, code));
+  const codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(extensionAuthCodeDocId(email));
 
   const result = await db.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(codeRef);
@@ -305,6 +299,7 @@ export const exchangeExtensionAuthCode = async (request: Request) => {
 
     const data = snapshot.data() as StoredCode;
     if (data.normalizedEmail !== email) return { error: "invalid_code" as const };
+    if (data.emailKey !== emailToCreditDocId(email)) return { error: "invalid_code" as const };
     if (data.code !== code) return { error: "invalid_code" as const };
     if (data.usedAt) return { error: "code_used" as const };
     if (toMillis(data.expiresAt) <= Date.now()) return { error: "code_expired" as const };

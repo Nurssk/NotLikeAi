@@ -60,6 +60,7 @@ service cloud.firestore {
       return [
         'userId',
         'email',
+        'emailKey',
         'normalizedEmail',
         'code',
         'expiresAt',
@@ -69,12 +70,13 @@ service cloud.firestore {
       ];
     }
 
-    function isOwnExtensionAuthCodeCreate(docId) {
+    function isOwnExtensionAuthCodeWrite(emailKey) {
       return hasAuthEmail()
         && request.resource.data.keys().hasOnly(extensionAuthCodeFields())
         && request.resource.data.keys().hasAll(extensionAuthCodeFields())
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.email is string
+        && request.resource.data.emailKey == emailKey
         && request.resource.data.normalizedEmail == request.auth.token.email.lower()
         && request.resource.data.code is string
         && request.resource.data.code.size() == 6
@@ -120,9 +122,9 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    match /extensionAuthCodes/{docId} {
-      allow create: if isOwnExtensionAuthCodeCreate(docId);
-      allow read, update, delete: if false;
+    match /extensionAuthCodes/{emailKey} {
+      allow create, update: if isOwnExtensionAuthCodeWrite(emailKey);
+      allow read, delete: if false;
     }
 
     // Keep authenticated user data locked until the app has a concrete

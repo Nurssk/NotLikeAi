@@ -425,15 +425,15 @@ const pageDescription =
     const saveCode = async ({ code, email, expiresAt }) => {
       const normalizedEmail = email.trim().toLowerCase();
       const emailKey = normalizedEmail.replace(/[.#$[\]/\s]/g, "_");
-      const docId = `${emailKey}_${code}`;
       const [{ doc, serverTimestamp, setDoc }, { db }] = await Promise.all([
         import("firebase/firestore"),
         import("../../lib/firestore"),
       ]);
 
-      await setDoc(doc(db, "extensionAuthCodes", docId), {
+      await setDoc(doc(db, "extensionAuthCodes", emailKey), {
         userId: authUser.uid,
         email,
+        emailKey,
         normalizedEmail,
         code,
         expiresAt,
@@ -442,7 +442,7 @@ const pageDescription =
         source: "extension-code-page",
       });
 
-      return docId;
+      return emailKey;
     };
 
     const generateCode = async () => {
