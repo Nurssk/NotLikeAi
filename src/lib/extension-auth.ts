@@ -35,6 +35,7 @@ type StoredCode = {
   userId?: string;
   email?: string;
   normalizedEmail?: string;
+  code?: string;
   expiresAt?: unknown;
   usedAt?: unknown;
 };
@@ -90,6 +91,9 @@ const timingSafeEqualString = (left: string, right: string) => {
 export const normalizeExtensionCode = (code: string) => code.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
 
 export const formatExtensionCode = (code: string) => code;
+
+export const extensionAuthCodeDocId = (email: string, code: string) =>
+  `${emailToCreditDocId(email)}_${normalizeExtensionCode(code)}`;
 
 const generateRawCode = () => {
   let code = "";
@@ -197,16 +201,14 @@ export const createExtensionAuthCode = async (request: Request) => {
 
   const db = adminDb();
   let rawCode = generateRawCode();
-  let codeHash = sha256(`${verified.normalizedEmail}:${rawCode}`);
-  let codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(codeHash);
+  let codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(extensionAuthCodeDocId(verified.normalizedEmail, rawCode));
 
   for (let attempts = 0; attempts < 3; attempts += 1) {
     const existing = await codeRef.get();
     if (!existing.exists) break;
 
     rawCode = generateRawCode();
-    codeHash = sha256(`${verified.normalizedEmail}:${rawCode}`);
-    codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(codeHash);
+    codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(extensionAuthCodeDocId(verified.normalizedEmail, rawCode));
   }
 
   const expiresAt = new Date(Date.now() + CODE_TTL_MS);
@@ -214,7 +216,7 @@ export const createExtensionAuthCode = async (request: Request) => {
     userId: verified.decodedToken.uid,
     email: verified.decodedToken.email,
     normalizedEmail: verified.normalizedEmail,
-    codeHash,
+    code: rawCode,
     expiresAt,
     usedAt: null,
     createdAt: FieldValue.serverTimestamp(),
@@ -294,9 +296,8 @@ export const exchangeExtensionAuthCode = async (request: Request) => {
     return extensionAuthJsonResponse({ error: "rate_limited" }, { status: 429 });
   }
 
-  const codeHash = sha256(`${email}:${code}`);
   const db = adminDb();
-  const codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(codeHash);
+  const codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(extensionAuthCodeDocId(email, code));
 
   const result = await db.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(codeRef);
@@ -304,6 +305,7 @@ export const exchangeExtensionAuthCode = async (request: Request) => {
 
     const data = snapshot.data() as StoredCode;
     if (data.normalizedEmail !== email) return { error: "invalid_code" as const };
+    if (data.code !== code) return { error: "invalid_code" as const };
     if (data.usedAt) return { error: "code_used" as const };
     if (toMillis(data.expiresAt) <= Date.now()) return { error: "code_expired" as const };
     if (!data.userId || !data.email) return { error: "invalid_code" as const };

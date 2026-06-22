@@ -422,34 +422,27 @@ const pageDescription =
       return code;
     };
 
-    const sha256 = async (value) => {
-      const bytes = new TextEncoder().encode(value);
-      const digest = await window.crypto.subtle.digest("SHA-256", bytes);
-      return Array.from(new Uint8Array(digest))
-        .map((byte) => byte.toString(16).padStart(2, "0"))
-        .join("");
-    };
-
     const saveCode = async ({ code, email, expiresAt }) => {
       const normalizedEmail = email.trim().toLowerCase();
-      const codeHash = await sha256(`${normalizedEmail}:${code}`);
+      const emailKey = normalizedEmail.replace(/[.#$[\]/\s]/g, "_");
+      const docId = `${emailKey}_${code}`;
       const [{ doc, serverTimestamp, setDoc }, { db }] = await Promise.all([
         import("firebase/firestore"),
         import("../../lib/firestore"),
       ]);
 
-      await setDoc(doc(db, "extensionAuthCodes", codeHash), {
+      await setDoc(doc(db, "extensionAuthCodes", docId), {
         userId: authUser.uid,
         email,
         normalizedEmail,
-        codeHash,
+        code,
         expiresAt,
         usedAt: null,
         createdAt: serverTimestamp(),
         source: "extension-code-page",
       });
 
-      return codeHash;
+      return docId;
     };
 
     const generateCode = async () => {

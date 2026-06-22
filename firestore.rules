@@ -61,7 +61,7 @@ service cloud.firestore {
         'userId',
         'email',
         'normalizedEmail',
-        'codeHash',
+        'code',
         'expiresAt',
         'usedAt',
         'createdAt',
@@ -69,14 +69,15 @@ service cloud.firestore {
       ];
     }
 
-    function isOwnExtensionAuthCodeCreate(codeHash) {
+    function isOwnExtensionAuthCodeCreate(docId) {
       return hasAuthEmail()
         && request.resource.data.keys().hasOnly(extensionAuthCodeFields())
         && request.resource.data.keys().hasAll(extensionAuthCodeFields())
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.email is string
         && request.resource.data.normalizedEmail == request.auth.token.email.lower()
-        && request.resource.data.codeHash == codeHash
+        && request.resource.data.code is string
+        && request.resource.data.code.size() == 6
         && request.resource.data.expiresAt is timestamp
         && request.resource.data.usedAt == null
         && request.resource.data.createdAt is timestamp
@@ -119,8 +120,8 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    match /extensionAuthCodes/{codeHash} {
-      allow create: if isOwnExtensionAuthCodeCreate(codeHash);
+    match /extensionAuthCodes/{docId} {
+      allow create: if isOwnExtensionAuthCodeCreate(docId);
       allow read, update, delete: if false;
     }
 
