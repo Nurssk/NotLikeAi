@@ -1,12 +1,10 @@
-import { createHash, createHmac, randomInt, timingSafeEqual } from "node:crypto";
+import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 import type { DecodedIdToken } from "firebase-admin/auth";
-import { FieldValue } from "firebase-admin/firestore";
 import { emailToCreditDocId, isValidEmail, normalizeEmail } from "./billing";
 import { adminAuth, adminDb } from "./firebase-admin";
 import { readServerEnv } from "./server-env";
 
 export const EXTENSION_AUTH_CODES_COLLECTION = "extensionAuthCodes";
-export const EXTENSION_AUTH_RATE_LIMITS_COLLECTION = "extensionAuthRateLimits";
 
 export const extensionAuthCorsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,9 +16,6 @@ const CODE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 const CODE_LENGTH = 6;
 const CODE_TTL_MS = 10 * 60 * 1000;
 const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60;
-const CODE_ATTEMPT_LIMIT = 5;
-const EXCHANGE_ATTEMPT_LIMIT = 10;
-const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 
 type ExtensionSessionPayload = {
   typ: "extension-session";
@@ -32,13 +27,8 @@ type ExtensionSessionPayload = {
 };
 
 type StoredCode = {
-  userId?: string;
   email?: string;
-  emailKey?: string;
-  normalizedEmail?: string;
   code?: string;
-  expiresAt?: unknown;
-  usedAt?: unknown;
 };
 
 export type VerifiedExtensionSession = {
@@ -79,8 +69,6 @@ const getExtensionAuthSecret = () => {
   return secret;
 };
 
-const sha256 = (value: string) => createHash("sha256").update(value).digest("hex");
-
 const hmacBase64Url = (value: string) => base64UrlEncode(createHmac("sha256", getExtensionAuthSecret()).update(value).digest());
 
 const timingSafeEqualString = (left: string, right: string) => {
@@ -92,8 +80,6 @@ const timingSafeEqualString = (left: string, right: string) => {
 export const normalizeExtensionCode = (code: string) => code.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
 
 export const formatExtensionCode = (code: string) => code;
-
-export const extensionAuthCodeDocId = (email: string) => emailToCreditDocId(email);
 
 const generateRawCode = () => {
   let code = "";
@@ -109,57 +95,20 @@ const getBearerToken = (request: Request) => {
   return match?.[1] ?? null;
 };
 
-const getClientIp = (request: Request) => {
-  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return (
-    forwarded ||
-    request.headers.get("x-real-ip") ||
-    request.headers.get("cf-connecting-ip") ||
-    request.headers.get("fly-client-ip") ||
-    "unknown"
-  );
-};
+const deleteSnapshots = async (snapshots: FirebaseFirestore.QuerySnapshot[]) => {
+  const db = adminDb();
+  const refs = new Map<string, FirebaseFirestore.DocumentReference>();
 
-const toMillis = (value: unknown) => {
-  if (!value) return 0;
-  if (value instanceof Date) return value.getTime();
-  if (typeof value === "string") return Date.parse(value);
-
-  if (typeof value === "object" && "toDate" in value) {
-    const toDate = (value as { toDate?: () => Date }).toDate;
-    if (typeof toDate === "function") return toDate.call(value).getTime();
-  }
-
-  return 0;
-};
-
-const rateLimit = async (kind: "code" | "exchange", keyParts: string[], limit: number) => {
-  const now = Date.now();
-  const windowStart = Math.floor(now / RATE_LIMIT_WINDOW_MS) * RATE_LIMIT_WINDOW_MS;
-  const docId = sha256([kind, windowStart, ...keyParts].join(":"));
-  const ref = adminDb().collection(EXTENSION_AUTH_RATE_LIMITS_COLLECTION).doc(docId);
-
-  return adminDb().runTransaction(async (transaction) => {
-    const snapshot = await transaction.get(ref);
-    const data = snapshot.exists ? snapshot.data() : null;
-    const count = typeof data?.count === "number" ? data.count : 0;
-    const nextCount = count + 1;
-
-    transaction.set(
-      ref,
-      {
-        kind,
-        keyHash: sha256(keyParts.join(":")),
-        windowStart: new Date(windowStart),
-        expiresAt: new Date(windowStart + RATE_LIMIT_WINDOW_MS),
-        count: nextCount,
-        updatedAt: FieldValue.serverTimestamp(),
-      },
-      { merge: true },
-    );
-
-    return nextCount <= limit;
+  snapshots.forEach((snapshot) => {
+    snapshot.docs.forEach((doc) => refs.set(doc.ref.path, doc.ref));
   });
+
+  const refsToDelete = Array.from(refs.values());
+  for (let index = 0; index < refsToDelete.length; index += 500) {
+    const batch = db.batch();
+    refsToDelete.slice(index, index + 500).forEach((ref) => batch.delete(ref));
+    await batch.commit();
+  }
 };
 
 export const verifyWebsiteFirebaseRequest = async (request: Request) => {
@@ -193,33 +142,24 @@ export const createExtensionAuthCode = async (request: Request) => {
   const verified = await verifyWebsiteFirebaseRequest(request);
   if ("error" in verified) return verified.error;
 
-  const clientIpHash = sha256(getClientIp(request));
-  const allowed = await rateLimit("code", [verified.decodedToken.uid, clientIpHash], CODE_ATTEMPT_LIMIT);
-  if (!allowed) {
-    return extensionAuthJsonResponse({ error: "rate_limited" }, { status: 429 });
-  }
-
   const db = adminDb();
   const rawCode = generateRawCode();
-  const emailKey = emailToCreditDocId(verified.normalizedEmail);
-  const codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(emailKey);
+  const codesCollection = db.collection(EXTENSION_AUTH_CODES_COLLECTION);
+  const [emailSnapshot, originalEmailSnapshot, normalizedEmailSnapshot] = await Promise.all([
+    codesCollection.where("email", "==", verified.normalizedEmail).get(),
+    codesCollection.where("email", "==", verified.decodedToken.email).get(),
+    codesCollection.where("normalizedEmail", "==", verified.normalizedEmail).get(),
+  ]);
 
-  const expiresAt = new Date(Date.now() + CODE_TTL_MS);
-  await codeRef.set({
-    userId: verified.decodedToken.uid,
-    email: verified.decodedToken.email,
-    emailKey,
-    normalizedEmail: verified.normalizedEmail,
+  await deleteSnapshots([emailSnapshot, originalEmailSnapshot, normalizedEmailSnapshot]);
+
+  await codesCollection.add({
+    email: verified.normalizedEmail,
     code: rawCode,
-    expiresAt,
-    usedAt: null,
-    createdAt: FieldValue.serverTimestamp(),
-    createdIpHash: clientIpHash,
   });
 
   return extensionAuthJsonResponse({
     code: formatExtensionCode(rawCode),
-    expiresAt: expiresAt.toISOString(),
     expiresInSeconds: Math.floor(CODE_TTL_MS / 1000),
     email: verified.normalizedEmail,
   });
@@ -285,52 +225,43 @@ export const exchangeExtensionAuthCode = async (request: Request) => {
     return extensionAuthJsonResponse({ error: "invalid_code" }, { status: 400 });
   }
 
-  const allowed = await rateLimit("exchange", [emailToCreditDocId(email), sha256(getClientIp(request))], EXCHANGE_ATTEMPT_LIMIT);
-  if (!allowed) {
-    return extensionAuthJsonResponse({ error: "rate_limited" }, { status: 429 });
-  }
-
   const db = adminDb();
-  const codeRef = db.collection(EXTENSION_AUTH_CODES_COLLECTION).doc(extensionAuthCodeDocId(email));
+  const snapshot = await db
+    .collection(EXTENSION_AUTH_CODES_COLLECTION)
+    .where("email", "==", email)
+    .where("code", "==", code)
+    .limit(1)
+    .get();
 
-  const result = await db.runTransaction(async (transaction) => {
-    const snapshot = await transaction.get(codeRef);
-    if (!snapshot.exists) return { error: "invalid_code" as const };
-
-    const data = snapshot.data() as StoredCode;
-    if (data.normalizedEmail !== email) return { error: "invalid_code" as const };
-    if (data.emailKey !== emailToCreditDocId(email)) return { error: "invalid_code" as const };
-    if (data.code !== code) return { error: "invalid_code" as const };
-    if (data.usedAt) return { error: "code_used" as const };
-    if (toMillis(data.expiresAt) <= Date.now()) return { error: "code_expired" as const };
-    if (!data.userId || !data.email) return { error: "invalid_code" as const };
-
-    transaction.update(codeRef, {
-      usedAt: FieldValue.serverTimestamp(),
-      exchangedAt: FieldValue.serverTimestamp(),
-      exchangedIpHash: sha256(getClientIp(request)),
-    });
-
-    return {
-      userId: data.userId,
-      email: normalizeEmail(data.email),
-    };
-  });
-
-  if ("error" in result) {
-    const status = result.error === "code_expired" || result.error === "code_used" ? 410 : 401;
-    return extensionAuthJsonResponse({ error: result.error }, { status });
+  if (snapshot.empty) {
+    return extensionAuthJsonResponse({ error: "invalid_code" }, { status: 401 });
   }
 
-  const emailKey = emailToCreditDocId(result.email);
+  const codeDoc = snapshot.docs[0];
+  const data = codeDoc.data() as StoredCode;
+  if (normalizeEmail(data.email || "") !== email || data.code !== code) {
+    return extensionAuthJsonResponse({ error: "invalid_code" }, { status: 401 });
+  }
+
+  let userId = "";
+  try {
+    const user = await adminAuth().getUserByEmail(email);
+    userId = user.uid;
+  } catch {
+    return extensionAuthJsonResponse({ error: "user_not_found" }, { status: 401 });
+  }
+
+  await codeDoc.ref.delete();
+
+  const emailKey = emailToCreditDocId(email);
   return extensionAuthJsonResponse({
     token: createExtensionSessionToken({
-      sub: result.userId,
-      email: result.email,
+      sub: userId,
+      email,
       emailKey,
     }),
     tokenType: "Bearer",
     expiresInSeconds: SESSION_TTL_SECONDS,
-    email: result.email,
+    email,
   });
 };

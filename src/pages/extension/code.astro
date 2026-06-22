@@ -408,42 +408,6 @@ const pageDescription =
 
     const codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const codeLength = 6;
-    const codeTtlMs = 10 * 60 * 1000;
-
-    const generateRawCode = () => {
-      let code = "";
-      const values = new Uint32Array(codeLength);
-      window.crypto.getRandomValues(values);
-
-      for (let index = 0; index < codeLength; index += 1) {
-        code += codeAlphabet[values[index] % codeAlphabet.length];
-      }
-
-      return code;
-    };
-
-    const saveCode = async ({ code, email, expiresAt }) => {
-      const normalizedEmail = email.trim().toLowerCase();
-      const emailKey = normalizedEmail.replace(/[.#$[\]/\s]/g, "_");
-      const [{ doc, serverTimestamp, setDoc }, { db }] = await Promise.all([
-        import("firebase/firestore"),
-        import("../../lib/firestore"),
-      ]);
-
-      await setDoc(doc(db, "extensionAuthCodes", emailKey), {
-        userId: authUser.uid,
-        email,
-        emailKey,
-        normalizedEmail,
-        code,
-        expiresAt,
-        usedAt: null,
-        createdAt: serverTimestamp(),
-        source: "extension-code-page",
-      });
-
-      return emailKey;
-    };
 
     const generateCode = async () => {
       if (isGenerating || !authUser) return;
@@ -467,21 +431,35 @@ const pageDescription =
           return;
         }
 
-        const code = generateRawCode();
-        const expiresAt = new Date(Date.now() + codeTtlMs);
-        await saveCode({
-          code,
-          email: authUser.email,
-          expiresAt,
+        const idToken = await authUser.getIdToken(true);
+        const response = await fetch("/api/extension-auth/code", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
         });
+        const payload = await response.json().catch(() => ({}));
+
+        if (
+          !response.ok ||
+          typeof payload.code !== "string" ||
+          payload.code.length !== codeLength ||
+          !Array.from(payload.code).every((character) => codeAlphabet.includes(character))
+        ) {
+          setMessage("Could not create the extension code in Firebase. Please try again.", "error");
+          return;
+        }
+
+        const expiresInSeconds = typeof payload.expiresInSeconds === "number" ? payload.expiresInSeconds : 600;
+        const expiresAt = new Date(Date.now() + expiresInSeconds * 1000);
 
         showCode({
-          code,
+          code: payload.code,
           expiresAt: expiresAt.toISOString(),
-          email: authUser.email.trim().toLowerCase(),
+          email: typeof payload.email === "string" ? payload.email : authUser.email.trim().toLowerCase(),
         });
       } catch {
-        setMessage("Could not save the extension code in Firebase. Please try again.", "error");
+        setMessage("Could not create the extension code in Firebase. Please try again.", "error");
       } finally {
         isGenerating = false;
         if (activeCode) setButtonsDisabled(false);

@@ -56,36 +56,6 @@ service cloud.firestore {
         && resource.data.emailKey == emailKey;
     }
 
-    function extensionAuthCodeFields() {
-      return [
-        'userId',
-        'email',
-        'emailKey',
-        'normalizedEmail',
-        'code',
-        'expiresAt',
-        'usedAt',
-        'createdAt',
-        'source'
-      ];
-    }
-
-    function isOwnExtensionAuthCodeWrite(emailKey) {
-      return hasAuthEmail()
-        && request.resource.data.keys().hasOnly(extensionAuthCodeFields())
-        && request.resource.data.keys().hasAll(extensionAuthCodeFields())
-        && request.resource.data.userId == request.auth.uid
-        && request.resource.data.email is string
-        && request.resource.data.emailKey == emailKey
-        && request.resource.data.normalizedEmail == request.auth.token.email.lower()
-        && request.resource.data.code is string
-        && request.resource.data.code.size() == 6
-        && request.resource.data.expiresAt is timestamp
-        && request.resource.data.usedAt == null
-        && request.resource.data.createdAt is timestamp
-        && request.resource.data.source == 'extension-code-page';
-    }
-
     match /waitlist/{docId} {
       // Public landing-page signup only. No authentication is required here.
       // The frontend writes with serverTimestamp(), which evaluates to a
@@ -123,8 +93,7 @@ service cloud.firestore {
     }
 
     match /extensionAuthCodes/{emailKey} {
-      allow create, update: if isOwnExtensionAuthCodeWrite(emailKey);
-      allow read, delete: if false;
+      allow read, write: if false;
     }
 
     // Keep authenticated user data locked until the app has a concrete
