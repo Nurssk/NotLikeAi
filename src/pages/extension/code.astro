@@ -392,13 +392,6 @@ const pageDescription =
       return authModulePromise;
     };
 
-    const apiErrorMessage = (error) => {
-      if (error === "email_not_verified") return "Verify your email before generating an extension code.";
-      if (error === "rate_limited") return "Too many attempts. Wait a moment and try again.";
-      if (error === "missing_authorization" || error === "invalid_authorization") return "Log in again before generating a code.";
-      return "Could not generate an extension code. Please try again.";
-    };
-
     const showCode = (payload) => {
       activeCode = payload.code;
       codeExpiresAt = Date.parse(payload.expiresAt);
@@ -410,7 +403,53 @@ const pageDescription =
       window.clearInterval(codeTimer);
       updateCodeExpiry();
       codeTimer = window.setInterval(updateCodeExpiry, 1000);
-      setMessage("This code was created for your email and saved on the server as a one-time login attempt.", "success");
+      setMessage("This code was created for your email and saved in Firebase as a one-time login attempt.", "success");
+    };
+
+    const codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const codeLength = 6;
+    const codeTtlMs = 10 * 60 * 1000;
+
+    const generateRawCode = () => {
+      let code = "";
+      const values = new Uint32Array(codeLength);
+      window.crypto.getRandomValues(values);
+
+      for (let index = 0; index < codeLength; index += 1) {
+        code += codeAlphabet[values[index] % codeAlphabet.length];
+      }
+
+      return code;
+    };
+
+    const sha256 = async (value) => {
+      const bytes = new TextEncoder().encode(value);
+      const digest = await window.crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(digest))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+    };
+
+    const saveCode = async ({ code, email, expiresAt }) => {
+      const normalizedEmail = email.trim().toLowerCase();
+      const codeHash = await sha256(`${normalizedEmail}:${code}`);
+      const [{ doc, serverTimestamp, setDoc }, { db }] = await Promise.all([
+        import("firebase/firestore"),
+        import("../../lib/firestore"),
+      ]);
+
+      await setDoc(doc(db, "extensionAuthCodes", codeHash), {
+        userId: authUser.uid,
+        email,
+        normalizedEmail,
+        codeHash,
+        expiresAt,
+        usedAt: null,
+        createdAt: serverTimestamp(),
+        source: "extension-code-page",
+      });
+
+      return codeHash;
     };
 
     const generateCode = async () => {
@@ -430,23 +469,26 @@ const pageDescription =
           return;
         }
 
-        const idToken = await authUser.getIdToken(true);
-        const response = await fetch("/api/extension-auth/code", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        });
-        const payload = await response.json().catch(() => ({}));
-
-        if (!response.ok || typeof payload.code !== "string" || typeof payload.expiresAt !== "string") {
-          setMessage(apiErrorMessage(payload.error), "error");
+        if (!authUser.email) {
+          setMessage("This account does not have an email address.", "error");
           return;
         }
 
-        showCode(payload);
+        const code = generateRawCode();
+        const expiresAt = new Date(Date.now() + codeTtlMs);
+        await saveCode({
+          code,
+          email: authUser.email,
+          expiresAt,
+        });
+
+        showCode({
+          code,
+          expiresAt: expiresAt.toISOString(),
+          email: authUser.email.trim().toLowerCase(),
+        });
       } catch {
-        setMessage("Could not generate an extension code. Please try again.", "error");
+        setMessage("Could not save the extension code in Firebase. Please try again.", "error");
       } finally {
         isGenerating = false;
         if (activeCode) setButtonsDisabled(false);
