@@ -69,6 +69,9 @@ const pageDescription =
             <button class="extension-secondary-button" type="button" data-regenerate-code disabled>
               New code
             </button>
+            <button class="extension-secondary-button" type="button" data-sign-out>
+              Sign out
+            </button>
           </div>
 
           <p class="extension-code-email" data-code-email></p>
@@ -254,7 +257,7 @@ const pageDescription =
 
   .extension-code-actions {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(120px, 0.4fr);
+    grid-template-columns: minmax(0, 1fr) minmax(120px, 0.4fr) minmax(120px, 0.4fr);
     gap: 12px;
   }
 
@@ -343,6 +346,7 @@ const pageDescription =
     const messageNode = codePage.querySelector("[data-code-message]");
     const copyButton = codePage.querySelector("[data-copy-code]");
     const regenerateButton = codePage.querySelector("[data-regenerate-code]");
+    const signOutButton = codePage.querySelector("[data-sign-out]");
     let authModulePromise = null;
     let authUser = null;
     let activeCode = "";
@@ -381,6 +385,7 @@ const pageDescription =
         authModulePromise = Promise.all([import("firebase/auth"), import("../../lib/firebase")])
           .then(([firebaseAuth, firebase]) => ({
             onAuthStateChanged: firebaseAuth.onAuthStateChanged,
+            signOut: firebaseAuth.signOut,
             auth: firebase.auth,
           }))
           .catch((error) => {
@@ -500,6 +505,21 @@ const pageDescription =
 
     regenerateButton?.addEventListener("click", () => {
       void generateCode();
+    });
+
+    signOutButton?.addEventListener("click", async () => {
+      if (!(signOutButton instanceof HTMLButtonElement)) return;
+      signOutButton.disabled = true;
+      setMessage("Signing out...");
+
+      try {
+        const { auth, signOut } = await loadAuthModule();
+        await signOut(auth);
+        window.location.assign("/extension/authorize");
+      } catch {
+        signOutButton.disabled = false;
+        setMessage("Could not sign out. Please try again.", "error");
+      }
     });
 
     loadAuthModule()

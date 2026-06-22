@@ -102,6 +102,9 @@ const pageDescription =
             <button class="btn btn-primary extension-auth-submit" type="submit" data-auth-submit>
               Log in
             </button>
+            <button class="extension-forgot-button" type="button" data-forgot-password>
+              Forgot password?
+            </button>
           </form>
 
           <p class="extension-auth-message" data-auth-message aria-live="polite">
@@ -253,7 +256,8 @@ const pageDescription =
   }
 
   .extension-google-button,
-  .extension-auth-submit {
+  .extension-auth-submit,
+  .extension-forgot-button {
     width: 100%;
     min-height: 54px;
     border-radius: 10px;
@@ -365,6 +369,14 @@ const pageDescription =
     box-shadow: 0 0 0 3px rgba(16, 17, 18, 0.08);
   }
 
+  .extension-forgot-button {
+    min-height: 44px;
+    border: 1px solid rgba(16, 17, 18, 0.12);
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--text);
+    cursor: pointer;
+  }
+
   .extension-auth-message {
     min-height: 40px;
     margin: 0;
@@ -384,7 +396,8 @@ const pageDescription =
 
   .extension-google-button:disabled,
   .extension-auth-switch button:disabled,
-  .extension-auth-submit:disabled {
+  .extension-auth-submit:disabled,
+  .extension-forgot-button:disabled {
     cursor: wait;
     opacity: 0.64;
   }
@@ -431,6 +444,7 @@ const pageDescription =
     const passwordInput = authPage.querySelector("#extension-password");
     const submitButton = authPage.querySelector("[data-auth-submit]");
     const googleButton = authPage.querySelector("[data-google-auth]");
+    const forgotPasswordButton = authPage.querySelector("[data-forgot-password]");
     let authMode = "login";
     let authUser = null;
     let authLoading = false;
@@ -479,6 +493,7 @@ const pageDescription =
       if (code === "auth/weak-password") return "Use a password with at least 6 characters.";
       if (code === "auth/too-many-requests") return "Too many attempts. Wait a moment and try again.";
       if (code === "auth/invalid-email") return "Enter a valid email address.";
+      if (code === "auth/missing-email") return "Enter your email address.";
       if (code === "auth/missing-password") return "Enter a password.";
       if (code === "auth/user-disabled") return "This account is disabled.";
       if (code === "auth/popup-closed-by-user") return "Google sign-in was closed before it finished.";
@@ -498,6 +513,7 @@ const pageDescription =
             createUserWithEmailAndPassword: firebaseAuth.createUserWithEmailAndPassword,
             GoogleAuthProvider: firebaseAuth.GoogleAuthProvider,
             onAuthStateChanged: firebaseAuth.onAuthStateChanged,
+            sendPasswordResetEmail: firebaseAuth.sendPasswordResetEmail,
             sendEmailVerification: firebaseAuth.sendEmailVerification,
             signInWithEmailAndPassword: firebaseAuth.signInWithEmailAndPassword,
             signInWithPopup: firebaseAuth.signInWithPopup,
@@ -616,6 +632,31 @@ const pageDescription =
         } else {
           setMessage(`Signed in as ${result.user.email}. Verify this email before generating a code.`);
         }
+      } catch (error) {
+        setMessage(authErrorMessage(error), "error");
+      } finally {
+        setLoading(false);
+        updateAuthState();
+      }
+    });
+
+    forgotPasswordButton?.addEventListener("click", async () => {
+      if (authLoading) return;
+      if (!(emailInput instanceof HTMLInputElement)) return;
+
+      const email = emailInput.value.trim().toLowerCase();
+      if (!email || !emailInput.checkValidity()) {
+        emailInput.reportValidity();
+        return;
+      }
+
+      setLoading(true);
+      setMessage("Sending password reset email...");
+
+      try {
+        const { auth, sendPasswordResetEmail } = await loadAuthModule();
+        await sendPasswordResetEmail(auth, email);
+        setMessage("Password reset email sent. Check your inbox and spam folder.", "success");
       } catch (error) {
         setMessage(authErrorMessage(error), "error");
       } finally {
