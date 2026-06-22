@@ -1,11 +1,11 @@
 ---
-import "../styles/global.css";
+import "../../styles/global.css";
 import Analytics from "@vercel/analytics/astro";
-import AmplitudeAnalytics from "../components/AmplitudeAnalytics.astro";
+import AmplitudeAnalytics from "../../components/AmplitudeAnalytics.astro";
 
-const pageTitle = "Chrome Extension Sign In | BeUniq Design";
+const pageTitle = "Authorize Chrome Extension | BeUniq Design";
 const pageDescription =
-  "Sign in or create a BeUniq Design account for the Chrome extension.";
+  "Authorize the BeUniq Design Chrome extension with a short one-time code.";
 ---
 
 <html lang="en">
@@ -21,37 +21,39 @@ const pageDescription =
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
-  <body class="extension-auth-body">
-    <main class="extension-auth-page" data-extension-auth>
-      <section class="extension-auth-shell" aria-labelledby="extension-auth-title">
-        <aside class="extension-auth-summary" aria-label="Product summary">
-          <div class="extension-auth-logo" aria-hidden="true">
+  <body class="extension-authorize-body">
+    <main class="extension-authorize-page" data-extension-authorize>
+      <section class="extension-authorize-shell" aria-labelledby="extension-authorize-title">
+        <aside class="extension-authorize-summary" aria-label="Extension authorization summary">
+          <div class="extension-authorize-logo" aria-hidden="true">
             <img src="/logo/icon-d.svg" alt="" />
           </div>
+
           <div>
-            <h1 id="extension-auth-title">Sign in to Design Humanizer</h1>
+            <h1 id="extension-authorize-title">Authorize Design Humanizer</h1>
             <p>
-              Use the same account that stores Chrome extension credits, verification, and screenshot history.
+              Sign in here, then copy the one-time code into the Chrome extension.
             </p>
           </div>
-          <div class="extension-auth-steps" aria-label="Account requirements">
+
+          <div class="extension-authorize-steps" aria-label="Authorization steps">
             <div>
-              <span aria-hidden="true"></span>
-              <strong>Verified email</strong>
-              <p>Email accounts must be verified before extension access is ready.</p>
+              <span>1</span>
+              <strong>Log in on the website</strong>
+              <p>Google and email sign-in stay in the browser where they work normally.</p>
             </div>
             <div>
-              <span aria-hidden="true"></span>
-              <strong>Chrome ready</strong>
-              <p>After sign-in, return to the extension to continue your design review.</p>
+              <span>2</span>
+              <strong>Use the short code</strong>
+              <p>Codes expire in 10 minutes and can only be exchanged once.</p>
             </div>
           </div>
         </aside>
 
-        <div class="extension-auth-card">
-          <div class="extension-auth-card-head">
+        <div class="extension-authorize-card" data-authorize-card>
+          <div class="extension-authorize-card-head">
             <h2 data-auth-heading>Log in</h2>
-            <p data-auth-subtitle>Access your existing extension credits and saved account.</p>
+            <p data-auth-subtitle>Access the account you want to connect to the Chrome extension.</p>
           </div>
 
           <button class="extension-google-button" type="button" data-google-auth>
@@ -102,8 +104,21 @@ const pageDescription =
             </button>
           </form>
 
+          <div class="extension-code-panel" data-code-panel hidden>
+            <div>
+              <span>One-time code</span>
+              <strong data-extension-code>----</strong>
+              <p data-code-expiry>Expires in 10:00</p>
+            </div>
+            <button class="extension-copy-button" type="button" data-copy-code>Copy</button>
+          </div>
+
+          <button class="btn btn-primary extension-generate-button" type="button" data-generate-code hidden>
+            Generate extension code
+          </button>
+
           <p class="extension-auth-message" data-auth-message aria-live="polite">
-            Log in or register with email and password. Verification is required before extension access.
+            Log in or register with email and password. Verification is required before generating a code.
           </p>
         </div>
       </section>
@@ -114,18 +129,18 @@ const pageDescription =
 </html>
 
 <style>
-  .extension-auth-body {
+  .extension-authorize-body {
     min-height: 100vh;
   }
 
-  .extension-auth-page {
+  .extension-authorize-page {
     min-height: 100vh;
     display: grid;
     align-items: center;
     padding: clamp(22px, 5vw, 56px);
   }
 
-  .extension-auth-shell {
+  .extension-authorize-shell {
     width: min(100%, 980px);
     margin: 0 auto;
     display: grid;
@@ -136,20 +151,20 @@ const pageDescription =
     box-shadow: 0 2px 8px rgba(16, 17, 18, 0.08);
   }
 
-  .extension-auth-summary,
-  .extension-auth-card {
+  .extension-authorize-summary,
+  .extension-authorize-card {
     min-width: 0;
     padding: clamp(28px, 4.6vw, 44px);
   }
 
-  .extension-auth-summary {
+  .extension-authorize-summary {
     display: flex;
     flex-direction: column;
     gap: 28px;
     background: rgba(238, 231, 219, 0.78);
   }
 
-  .extension-auth-logo {
+  .extension-authorize-logo {
     display: inline-flex;
     width: 58px;
     height: 58px;
@@ -159,14 +174,14 @@ const pageDescription =
     background: var(--accent);
   }
 
-  .extension-auth-logo img {
+  .extension-authorize-logo img {
     width: 36px;
     height: 36px;
     object-fit: contain;
   }
 
-  .extension-auth-summary h1,
-  .extension-auth-card h2 {
+  .extension-authorize-summary h1,
+  .extension-authorize-card h2 {
     margin: 0;
     color: var(--text);
     font-family: var(--font-display);
@@ -175,99 +190,84 @@ const pageDescription =
     line-height: 1.02;
   }
 
-  .extension-auth-summary h1 {
+  .extension-authorize-summary h1 {
     max-width: 440px;
     font-size: clamp(34px, 5vw, 56px);
   }
 
-  .extension-auth-summary p,
-  .extension-auth-card-head p,
-  .extension-auth-steps p {
+  .extension-authorize-summary p,
+  .extension-authorize-card-head p,
+  .extension-authorize-steps p {
     color: var(--muted);
     font-weight: 700;
     line-height: 1.48;
   }
 
-  .extension-auth-summary > div > p {
+  .extension-authorize-summary > div > p {
     max-width: 430px;
     margin: 18px 0 0;
     font-size: 17px;
   }
 
-  .extension-auth-steps {
+  .extension-authorize-steps {
     display: grid;
     gap: 14px;
     margin-top: auto;
   }
 
-  .extension-auth-steps div {
+  .extension-authorize-steps div {
     display: grid;
-    grid-template-columns: 22px minmax(0, 1fr);
+    grid-template-columns: 26px minmax(0, 1fr);
     gap: 4px 12px;
     align-items: start;
     padding: 16px 0 0;
     border-top: 1px solid rgba(16, 17, 18, 0.1);
   }
 
-  .extension-auth-steps span {
-    width: 21px;
-    height: 21px;
-    margin-top: 1px;
+  .extension-authorize-steps span {
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
     border-radius: 999px;
     background: var(--accent);
-    position: relative;
+    color: var(--on-accent);
+    font-size: 12px;
+    font-weight: 900;
   }
 
-  .extension-auth-steps span::before,
-  .extension-auth-steps span::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 10px;
-    height: 2px;
-    border-radius: 999px;
-    background: var(--on-accent);
-  }
-
-  .extension-auth-steps span::before {
-    transform: translate(-50%, -50%);
-  }
-
-  .extension-auth-steps span::after {
-    transform: translate(-50%, -50%) rotate(90deg);
-  }
-
-  .extension-auth-steps strong {
+  .extension-authorize-steps strong {
     color: var(--text);
     font-size: 15px;
     font-weight: 800;
   }
 
-  .extension-auth-steps p {
+  .extension-authorize-steps p {
     grid-column: 2 / 3;
     margin: 0;
     font-size: 13px;
   }
 
-  .extension-auth-card {
+  .extension-authorize-card {
     display: grid;
     align-content: center;
     gap: 16px;
     background: rgba(250, 247, 243, 0.86);
   }
 
-  .extension-auth-card h2 {
+  .extension-authorize-card h2 {
     font-size: clamp(26px, 3vw, 34px);
   }
 
-  .extension-auth-card-head p {
+  .extension-authorize-card-head p {
     margin: 10px 0 0;
     font-size: 15px;
   }
 
   .extension-google-button,
-  .extension-auth-submit {
+  .extension-auth-submit,
+  .extension-generate-button {
     width: 100%;
     min-height: 54px;
     border-radius: 10px;
@@ -379,6 +379,59 @@ const pageDescription =
     box-shadow: 0 0 0 3px rgba(16, 17, 18, 0.08);
   }
 
+  .extension-code-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    padding: 18px;
+    border-radius: 12px;
+    background: #111111;
+    color: var(--on-accent);
+  }
+
+  .extension-code-panel[hidden],
+  .extension-generate-button[hidden] {
+    display: none;
+  }
+
+  .extension-code-panel span,
+  .extension-code-panel p {
+    color: rgba(250, 247, 243, 0.72);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .extension-code-panel strong {
+    display: block;
+    margin: 6px 0;
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4vw, 42px);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1;
+  }
+
+  .extension-code-panel p {
+    margin: 0;
+    text-transform: none;
+  }
+
+  .extension-copy-button {
+    min-width: 76px;
+    min-height: 42px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--on-accent);
+    color: #111111;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 900;
+  }
+
   .extension-auth-message {
     min-height: 40px;
     margin: 0;
@@ -396,52 +449,57 @@ const pageDescription =
     color: #147A3F;
   }
 
-  .extension-auth-card.is-signed-in .extension-auth-form {
-    opacity: 0.72;
-  }
-
   .extension-google-button:disabled,
   .extension-auth-switch button:disabled,
-  .extension-auth-submit:disabled {
+  .extension-auth-submit:disabled,
+  .extension-generate-button:disabled,
+  .extension-copy-button:disabled {
     cursor: wait;
     opacity: 0.64;
   }
 
   @media (max-width: 780px) {
-    .extension-auth-page {
+    .extension-authorize-page {
       align-items: start;
       padding: 18px;
     }
 
-    .extension-auth-shell {
+    .extension-authorize-shell {
       grid-template-columns: 1fr;
       border-radius: 14px;
     }
 
-    .extension-auth-summary,
-    .extension-auth-card {
+    .extension-authorize-summary,
+    .extension-authorize-card {
       padding: 28px 22px;
     }
 
-    .extension-auth-summary {
+    .extension-authorize-summary {
       gap: 22px;
     }
 
-    .extension-auth-summary h1 {
+    .extension-authorize-summary h1 {
       font-size: clamp(31px, 12vw, 44px);
     }
 
-    .extension-auth-summary > div > p {
+    .extension-authorize-summary > div > p {
       font-size: 15px;
+    }
+
+    .extension-code-panel {
+      grid-template-columns: 1fr;
+    }
+
+    .extension-copy-button {
+      width: 100%;
     }
   }
 </style>
 
 <script>
-  const authPage = document.querySelector("[data-extension-auth]");
+  const authPage = document.querySelector("[data-extension-authorize]");
 
   if (authPage) {
-    const card = authPage.querySelector(".extension-auth-card");
     const heading = authPage.querySelector("[data-auth-heading]");
     const subtitle = authPage.querySelector("[data-auth-subtitle]");
     const messageNode = authPage.querySelector("[data-auth-message]");
@@ -449,11 +507,19 @@ const pageDescription =
     const passwordInput = authPage.querySelector("#extension-password");
     const submitButton = authPage.querySelector("[data-auth-submit]");
     const googleButton = authPage.querySelector("[data-google-auth]");
+    const generateButton = authPage.querySelector("[data-generate-code]");
+    const codePanel = authPage.querySelector("[data-code-panel]");
+    const codeNode = authPage.querySelector("[data-extension-code]");
+    const codeExpiryNode = authPage.querySelector("[data-code-expiry]");
+    const copyButton = authPage.querySelector("[data-copy-code]");
     let authMode = "login";
     let authUser = null;
     let authLoading = false;
     let authModulePromise = null;
     let authUnsubscribe = null;
+    let activeCode = "";
+    let codeExpiresAt = 0;
+    let codeTimer = 0;
 
     const setMessage = (message, tone = "neutral") => {
       if (!messageNode) return;
@@ -473,6 +539,35 @@ const pageDescription =
 
     const setSubmitLabel = (label) => {
       if (submitButton) submitButton.textContent = label;
+    };
+
+    const setCodeVisible = (visible) => {
+      if (codePanel instanceof HTMLElement) codePanel.hidden = !visible;
+    };
+
+    const setGenerateVisible = (visible) => {
+      if (generateButton instanceof HTMLElement) generateButton.hidden = !visible;
+    };
+
+    const updateCodeExpiry = () => {
+      if (!codeExpiryNode) return;
+      const seconds = Math.max(0, Math.ceil((codeExpiresAt - Date.now()) / 1000));
+      const minutes = Math.floor(seconds / 60);
+      const remainder = String(seconds % 60).padStart(2, "0");
+      codeExpiryNode.textContent = seconds > 0 ? `Expires in ${minutes}:${remainder}` : "Expired. Generate a new code.";
+      if (seconds <= 0) {
+        window.clearInterval(codeTimer);
+      }
+    };
+
+    const showCode = (code, expiresAt) => {
+      activeCode = code;
+      codeExpiresAt = Date.parse(expiresAt);
+      if (codeNode) codeNode.textContent = code;
+      setCodeVisible(true);
+      window.clearInterval(codeTimer);
+      updateCodeExpiry();
+      codeTimer = window.setInterval(updateCodeExpiry, 1000);
     };
 
     const authErrorMessage = (error) => {
@@ -501,9 +596,16 @@ const pageDescription =
       return code ? `Authentication failed: ${code.replace("auth/", "")}.` : "Authentication failed. Please try again.";
     };
 
+    const apiErrorMessage = (error) => {
+      if (error === "email_not_verified") return "Verify your email before generating an extension code.";
+      if (error === "rate_limited") return "Too many attempts. Wait a moment and try again.";
+      if (error === "missing_authorization" || error === "invalid_authorization") return "Log in again before generating a code.";
+      return "Could not generate an extension code. Please try again.";
+    };
+
     const loadAuthModule = () => {
       if (!authModulePromise) {
-        authModulePromise = Promise.all([import("firebase/auth"), import("../lib/firebase")])
+        authModulePromise = Promise.all([import("firebase/auth"), import("../../lib/firebase")])
           .then(([firebaseAuth, firebase]) => ({
             createUserWithEmailAndPassword: firebaseAuth.createUserWithEmailAndPassword,
             GoogleAuthProvider: firebaseAuth.GoogleAuthProvider,
@@ -523,33 +625,9 @@ const pageDescription =
       return authModulePromise;
     };
 
-    const notifyExtensionAuth = async (user) => {
-      if (!user?.email) return;
-      let idToken = "";
-
-      try {
-        idToken = await user.getIdToken();
-      } catch {
-        idToken = "";
-      }
-
-      window.dispatchEvent(
-        new CustomEvent("extension-auth:signed-in", {
-          detail: {
-            email: user.email,
-            emailVerified: Boolean(user.emailVerified),
-            uid: user.uid,
-            idToken,
-          },
-        }),
-      );
-    };
-
     const updateAuthState = () => {
       const isAuthenticated = Boolean(authUser?.email);
       const isVerified = Boolean(authUser?.emailVerified);
-
-      card?.classList.toggle("is-signed-in", isAuthenticated);
 
       if (emailInput instanceof HTMLInputElement && authUser?.email) {
         emailInput.value = authUser.email;
@@ -560,30 +638,34 @@ const pageDescription =
       }
 
       if (authUser?.email) {
-        if (heading) heading.textContent = "Signed in";
-        if (subtitle) subtitle.textContent = "Your account is connected for the Chrome extension.";
+        if (heading) heading.textContent = isVerified ? "Generate code" : "Verify email";
+        if (subtitle) {
+          subtitle.textContent = isVerified
+            ? "Copy this one-time code into the Chrome extension."
+            : "Check your inbox before generating a Chrome extension code.";
+        }
         setSubmitLabel(isVerified ? "Signed in" : "Send verification email");
+        setGenerateVisible(isVerified);
         setMessage(
           isVerified
-            ? `Signed in as ${authUser.email}. Return to the Chrome extension to continue.`
-            : `Signed in as ${authUser.email}. Verify this email before using the extension.`,
+            ? `Signed in as ${authUser.email}. Generate a code when the extension asks for one.`
+            : `Signed in as ${authUser.email}. Verify this email before generating a code.`,
           isVerified ? "success" : "neutral",
         );
-        if (isVerified) {
-          void notifyExtensionAuth(authUser);
-        }
       } else {
         if (heading) heading.textContent = authMode === "register" ? "Create account" : "Log in";
         if (subtitle) {
           subtitle.textContent =
             authMode === "register"
-              ? "Create the account you want to use with the Chrome extension."
-              : "Access your existing extension credits and saved account.";
+              ? "Create the account you want to connect to the Chrome extension."
+              : "Access the account you want to connect to the Chrome extension.";
         }
         setSubmitLabel(authMode === "register" ? "Create account" : "Log in");
+        setGenerateVisible(false);
+        setCodeVisible(false);
         setMessage(
           authMode === "register"
-            ? "Create your account. We will email you a verification link before extension access."
+            ? "Create your account. We will email you a verification link before generating a code."
             : "Log in with a verified email or continue with Google.",
         );
       }
@@ -639,8 +721,7 @@ const pageDescription =
         provider.setCustomParameters({ prompt: "select_account" });
         const result = await signInWithPopup(auth, provider);
         authUser = result.user;
-        setMessage(`Signed in as ${result.user.email}. Return to the Chrome extension to continue.`, "success");
-        void notifyExtensionAuth(result.user);
+        setMessage(`Signed in as ${result.user.email}. Generate a code when the extension asks for one.`, "success");
       } catch (error) {
         setMessage(authErrorMessage(error), "error");
       } finally {
@@ -683,8 +764,7 @@ const pageDescription =
             await signOut(auth);
             authUser = null;
           } else if (currentUser?.emailVerified) {
-            setMessage(`Signed in as ${currentUser.email}. Return to the Chrome extension to continue.`, "success");
-            await notifyExtensionAuth(currentUser);
+            setMessage(`Signed in as ${currentUser.email}. Generate a code when the extension asks for one.`, "success");
             return;
           } else if (currentUser) {
             await sendEmailVerification(currentUser);
@@ -721,8 +801,7 @@ const pageDescription =
               : "Account created. Verification email sent. Check your inbox and spam folder.",
           );
         } else if (result.user.emailVerified) {
-          setMessage(`Signed in as ${result.user.email}. Return to the Chrome extension to continue.`, "success");
-          await notifyExtensionAuth(result.user);
+          setMessage(`Signed in as ${result.user.email}. Generate a code when the extension asks for one.`, "success");
         } else {
           await sendEmailVerification(result.user);
           setMessage("Email is not verified yet. We sent a new verification link to your inbox.", "error");
@@ -732,6 +811,58 @@ const pageDescription =
       } finally {
         setLoading(false);
         updateAuthState();
+      }
+    });
+
+    generateButton?.addEventListener("click", async () => {
+      if (authLoading) return;
+      if (!authUser?.email) {
+        setMessage("Log in before generating a code.", "error");
+        return;
+      }
+
+      setLoading(true);
+      setMessage("Generating one-time code...");
+
+      try {
+        await authUser.reload();
+        if (!authUser.emailVerified) {
+          setMessage("Verify your email before generating an extension code.", "error");
+          return;
+        }
+
+        const idToken = await authUser.getIdToken(true);
+        const response = await fetch("/api/extension-auth/code", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
+        const payload = await response.json().catch(() => ({}));
+
+        if (!response.ok || typeof payload.code !== "string" || typeof payload.expiresAt !== "string") {
+          setMessage(apiErrorMessage(payload.error), "error");
+          return;
+        }
+
+        showCode(payload.code, payload.expiresAt);
+        setMessage("Code generated. Return to the Chrome extension and enter your email plus this code.", "success");
+      } catch {
+        setMessage("Could not generate an extension code. Please try again.", "error");
+      } finally {
+        setLoading(false);
+        updateAuthState();
+      }
+    });
+
+    copyButton?.addEventListener("click", async () => {
+      if (!activeCode) return;
+
+      try {
+        await navigator.clipboard.writeText(activeCode);
+        setMessage("Code copied. Paste it into the Chrome extension.", "success");
+      } catch {
+        setMessage("Copy failed. Select the code and copy it manually.", "error");
       }
     });
 

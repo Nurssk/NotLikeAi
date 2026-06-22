@@ -1,6 +1,7 @@
 import type { DecodedIdToken } from "firebase-admin/auth";
 import { FieldValue } from "firebase-admin/firestore";
 import { emailToCreditDocId, normalizeEmail } from "./billing";
+import { verifyExtensionSessionToken } from "./extension-auth";
 import { adminAuth, adminDb } from "./firebase-admin";
 
 export const CUSTOMER_CREDITS_COLLECTION = "customerCredits";
@@ -66,7 +67,26 @@ export const verifyCreditRequest = async (request: Request) => {
   try {
     decodedToken = await adminAuth().verifyIdToken(token);
   } catch {
-    return { error: jsonResponse({ error: "invalid_authorization" }, { status: 401 }) };
+    const extensionSession = (() => {
+      try {
+        return verifyExtensionSessionToken(token);
+      } catch {
+        return null;
+      }
+    })();
+
+    if (!extensionSession) {
+      return { error: jsonResponse({ error: "invalid_authorization" }, { status: 401 }) };
+    }
+
+    return {
+      decodedToken: {
+        uid: extensionSession.uid,
+        email: extensionSession.email,
+      } as DecodedIdToken,
+      normalizedEmail: extensionSession.normalizedEmail,
+      emailKey: extensionSession.emailKey,
+    };
   }
 
   if (!decodedToken.email) {
