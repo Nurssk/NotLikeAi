@@ -652,23 +652,33 @@ svg {
 
 .start-button {
   display: inline-flex;
-  min-height: 56px;
+  position: relative;
+  min-width: 220px;
+  min-height: 68px;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   border: 1px solid transparent;
   border-radius: 999px;
   background: var(--accent);
   color: var(--on-accent, var(--text));
-  padding: 0 38px;
+  padding: 0 54px 0 72px;
   font-family: var(--font-body);
-  font-size: 18px;
+  font-size: 21px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0;
+  text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
   box-shadow: none;
   transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 120ms ease;
+}
+
+.start-button.start-button--lg {
+  justify-content: center;
+  padding-left: 72px;
+  padding-right: 22px;
 }
 
 .pill-nav-cta.start-button--icon,
@@ -682,14 +692,18 @@ svg {
 
 .pill-nav-cta.start-button--sm,
 .start-button.start-button--sm {
-  width: 46px;
-  min-width: 46px;
+  min-width: 136px;
   min-height: 46px;
+  padding: 0 22px 0 46px;
+  gap: 8px;
+  font-size: 14px;
 }
 
 .start-button-chrome-logo {
-  width: 34px;
-  height: 34px;
+  position: absolute;
+  left: 18px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
   transform-origin: center;
   transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -697,8 +711,15 @@ svg {
 
 .pill-nav-cta.start-button--sm .start-button-chrome-logo,
 .start-button.start-button--sm .start-button-chrome-logo {
-  width: 29px;
-  height: 29px;
+  left: 13px;
+  width: 24px;
+  height: 24px;
+}
+
+.start-button.start-button--lg span {
+  font-size: 24px;
+  width: 100%;
+  text-align: center;
 }
 
 .start-button:hover {
@@ -3635,13 +3656,13 @@ h1 {
 
 /* Pricing flow */
 .pricing-section {
-  background: var(--bg);
+  background: #000000;
   border-top: 0;
-  padding: clamp(48px, 6vw, 72px) 0;
+  padding: clamp(64px, 7vw, 88px) 0;
 }
 
 .pricing-shell {
-  width: min(100% - 40px, 1180px);
+  width: min(100% - 64px, 1420px);
   margin: 0 auto;
   padding: 0;
   background: transparent;
@@ -3666,14 +3687,14 @@ h1 {
 .pricing-flow {
   overflow: hidden;
   border: 0;
-  border-radius: 18px;
-  background: rgba(250, 247, 243, 0.72);
-  box-shadow: 0 2px 8px rgba(16, 17, 18, 0.08);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .pricing-flow-view {
   display: none;
-  min-height: 600px;
+  min-height: 260px;
   animation: pricingViewIn 260ms ease both;
 }
 
@@ -3710,7 +3731,8 @@ h1 {
 .pricing-flow-view[data-flow-view="plans"] {
   position: relative;
   overflow: hidden;
-  grid-template-columns: minmax(340px, 0.86fr) minmax(520px, 1.14fr);
+  grid-template-columns: 1fr;
+  min-height: 260px;
 }
 
 .pricing-flow-view[data-flow-view="plans"]::after {
@@ -3892,8 +3914,23 @@ h1 {
   gap: 24px;
 }
 
+.pricing-flow-view[data-flow-view="plans"] .pricing-flow-main {
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+}
+
 .pricing-main-copy {
   max-width: 560px;
+}
+
+.pricing-flow-view[data-flow-view="plans"] .pricing-main-copy {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .pricing-kicker {
@@ -3928,7 +3965,9 @@ h1 {
 
 .pricing-choice-stack {
   display: grid;
-  gap: 16px;
+  grid-template-columns: minmax(440px, 1fr) minmax(380px, 0.8fr) minmax(280px, 0.52fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 56px);
   margin-top: 0;
 }
 
@@ -3936,6 +3975,157 @@ h1 {
   display: grid;
   gap: 16px;
   margin-top: 0;
+}
+
+.pricing-credit-control {
+  display: grid;
+  align-content: center;
+  gap: 24px;
+  min-width: 0;
+  min-height: 170px;
+  margin-left: clamp(12px, 1.8vw, 28px);
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--on-accent);
+  border: 0;
+  box-shadow: none;
+}
+
+.pricing-credit-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--on-accent);
+}
+
+.pricing-credit-head span {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pricing-credit-head strong {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 3.1vw, 44px);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 0.9;
+}
+
+.pricing-credit-slider-shell {
+  position: relative;
+  min-height: 54px;
+  display: grid;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.pricing-credit-slider-track {
+  position: absolute;
+  inset: calc(50% + 10px) 0 auto;
+  height: 16px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(250, 247, 243, 0.18);
+  transform: translateY(-50%);
+}
+
+.pricing-credit-slider-track span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--on-accent);
+  transition: width 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pricing-credit-balance {
+  position: absolute;
+  top: 4px;
+  left: 100%;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--on-accent);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateX(-50%);
+  transition: left 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pricing-credit-range {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 54px;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pricing-credit-range:focus {
+  outline: 0;
+}
+
+.pricing-credit-range:focus-visible {
+  outline: 3px solid rgba(16, 17, 18, 0.18);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.pricing-credit-range::-webkit-slider-runnable-track {
+  height: 16px;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.pricing-credit-range::-webkit-slider-thumb {
+  width: 36px;
+  height: 36px;
+  margin-top: -10px;
+  appearance: none;
+  border: 8px solid #000000;
+  border-radius: 10px;
+  background: var(--on-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-credit-range::-moz-range-track {
+  height: 16px;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.pricing-credit-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 8px solid #000000;
+  border-radius: 10px;
+  background: var(--on-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-credit-bounds {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: rgba(250, 247, 243, 0.68);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .pricing-choice {
@@ -4049,16 +4239,19 @@ h1 {
 .pricing-summary-card {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(150px, 0.64fr);
-  align-items: center;
+  grid-template-columns: 1fr;
+  align-items: start;
   gap: 16px;
-  min-height: 164px;
+  min-height: 170px;
   overflow: hidden;
-  padding: 28px;
+  padding: 0;
   border: 0;
-  border-radius: 12px;
-  background: rgba(250, 247, 243, 0.76);
-  box-shadow: 0 2px 8px rgba(16, 17, 18, 0.08);
+  border-radius: 0;
+  background: transparent;
+  color: var(--on-accent);
+  box-shadow: none;
+  justify-items: center;
+  text-align: center;
 }
 
 .pricing-summary-card::before {
@@ -4073,9 +4266,9 @@ h1 {
   position: relative;
   z-index: 3;
   display: grid;
-  color: var(--text);
+  color: var(--on-accent);
   font-family: var(--font-display);
-  font-size: clamp(16px, 1.8vw, 22px);
+  font-size: clamp(15px, 1.4vw, 20px);
   font-weight: 800;
   letter-spacing: 0.02em;
   line-height: 1.05;
@@ -4086,14 +4279,14 @@ h1 {
   position: relative;
   z-index: 3;
   display: grid;
-  justify-items: start;
+  justify-items: center;
   gap: 5px;
 }
 
 .pricing-summary-count strong {
-  color: var(--text);
+  color: var(--on-accent);
   font-family: var(--font-display);
-  font-size: clamp(34px, 4vw, 50px);
+  font-size: clamp(52px, 5vw, 74px);
   font-weight: 800;
   letter-spacing: 0;
   line-height: 0.85;
@@ -4101,7 +4294,7 @@ h1 {
 
 .pricing-summary-count span {
   max-width: 210px;
-  color: var(--muted);
+  color: rgba(250, 247, 243, 0.72);
   font-size: clamp(12px, 1.2vw, 15px);
   font-weight: 700;
   line-height: 1.15;
@@ -4109,10 +4302,46 @@ h1 {
 
 .pricing-buy-button {
   width: 100%;
-  min-height: 60px;
+  min-height: 96px;
   margin-top: 0;
+  padding: 0 32px;
+  border: 0;
   border-radius: 10px;
-  font-size: 14px;
+  background: var(--on-accent);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 4px;
+  font-size: 21px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.pricing-buy-button::before {
+  display: none;
+}
+
+.pricing-buy-button small {
+  color: rgba(17, 17, 17, 0.58);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.pricing-buy-button:hover {
+  background: #ffffff;
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.pricing-buy-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
 }
 
 .pricing-checkout-view {
@@ -4901,6 +5130,13 @@ h1 {
   .pricing-flow-view {
     min-height: 0;
   }
+  .pricing-choice-stack {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .pricing-credit-control {
+    margin-left: 0;
+  }
   .pricing-flow-left,
   .checkout-summary,
   .pricing-flow-main,
@@ -4920,9 +5156,15 @@ h1 {
   .pricing-summary-card {
     grid-template-columns: 1fr;
     min-height: 144px;
+    justify-items: center;
+    text-align: center;
   }
   .pricing-summary-count {
-    justify-items: start;
+    justify-items: center;
+  }
+  .pricing-buy-button {
+    min-height: 96px;
+    gap: 6px;
   }
   .checkout-secure {
     margin-top: 24px;
@@ -4978,6 +5220,18 @@ h1 {
   }
   .pricing-screenshot-block {
     margin-top: 32px;
+  }
+  .pricing-credit-control {
+    padding: 20px;
+  }
+  .pricing-credit-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pricing-credit-bounds {
+    align-items: flex-start;
+    flex-direction: column;
   }
   .pricing-description {
     min-height: 0;

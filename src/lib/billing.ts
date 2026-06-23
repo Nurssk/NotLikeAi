@@ -1,47 +1,14 @@
-export type PlanId = "minimal" | "popular" | "maximum";
+export const CREDIT_PURCHASE_MIN_CREDITS = 3;
+export const CREDIT_PURCHASE_MAX_CREDITS = 200;
+export const CREDIT_PURCHASE_MIN_AMOUNT = 100;
+export const CREDIT_PURCHASE_MAX_AMOUNT = 6500;
 
-export type BillingPlan = {
-  id: PlanId;
-  label: string;
-  amount: number;
+export type CreditPurchase = {
   credits: number;
-  period: "week" | "month";
+  amount: number;
+  label: string;
   limit: string;
-};
-
-export const CREDIT_PLANS: Record<PlanId, BillingPlan> = {
-  minimal: {
-    id: "minimal",
-    label: "Minimal",
-    amount: 1000,
-    credits: 50,
-    period: "week",
-    limit: "screenshots per week",
-  },
-  popular: {
-    id: "popular",
-    label: "Popular",
-    amount: 2500,
-    credits: 200,
-    period: "month",
-    limit: "screenshots per month",
-  },
-  maximum: {
-    id: "maximum",
-    label: "Maximum",
-    amount: 4000,
-    credits: 450,
-    period: "month",
-    limit: "screenshots per month",
-  },
-};
-
-const PLAN_ALIASES: Record<string, PlanId> = {
-  min: "minimal",
-  minimal: "minimal",
-  popular: "popular",
-  max: "maximum",
-  maximum: "maximum",
+  period: "one_time";
 };
 
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
@@ -50,20 +17,49 @@ export const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test
 
 export const emailToCreditDocId = (email: string) => normalizeEmail(email).replace(/[.#$[\]/\s]/g, "_");
 
-export const resolvePlanId = (rawPlan: string | null | undefined): PlanId | null => {
-  if (!rawPlan) return null;
-  return PLAN_ALIASES[rawPlan.toLowerCase()] ?? null;
+export const amountForCredits = (credits: number) => {
+  const progress =
+    (credits - CREDIT_PURCHASE_MIN_CREDITS) / (CREDIT_PURCHASE_MAX_CREDITS - CREDIT_PURCHASE_MIN_CREDITS);
+  return Math.round(CREDIT_PURCHASE_MIN_AMOUNT + progress * (CREDIT_PURCHASE_MAX_AMOUNT - CREDIT_PURCHASE_MIN_AMOUNT));
 };
 
-export const planFromAmount = (amount: number | null | undefined): BillingPlan | null =>
-  Object.values(CREDIT_PLANS).find((plan) => plan.amount === amount) ?? null;
+export const resolveCreditQuantity = (rawCredits: string | number | null | undefined) => {
+  const credits = typeof rawCredits === "number" ? rawCredits : Number(rawCredits);
+  if (!Number.isInteger(credits)) return null;
+  if (credits < CREDIT_PURCHASE_MIN_CREDITS || credits > CREDIT_PURCHASE_MAX_CREDITS) return null;
+  return credits;
+};
 
-export const planFromMetadata = (metadata: Record<string, unknown> | null | undefined, amount?: number | null) => {
-  const metadataPlan = metadata?.plan ?? metadata?.plan_id;
-  if (typeof metadataPlan === "string") {
-    const planId = resolvePlanId(metadataPlan);
-    if (planId) return CREDIT_PLANS[planId];
+export const creditPurchaseFromQuantity = (rawCredits: string | number | null | undefined): CreditPurchase | null => {
+  const credits = resolveCreditQuantity(rawCredits);
+  if (!credits) return null;
+
+  return {
+    credits,
+    amount: amountForCredits(credits),
+    label: `${credits} credits`,
+    limit: "one-time credits",
+    period: "one_time",
+  };
+};
+
+const creditQuantityFromAmount = (amount: number | null | undefined) => {
+  if (typeof amount !== "number") return null;
+
+  for (let credits = CREDIT_PURCHASE_MIN_CREDITS; credits <= CREDIT_PURCHASE_MAX_CREDITS; credits += 1) {
+    if (amountForCredits(credits) === amount) return credits;
   }
 
-  return planFromAmount(amount);
+  return null;
+};
+
+export const purchaseFromMetadata = (metadata: Record<string, unknown> | null | undefined, amount?: number | null) => {
+  const metadataCredits = metadata?.credits ?? metadata?.credit_quantity;
+  const purchase = creditPurchaseFromQuantity(
+    typeof metadataCredits === "string" || typeof metadataCredits === "number" ? metadataCredits : null,
+  );
+
+  if (purchase) return purchase;
+
+  return creditPurchaseFromQuantity(creditQuantityFromAmount(amount));
 };

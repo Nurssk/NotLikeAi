@@ -39,6 +39,11 @@
     });
   };
 
+  const getCreditsFromFlow = (element: Element | null) => {
+    const flow = element?.closest("[data-pricing-flow]");
+    return flow instanceof HTMLElement ? flow.dataset.selectedCredits : undefined;
+  };
+
   const getPlanFromElement = (element: Element | null) => {
     if (!(element instanceof HTMLElement)) return undefined;
 
@@ -75,6 +80,11 @@
       track("Waitlist Submitted", detail);
     });
 
+    window.addEventListener("extension:started", (event) => {
+      const detail = event instanceof CustomEvent ? event.detail : {};
+      track("Chrome Extension Started", detail);
+    });
+
     document.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
@@ -87,10 +97,29 @@
         return;
       }
 
+      const creditSlider = target.closest("[data-credit-slider]");
+      if (creditSlider) {
+        track("Pricing Credits Changed", {
+          credits: getCreditsFromFlow(creditSlider),
+        });
+        return;
+      }
+
       if (target.closest("[data-buy-now]")) {
-        const flow = target.closest("[data-pricing-flow]");
         track("Pricing Buy Now Clicked", {
-          plan: flow instanceof HTMLElement ? flow.dataset.selectedPlan : undefined,
+          credits: getCreditsFromFlow(target),
+        });
+        return;
+      }
+
+      const extensionStart = target.closest("[data-extension-start]");
+      if (extensionStart) {
+        const extensionData = extensionStart instanceof HTMLElement ? extensionStart.dataset : undefined;
+        track("Chrome Extension Started", {
+          destination: extensionData?.extensionDestination || "chrome_web_store",
+          size: extensionData?.extensionSize,
+          variant: extensionData?.extensionVariant,
+          source: "click",
         });
         return;
       }
@@ -98,7 +127,7 @@
       const checkoutSubmit = target.closest("[data-checkout-submit]");
       if (checkoutSubmit) {
         track("Checkout Started", {
-          plan: getPlanFromElement(checkoutSubmit),
+          credits: getCreditsFromFlow(checkoutSubmit),
         });
         return;
       }

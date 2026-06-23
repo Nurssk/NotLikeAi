@@ -16,6 +16,8 @@ export const creditCorsHeaders = {
 type CreditDocument = {
   normalizedEmail?: string;
   planId?: string;
+  purchaseType?: string;
+  lastCreditPurchase?: number;
   status?: string;
   creditsTotal?: number;
   creditsRemaining?: number;
@@ -104,6 +106,8 @@ export const verifyCreditRequest = async (request: Request) => {
 export const serializeCreditData = (data: CreditDocument) => ({
   normalizedEmail: data.normalizedEmail ?? null,
   planId: data.planId ?? null,
+  purchaseType: data.purchaseType ?? null,
+  lastCreditPurchase: typeof data.lastCreditPurchase === "number" ? data.lastCreditPurchase : null,
   status: data.status ?? null,
   creditsTotal: typeof data.creditsTotal === "number" ? data.creditsTotal : 0,
   creditsRemaining: typeof data.creditsRemaining === "number" ? data.creditsRemaining : 0,
@@ -159,7 +163,7 @@ export const consumeCreditsForRequest = async (request: Request, amount: number)
       }
 
       if (data.status !== "active") {
-        return { error: "inactive_plan" as const };
+        return { error: "inactive_credits" as const };
       }
 
       const periodEnd = serializeDate(data.currentPeriodEnd);

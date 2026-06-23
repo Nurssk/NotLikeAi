@@ -2,11 +2,10 @@ import type { APIRoute } from "astro";
 import { validateEvent, WebhookVerificationError } from "@polar-sh/sdk/webhooks";
 import { FieldValue } from "firebase-admin/firestore";
 import {
-  CREDIT_PLANS,
   emailToCreditDocId,
   isValidEmail,
   normalizeEmail,
-  planFromMetadata,
+  purchaseFromMetadata,
 } from "../../../lib/billing";
 import { adminDb } from "../../../lib/firebase-admin";
 import { readServerEnv } from "../../../lib/server-env";
@@ -22,7 +21,7 @@ type PolarEvent = {
 
 type CreditStatus = "active" | "past_due" | "canceled" | "revoked" | "refunded";
 
-const ACTIVE_EVENT_TYPES = new Set(["order.paid", "subscription.active", "subscription.updated", "subscription.uncanceled"]);
+const ACTIVE_EVENT_TYPES = new Set(["order.paid"]);
 
 const STATUS_EVENT_MAP: Record<string, CreditStatus> = {
   "subscription.past_due": "past_due",
@@ -134,7 +133,7 @@ export const POST: APIRoute = async ({ request }) => {
   const eventStatus = statusForEvent(event, data);
   const metadata = getMetadata(data);
   const normalizedEmail = getCustomerEmail(data, metadata);
-  const plan = planFromMetadata(metadata, getPlanAmount(data));
+  const purchase = purchaseFromMetadata(metadata, getPlanAmount(data));
 
   const db = adminDb();
   const eventRef = db.collection(POLAR_EVENTS_COLLECTION).doc(eventId);
@@ -204,31 +203,32 @@ export const POST: APIRoute = async ({ request }) => {
       return { applied: true };
     }
 
-    if (!plan) {
+    if (!purchase) {
       transaction.set(eventRef, {
         ...baseEventRecord,
         normalizedEmail,
-        processingStatus: "skipped_missing_plan",
+        processingStatus: "skipped_missing_purchase",
       });
-      return { skipped: "missing_plan" };
+      return { skipped: "missing_purchase" };
     }
 
-    const shouldResetCredits = event.type === "order.paid" || !currentCreditSnapshot.exists;
-    const creditsRemaining = shouldResetCredits
-      ? plan.credits
-      : Math.min(existingCreditsRemaining ?? plan.credits, plan.credits);
+    const existingCreditsTotal =
+      typeof currentCreditData.creditsTotal === "number" ? currentCreditData.creditsTotal : 0;
+    const creditsRemaining = (existingCreditsRemaining ?? 0) + purchase.credits;
 
     transaction.set(
       creditRef,
       {
         normalizedEmail,
         emailKey,
-        planId: plan.id,
+        planId: null,
+        purchaseType: "credits",
+        lastCreditPurchase: purchase.credits,
         status: "active",
-        creditsTotal: plan.credits,
+        creditsTotal: existingCreditsTotal + purchase.credits,
         creditsRemaining,
-        period: plan.period,
-        usageLimit: plan.limit,
+        period: purchase.period,
+        usageLimit: purchase.limit,
         polarCustomerId: getString(data, "customerId") || getString(data ? getRecord(data, "customer") : null, "id"),
         polarCheckoutId: getString(data, "checkoutId"),
         polarOrderId: event.type.startsWith("order.") ? getString(data, "id") : currentCreditData.polarOrderId ?? null,
@@ -246,8 +246,9 @@ export const POST: APIRoute = async ({ request }) => {
       ...baseEventRecord,
       emailKey,
       normalizedEmail,
-      planId: plan.id,
-      creditsTotal: CREDIT_PLANS[plan.id].credits,
+      purchaseType: "credits",
+      creditsPurchased: purchase.credits,
+      creditsTotal: purchase.credits,
       processingStatus: "applied",
     });
 
