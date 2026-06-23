@@ -427,6 +427,21 @@ const pageDescription =
       return code;
     };
 
+    const ensureFreeCredits = async (user) => {
+      if (!user?.getIdToken) return;
+
+      try {
+        const token = await user.getIdToken();
+        await fetch("/api/credits/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } catch {
+        // The extension credits API will initialize the free plan on first read too.
+      }
+    };
+
     const saveCode = async ({ code, email }) => {
       const normalizedEmail = email.trim().toLowerCase();
       const [{ collection, doc, getDocs, query, where, writeBatch }, { db }] = await Promise.all([
@@ -471,6 +486,8 @@ const pageDescription =
           setMessage("This account does not have an email address.", "error");
           return;
         }
+
+        await ensureFreeCredits(authUser);
 
         const code = generateRawCode();
         await saveCode({

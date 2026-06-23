@@ -479,6 +479,21 @@ const pageDescription =
       window.location.assign(codePagePath);
     };
 
+    const ensureFreeCredits = async (user) => {
+      if (!user?.getIdToken) return;
+
+      try {
+        const token = await user.getIdToken();
+        await fetch("/api/credits/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } catch {
+        // Credits are also initialized by the credits API when the extension reads them.
+      }
+    };
+
     const authErrorMessage = (error) => {
       const code = typeof error === "object" && error && "code" in error ? error.code : "";
       if (code === "auth/email-already-in-use") return "This email already has an account. Switch to Log in.";
@@ -627,6 +642,7 @@ const pageDescription =
         provider.setCustomParameters({ prompt: "select_account" });
         const result = await signInWithPopup(auth, provider);
         authUser = result.user;
+        await ensureFreeCredits(result.user);
         if (result.user.emailVerified) {
           redirectToCodePage();
         } else {
@@ -699,9 +715,11 @@ const pageDescription =
             await signOut(auth);
             authUser = null;
           } else if (currentUser?.emailVerified) {
+            await ensureFreeCredits(currentUser);
             redirectToCodePage();
             return;
           } else if (currentUser) {
+            await ensureFreeCredits(currentUser);
             await sendEmailVerification(currentUser);
             setMessage("Verification email sent. Check your inbox and spam folder, then log in again to continue.");
             return;
@@ -729,6 +747,7 @@ const pageDescription =
         if (!result.user.email) {
           setMessage("Account does not have an email address.", "error");
         } else if (authMode === "register") {
+          await ensureFreeCredits(result.user);
           await sendEmailVerification(result.user);
           setMessage(
             reusedExistingAccount
@@ -736,8 +755,10 @@ const pageDescription =
               : "Account created. Verification email sent. Check your inbox and spam folder.",
           );
         } else if (result.user.emailVerified) {
+          await ensureFreeCredits(result.user);
           redirectToCodePage();
         } else {
+          await ensureFreeCredits(result.user);
           await sendEmailVerification(result.user);
           setMessage("Email is not verified yet. We sent a new verification link to your inbox.", "error");
         }

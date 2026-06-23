@@ -4,7 +4,7 @@ const creditPricing = {
   maxCredits: 200,
   minAmount: 100,
   maxAmount: 6500,
-  defaultCredits: 200,
+  defaultCredits: 3,
 };
 
 const amountForCredits = (credits: number) => {
@@ -41,6 +41,37 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
                 <strong><span data-credit-count data-current-value={creditPricing.defaultCredits}>{
                   creditPricing.defaultCredits
                 }</span></strong>
+              </div>
+
+              <div class="pricing-credit-inputs" aria-label="Custom credit purchase">
+                <label class="pricing-credit-input">
+                  <span>Credits</span>
+                  <input
+                    type="number"
+                    min={creditPricing.minCredits}
+                    max={creditPricing.maxCredits}
+                    step="1"
+                    inputmode="numeric"
+                    value={creditPricing.defaultCredits}
+                    data-credit-input
+                  />
+                </label>
+
+                <label class="pricing-credit-input">
+                  <span>Budget</span>
+                  <div class="pricing-money-input">
+                    <span aria-hidden="true">$</span>
+                    <input
+                      type="number"
+                      min={(creditPricing.minAmount / 100).toFixed(2)}
+                      max={(creditPricing.maxAmount / 100).toFixed(2)}
+                      step="0.01"
+                      inputmode="decimal"
+                      value={(defaultAmount / 100).toFixed(2)}
+                      data-amount-input
+                    />
+                  </div>
+                </label>
               </div>
 
               <div class="pricing-credit-slider-shell">
@@ -107,13 +138,26 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
     const maxAmount = Number(pricing.maxAmount || 6500);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let selectedCredits = Number(flow.getAttribute("data-selected-credits") || pricing.defaultCredits || maxCredits);
+    let selectedAmount = 0;
+    let selectionMode = "credits";
     let creditAnimationFrame = 0;
 
     const clampCredits = (value) => Math.min(maxCredits, Math.max(minCredits, Math.round(Number(value) || minCredits)));
 
+    const clampAmount = (value) => {
+      const amount = Math.round(Number(value) * 100);
+      if (!Number.isFinite(amount)) return minAmount;
+      return Math.min(maxAmount, Math.max(minAmount, amount));
+    };
+
     const amountForCredits = (credits) => {
       const progress = (credits - minCredits) / (maxCredits - minCredits);
       return Math.round(minAmount + progress * (maxAmount - minAmount));
+    };
+
+    const creditsForAmount = (amount) => {
+      const progress = (amount - minAmount) / (maxAmount - minAmount);
+      return clampCredits(minCredits + progress * (maxCredits - minCredits));
     };
 
     const formatAmount = (amount) =>
@@ -122,6 +166,8 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
         currency: "USD",
         maximumFractionDigits: amount % 100 === 0 ? 0 : 2,
       }).format(amount / 100);
+
+    const formatInputAmount = (amount) => (amount / 100).toFixed(2);
 
     const setText = (selector, value) => {
       const node = flow.querySelector(selector);
@@ -170,14 +216,34 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
       creditAnimationFrame = window.requestAnimationFrame(tick);
     };
 
-    const updateCreditSelection = (rawCredits) => {
-      const credits = clampCredits(rawCredits);
-      const amount = amountForCredits(credits);
+    const updatePricingInputs = (credits, amount, source) => {
+      const creditInput = flow.querySelector("[data-credit-input]");
+      if (creditInput instanceof HTMLInputElement && document.activeElement !== creditInput) {
+        creditInput.value = String(credits);
+      }
+
+      const amountInput = flow.querySelector("[data-amount-input]");
+      if (amountInput instanceof HTMLInputElement && document.activeElement !== amountInput) {
+        amountInput.value = formatInputAmount(amount);
+      }
+
+      if (source === "amount" && creditInput instanceof HTMLInputElement) {
+        creditInput.value = String(credits);
+      }
+    };
+
+    const updateCreditSelection = (rawValue, source = "credits") => {
+      const amount = source === "amount" ? clampAmount(rawValue) : amountForCredits(clampCredits(rawValue));
+      const credits = source === "amount" ? creditsForAmount(amount) : clampCredits(rawValue);
       const progress = ((credits - minCredits) / (maxCredits - minCredits)) * 100;
       const rate = amount / credits / 100;
 
       selectedCredits = credits;
+      selectedAmount = amount;
+      selectionMode = source;
       flow.dataset.selectedCredits = String(credits);
+      flow.dataset.selectedAmount = String(amount);
+      flow.dataset.selectionMode = selectionMode;
 
       const slider = flow.querySelector("[data-credit-slider]");
       if (slider instanceof HTMLInputElement) slider.value = String(credits);
@@ -189,6 +255,7 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
       if (balanceNode instanceof HTMLElement) balanceNode.style.left = `${progress}%`;
       setText("[data-credit-balance-value]", credits.toLocaleString());
 
+      updatePricingInputs(credits, amount, source);
       animateCreditCount(credits);
       setText("[data-credit-price]", formatAmount(amount));
       setText(
@@ -205,7 +272,11 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
 
     const getCheckoutUrl = () => {
       const href = new URL("/api/checkout", window.location.origin);
-      href.searchParams.set("credits", String(selectedCredits));
+      if (selectionMode === "amount") {
+        href.searchParams.set("amount", String(selectedAmount));
+      } else {
+        href.searchParams.set("credits", String(selectedCredits));
+      }
       return href.toString();
     };
 
@@ -221,7 +292,26 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
 
     flow.querySelector("[data-credit-slider]")?.addEventListener("input", (event) => {
       const target = event.target;
-      if (target instanceof HTMLInputElement) updateCreditSelection(target.value);
+      if (target instanceof HTMLInputElement) updateCreditSelection(target.value, "credits");
+    });
+
+    flow.querySelector("[data-credit-input]")?.addEventListener("input", (event) => {
+      const target = event.target;
+      if (target instanceof HTMLInputElement) updateCreditSelection(target.value, "credits");
+    });
+
+    flow.querySelector("[data-credit-input]")?.addEventListener("blur", () => {
+      updateCreditSelection(selectedCredits, "credits");
+    });
+
+    flow.querySelector("[data-amount-input]")?.addEventListener("input", (event) => {
+      const target = event.target;
+      if (target instanceof HTMLInputElement) updateCreditSelection(target.value, "amount");
+    });
+
+    flow.querySelector("[data-amount-input]")?.addEventListener("blur", () => {
+      const amountInput = flow.querySelector("[data-amount-input]");
+      if (amountInput instanceof HTMLInputElement) amountInput.value = formatInputAmount(selectedAmount);
     });
 
     flow.querySelector("[data-buy-now]")?.addEventListener("click", redirectToPolar);

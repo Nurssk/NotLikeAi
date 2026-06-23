@@ -6,6 +6,8 @@ import { adminAuth, adminDb } from "./firebase-admin";
 
 export const CUSTOMER_CREDITS_COLLECTION = "customerCredits";
 export const POLAR_EVENTS_COLLECTION = "polarEvents";
+export const FREE_PLAN_ID = "free";
+export const FREE_PLAN_SCREENSHOTS = 3;
 
 export const creditCorsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,16 +17,19 @@ export const creditCorsHeaders = {
 
 type CreditDocument = {
   normalizedEmail?: string;
+  emailKey?: string;
   planId?: string;
   purchaseType?: string;
   lastCreditPurchase?: number;
   status?: string;
   creditsTotal?: number;
   creditsRemaining?: number;
+  usageLimit?: string;
   period?: string;
   polarCustomerId?: string | null;
   polarOrderId?: string | null;
   polarSubscriptionId?: string | null;
+  createdAt?: unknown;
   currentPeriodStart?: unknown;
   currentPeriodEnd?: unknown;
   updatedAt?: unknown;
@@ -105,36 +110,68 @@ export const verifyCreditRequest = async (request: Request) => {
 
 export const serializeCreditData = (data: CreditDocument) => ({
   normalizedEmail: data.normalizedEmail ?? null,
+  emailKey: data.emailKey ?? null,
   planId: data.planId ?? null,
   purchaseType: data.purchaseType ?? null,
   lastCreditPurchase: typeof data.lastCreditPurchase === "number" ? data.lastCreditPurchase : null,
   status: data.status ?? null,
   creditsTotal: typeof data.creditsTotal === "number" ? data.creditsTotal : 0,
   creditsRemaining: typeof data.creditsRemaining === "number" ? data.creditsRemaining : 0,
+  usageLimit: data.usageLimit ?? null,
   period: data.period ?? null,
   polarCustomerId: data.polarCustomerId ?? null,
   polarOrderId: data.polarOrderId ?? null,
   polarSubscriptionId: data.polarSubscriptionId ?? null,
+  createdAt: serializeDate(data.createdAt),
   currentPeriodStart: serializeDate(data.currentPeriodStart),
   currentPeriodEnd: serializeDate(data.currentPeriodEnd),
   updatedAt: serializeDate(data.updatedAt),
+});
+
+const createFreeCreditDocument = (verified: { normalizedEmail: string; emailKey: string }) => ({
+  normalizedEmail: verified.normalizedEmail,
+  emailKey: verified.emailKey,
+  planId: FREE_PLAN_ID,
+  purchaseType: FREE_PLAN_ID,
+  lastCreditPurchase: null,
+  status: "active",
+  creditsTotal: FREE_PLAN_SCREENSHOTS,
+  creditsRemaining: FREE_PLAN_SCREENSHOTS,
+  usageLimit: `${FREE_PLAN_SCREENSHOTS} screenshots`,
+  period: FREE_PLAN_ID,
+  polarCustomerId: null,
+  polarOrderId: null,
+  polarSubscriptionId: null,
+  currentPeriodStart: null,
+  currentPeriodEnd: null,
+  createdAt: FieldValue.serverTimestamp(),
+  updatedAt: FieldValue.serverTimestamp(),
+});
+
+const createFreeCreditResponseData = (verified: { normalizedEmail: string; emailKey: string }, creditsRemaining = FREE_PLAN_SCREENSHOTS) => ({
+  ...createFreeCreditDocument(verified),
+  creditsRemaining,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 });
 
 export const getCreditsForRequest = async (request: Request) => {
   const verified = await verifyCreditRequest(request);
   if ("error" in verified) return verified.error;
 
-  const snapshot = await adminDb().collection(CUSTOMER_CREDITS_COLLECTION).doc(verified.emailKey).get();
-  if (!snapshot.exists) {
-    return jsonResponse({
-      normalizedEmail: verified.normalizedEmail,
-      status: "missing",
-      creditsTotal: 0,
-      creditsRemaining: 0,
-    });
-  }
+  const db = adminDb();
+  const creditRef = db.collection(CUSTOMER_CREDITS_COLLECTION).doc(verified.emailKey);
 
-  return jsonResponse(serializeCreditData(snapshot.data() as CreditDocument));
+  const creditData = await db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(creditRef);
+    if (snapshot.exists) return snapshot.data() as CreditDocument;
+
+    const freeCreditDocument = createFreeCreditDocument(verified);
+    transaction.set(creditRef, freeCreditDocument);
+    return createFreeCreditResponseData(verified);
+  });
+
+  return jsonResponse(serializeCreditData(creditData));
 };
 
 export const consumeCreditsForRequest = async (request: Request, amount: number) => {
@@ -152,7 +189,19 @@ export const consumeCreditsForRequest = async (request: Request, amount: number)
     const result = await db.runTransaction(async (transaction) => {
       const snapshot = await transaction.get(creditRef);
       if (!snapshot.exists) {
-        return { error: "credits_not_found" as const };
+        if (FREE_PLAN_SCREENSHOTS < amount) {
+          return { error: "insufficient_credits" as const, creditsRemaining: FREE_PLAN_SCREENSHOTS };
+        }
+
+        const nextCreditsRemaining = FREE_PLAN_SCREENSHOTS - amount;
+        transaction.set(creditRef, {
+          ...createFreeCreditDocument(verified),
+          creditsRemaining: nextCreditsRemaining,
+        });
+
+        return {
+          credits: serializeCreditData(createFreeCreditResponseData(verified, nextCreditsRemaining)),
+        };
       }
 
       const data = snapshot.data() as CreditDocument;

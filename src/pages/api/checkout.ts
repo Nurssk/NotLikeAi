@@ -3,6 +3,9 @@ import { Polar } from "@polar-sh/sdk";
 import {
   CREDIT_PURCHASE_MAX_CREDITS,
   CREDIT_PURCHASE_MIN_CREDITS,
+  CREDIT_PURCHASE_MAX_AMOUNT,
+  CREDIT_PURCHASE_MIN_AMOUNT,
+  creditPurchaseFromAmount,
   creditPurchaseFromQuantity,
   isValidEmail,
   normalizeEmail,
@@ -12,12 +15,15 @@ import { readServerEnv } from "../../lib/server-env";
 const absoluteUrl = (base: string, path: string) => new URL(path, base).toString();
 
 export const GET: APIRoute = async ({ url, request }) => {
+  const rawAmount = url.searchParams.get("amount");
   const rawCredits = url.searchParams.get("credits") || String(CREDIT_PURCHASE_MAX_CREDITS);
-  const purchase = creditPurchaseFromQuantity(rawCredits);
+  const purchase = rawAmount ? creditPurchaseFromAmount(rawAmount) : creditPurchaseFromQuantity(rawCredits);
 
   if (!purchase) {
     return new Response(
-      `Credits must be a whole number between ${CREDIT_PURCHASE_MIN_CREDITS} and ${CREDIT_PURCHASE_MAX_CREDITS}`,
+      rawAmount
+        ? `Amount must be whole cents between ${CREDIT_PURCHASE_MIN_AMOUNT} and ${CREDIT_PURCHASE_MAX_AMOUNT}`
+        : `Credits must be a whole number between ${CREDIT_PURCHASE_MIN_CREDITS} and ${CREDIT_PURCHASE_MAX_CREDITS}`,
       { status: 400 },
     );
   }
@@ -49,8 +55,10 @@ export const GET: APIRoute = async ({ url, request }) => {
     credit_quantity: purchase.credits,
     credit_pack: purchase.label,
     credits: purchase.credits,
+    amount_cents: purchase.amount,
     usage_limit: purchase.limit,
     billing_period: purchase.period,
+    pricing_mode: rawAmount ? "amount" : "credits",
     source: "landing_pricing",
     ...(customerEmail ? { customer_email: customerEmail } : {}),
     ...(referrer ? { referrer } : {}),
