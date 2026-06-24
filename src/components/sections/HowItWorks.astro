@@ -1,4 +1,7 @@
 ---
+const chromeExtensionUrl =
+  "https://chromewebstore.google.com/detail/mbbhjpbbehelagdnlmppgdhheceijfmm?utm_source=item-share-cb";
+
 const steps = [
   {
     title: "Create screenshot",
@@ -33,6 +36,18 @@ const steps = [
       <div class="how-copy">
         <div class="how-head">
           <h2 class="how-title">How it works</h2>
+          <a
+            class="how-extension-link"
+            href={chromeExtensionUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-extension-start
+            data-extension-destination="chrome_web_store"
+            data-extension-size="section"
+            data-extension-variant="how_it_works"
+          >
+            Open Chrome extension
+          </a>
         </div>
 
         <div class="how-cards" aria-label="How Design Humanizer works">
@@ -203,6 +218,34 @@ const steps = [
     font-weight: 800;
     line-height: 1.05;
     letter-spacing: 0;
+  }
+
+  .how-extension-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    margin-top: 18px;
+    padding: 0 18px;
+    border-radius: 10px;
+    background: var(--accent, #111111);
+    color: var(--on-accent, #FAF7F3);
+    font-size: 14px;
+    font-weight: 850;
+    line-height: 1;
+    text-decoration: none;
+    transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+  }
+
+  .how-extension-link:hover {
+    background: var(--text, #111111);
+    color: var(--on-accent, #FAF7F3);
+    transform: translateY(-1px);
+  }
+
+  .how-extension-link:focus-visible {
+    outline: 3px solid rgba(17, 17, 17, 0.2);
+    outline-offset: 4px;
   }
 
   .how-demo {
