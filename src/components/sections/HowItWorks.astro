@@ -1,6 +1,5 @@
 ---
-const chromeExtensionUrl =
-  "https://chromewebstore.google.com/detail/mbbhjpbbehelagdnlmppgdhheceijfmm?utm_source=item-share-cb";
+import StartButton from "../StartButton";
 
 const steps = [
   {
@@ -36,18 +35,6 @@ const steps = [
       <div class="how-copy">
         <div class="how-head">
           <h2 class="how-title">How it works</h2>
-          <a
-            class="how-extension-link"
-            href={chromeExtensionUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-extension-start
-            data-extension-destination="chrome_web_store"
-            data-extension-size="section"
-            data-extension-variant="how_it_works"
-          >
-            Open Chrome extension
-          </a>
         </div>
 
         <div class="how-cards" aria-label="How Design Humanizer works">
@@ -100,18 +87,24 @@ const steps = [
         </div>
       </div>
 
-      <figure class="how-demo" aria-label="Design Humanizer demo video">
-        <video
-          class="how-demo-video"
-          src="/demo/demoview.mp4"
-          autoplay
-          muted
-          loop
-          playsinline
-          controls
-          preload="metadata"
-        ></video>
-      </figure>
+      <div class="how-demo-stack">
+        <figure class="how-demo" aria-label="Design Humanizer demo video">
+          <video
+            class="how-demo-video"
+            src="/demo/demoview.mp4"
+            autoplay
+            muted
+            loop
+            playsinline
+            controls
+            preload="metadata"
+          ></video>
+        </figure>
+
+        <div class="how-extension-action">
+          <StartButton client:visible size="lg" />
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -220,45 +213,29 @@ const steps = [
     letter-spacing: 0;
   }
 
-  .how-extension-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    margin-top: 18px;
-    padding: 0 18px;
-    border-radius: 10px;
-    background: var(--accent, #111111);
-    color: var(--on-accent, #FAF7F3);
-    font-size: 14px;
-    font-weight: 850;
-    line-height: 1;
-    text-decoration: none;
-    transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+  .how-demo-stack {
+    position: relative;
+    justify-self: end;
+    display: grid;
+    justify-items: end;
+    gap: 14px;
+    width: min(100%, 800px);
+    transform: translateX(clamp(8px, 2vw, 24px));
   }
 
-  .how-extension-link:hover {
-    background: var(--text, #111111);
-    color: var(--on-accent, #FAF7F3);
-    transform: translateY(-1px);
-  }
-
-  .how-extension-link:focus-visible {
-    outline: 3px solid rgba(17, 17, 17, 0.2);
-    outline-offset: 4px;
+  .how-extension-action {
+    justify-self: end;
   }
 
   .how-demo {
     position: relative;
-    justify-self: end;
-    width: min(100%, 800px);
+    width: 100%;
     margin: 0;
     overflow: hidden;
     border: 0;
     border-radius: 12px;
     background: var(--accent, #111111);
     box-shadow: 0 2px 8px rgba(16, 17, 18, 0.1);
-    transform: translateX(clamp(8px, 2vw, 24px));
   }
 
   .how-demo::before {
@@ -396,13 +373,15 @@ const steps = [
     .how-head {
       max-width: 680px;
     }
-    .how-demo {
+    .how-demo-stack {
       order: -1;
       justify-self: stretch;
       width: 100%;
       transform: none;
-      border-radius: 12px;
       margin-bottom: 24px;
+    }
+    .how-demo {
+      border-radius: 12px;
     }
   }
 

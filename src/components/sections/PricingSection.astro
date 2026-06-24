@@ -31,25 +31,27 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
       <div class="pricing-flow-view is-active" data-flow-view="plans">
         <div class="pricing-flow-main">
           <div class="pricing-main-copy">
-            <h2 id="pricing-title">Buy credits</h2>
+            <h2 id="pricing-title">Buy screenshots</h2>
           </div>
 
           <div class="pricing-choice-stack">
             <div class="pricing-credit-control">
               <div class="pricing-credit-head">
-                <span>Credits selected</span>
+                <span>Screenshots selected</span>
                 <strong><span data-credit-count data-current-value={creditPricing.defaultCredits}>{
                   creditPricing.defaultCredits
                 }</span></strong>
               </div>
-              <div class="pricing-credit-notes">
-                <p>1 credit = 1 screenshot</p>
-                <p>Free plan includes 3 screenshots</p>
+
+              <div class="pricing-free-plan" aria-label="Free plan allowance">
+                <span>Free plan</span>
+                <strong>3 screenshots included</strong>
+                <p>Start reviewing your UI before buying more screenshots.</p>
               </div>
 
-              <div class="pricing-credit-inputs" aria-label="Custom credit purchase">
+              <div class="pricing-credit-inputs" aria-label="Custom screenshot purchase">
                 <label class="pricing-credit-input">
-                  <span>Credits</span>
+                  <span>Screenshots</span>
                   <input
                     type="number"
                     min={creditPricing.minCredits}
@@ -86,7 +88,7 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
                   max={creditPricing.maxCredits}
                   step="1"
                   value={creditPricing.defaultCredits}
-                  aria-label="Credit amount"
+                  aria-label="Screenshot amount"
                   data-credit-slider
                 />
                 <div class="pricing-credit-slider-track" aria-hidden="true">
@@ -98,8 +100,8 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
               </div>
 
               <div class="pricing-credit-bounds">
-                <span>{creditPricing.minCredits} credits for {formatAmount(creditPricing.minAmount)}</span>
-                <span>{creditPricing.maxCredits} credits for {formatAmount(creditPricing.maxAmount)}</span>
+                <span>{creditPricing.minCredits} screenshots for {formatAmount(creditPricing.minAmount)}</span>
+                <span>{creditPricing.maxCredits} screenshots for {formatAmount(creditPricing.maxAmount)}</span>
               </div>
             </div>
 
@@ -115,13 +117,13 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
                     style: "currency",
                     currency: "USD",
                     maximumFractionDigits: 2,
-                  })} per credit
+                  })} per screenshot
                 </span>
               </div>
             </div>
 
             <button class="btn btn-primary pricing-buy-button" type="button" data-buy-now>
-              <span data-buy-credits-label>Buy {creditPricing.defaultCredits} credits</span>
+              <span data-buy-credits-label>Buy {creditPricing.defaultCredits} screenshots</span>
               <small data-buy-price-label>{formatAmount(defaultAmount)} today</small>
             </button>
           </div>
@@ -268,9 +270,9 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
           style: "currency",
           currency: "USD",
           maximumFractionDigits: 2,
-        })} per credit`,
+        })} per screenshot`,
       );
-      setText("[data-buy-credits-label]", `Buy ${credits.toLocaleString()} credits`);
+      setText("[data-buy-credits-label]", `Buy ${credits.toLocaleString()} screenshots`);
       setText("[data-buy-price-label]", `${formatAmount(amount)} today`);
     };
 
