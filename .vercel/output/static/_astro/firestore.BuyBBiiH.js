@@ -1,0 +1,1 @@
+import{getFirestore as o}from"./index.esm.YxfSz_1Q.js";import{app as r}from"./firebase.BXVhd1R1.js";import"./index.esm.Bd_x4rsI.js";import"./preload-helper.BlTxHScW.js";import"./index.esm.Dt0DXoXO.js";const f=o(r);export{f as db};

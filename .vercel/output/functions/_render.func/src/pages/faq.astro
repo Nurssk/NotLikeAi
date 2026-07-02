@@ -1,0 +1,228 @@
+---
+import "../styles/global.css";
+import Analytics from "@vercel/analytics/astro";
+import FAQAccordion from "../components/FAQAccordion.astro";
+import Footer from "../components/Footer.astro";
+import GlobalClickSpark from "../components/GlobalClickSpark";
+import AmplitudeAnalytics from "../components/AmplitudeAnalytics.astro";
+
+const faqItems = [
+  {
+    id: "q1",
+    number: "01",
+    category: "Product",
+    question: "What does Design Humanizer actually do?",
+    answer:
+      "It analyzes an AI-generated interface and shows what feels generic: weak hierarchy, repeated cards, unclear focus, poor spacing, and low visual priority. Then it suggests how to make the same content feel more intentional.",
+  },
+  {
+    id: "q2",
+    number: "02",
+    category: "Product",
+    question: "Is Design Humanizer a design generator?",
+    answer:
+      "Not exactly. It is closer to a design critique layer. It does not create a random new website from scratch; it helps improve the interface you already have.",
+  },
+  {
+    id: "q3",
+    number: "03",
+    category: "Product",
+    question: "Does it replace a designer?",
+    answer:
+      "No. It helps non-designers make better design decisions faster. A designer can still make deeper brand and product decisions.",
+  },
+  {
+    id: "q4",
+    number: "04",
+    category: "Workflow",
+    question: "Does it change my content?",
+    answer: "No. The goal is to keep your original content and improve how it is presented visually.",
+  },
+  {
+    id: "q5",
+    number: "05",
+    category: "Workflow",
+    question: "What problems does it detect?",
+    answer:
+      "It detects weak hierarchy, repeated cards, unclear CTA focus, generic layout rhythm, poor grouping, spacing issues, and visual sameness.",
+  },
+  {
+    id: "q6",
+    number: "06",
+    category: "Workflow",
+    question: "Can I preview changes before applying them?",
+    answer: "Yes. The goal is to show a clearer design direction before you change the actual page.",
+  },
+  {
+    id: "q7",
+    number: "07",
+    category: "Chrome Extension",
+    question: "How does the Chrome extension work?",
+    answer:
+      "The extension runs directly on the current page, reads the visible layout, detects weak design patterns, and shows suggestions in a side panel.",
+  },
+  {
+    id: "q8",
+    number: "08",
+    category: "Chrome Extension",
+    question: "What kinds of pages can it analyze?",
+    answer: "Landing pages, MVP screens, dashboards, generated frontend pages, and product interfaces that run in the browser.",
+  },
+  {
+    id: "q9",
+    number: "09",
+    category: "Privacy",
+    question: "Is my page data stored?",
+    answer:
+      "For the MVP, Design Humanizer should avoid storing page content unless the user explicitly chooses to submit or save it.",
+  },
+  {
+    id: "q10",
+    number: "10",
+    category: "Privacy",
+    question: "Will it edit my code automatically?",
+    answer:
+      "The first version focuses on analysis and preview. Apply/copy features can be added later depending on the product roadmap.",
+  },
+  {
+    id: "q11",
+    number: "11",
+    category: "Access",
+    question: "When will it be available?",
+    answer: "Click Start to sign in with Google and open the Chrome Web Store listing.",
+  },
+];
+
+const categories = ["All", "Product", "Workflow", "Chrome Extension", "Privacy", "Access"];
+const siteUrl = "https://www.beuniq.design";
+const pageUrl = `${siteUrl}/faq`;
+const pageTitle = "FAQ | BeUniq Design UI Humanizer";
+const pageDescription =
+  "Questions and answers about Design Humanizer, a Chrome extension for humanizing AI-generated UI, reviewing screenshots, and improving product design.";
+const pageKeywords = [
+  "humanize design UI FAQ",
+  "AI UI design FAQ",
+  "Design Humanizer questions",
+  "UI screenshot analysis",
+  "AI-generated interface feedback",
+];
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqItems.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.answer,
+    },
+  })),
+};
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="keywords" content={pageKeywords.join(", ")} />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="BeUniq Design" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={pageUrl} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <link rel="icon" type="image/svg+xml" href="/logo/icon-d.svg" />
+    <link rel="apple-touch-icon" href="/logo/app-icon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+  </head>
+  <body>
+    <main class="faq-page">
+      <section class="faq-body-section" aria-labelledby="faq-list-heading" data-faq-filter-root>
+        <div class="lp-container faq-body-grid">
+          <aside class="faq-nav-card" aria-label="FAQ navigation">
+            <h2>Navigation</h2>
+            <div class="faq-category-list">
+              {categories.map((category, i) => (
+                <button
+                  class={i === 0 ? "is-active" : ""}
+                  type="button"
+                  data-faq-filter={category}
+                  aria-pressed={i === 0 ? "true" : "false"}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+            <a class="faq-nav-action" href="mailto:sarsennbaj.n@gmail.com">Ask your question &rarr;</a>
+          </aside>
+
+          <div id="faq-list" class="faq-list-column">
+            <h1 id="faq-list-heading" class="faq-list-title">Questions &amp; answers</h1>
+            <FAQAccordion items={faqItems} className="faq-accordion--full" />
+            <p class="faq-empty-state" data-faq-empty hidden>No questions in this category yet.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+    <GlobalClickSpark
+      client:load
+      sparkColor="#111111"
+      sparkSize={12}
+      sparkRadius={22}
+      sparkCount={10}
+      duration={520}
+    />
+    <AmplitudeAnalytics />
+    <Analytics />
+    <script>
+      const faqRoot = document.querySelector("[data-faq-filter-root]");
+
+      if (faqRoot instanceof HTMLElement) {
+        const filterButtons = Array.from(faqRoot.querySelectorAll<HTMLButtonElement>("[data-faq-filter]"));
+        const faqItems = Array.from(faqRoot.querySelectorAll<HTMLDetailsElement>("[data-faq-item]"));
+        const emptyState = faqRoot.querySelector<HTMLElement>("[data-faq-empty]");
+
+        const openFirstVisibleItem = () => {
+          const firstVisible = faqItems.find((item) => !item.hidden);
+          faqItems.forEach((item) => {
+            item.open = item === firstVisible;
+          });
+          if (emptyState) emptyState.hidden = Boolean(firstVisible);
+        };
+
+        const applyFilter = (category: string) => {
+          filterButtons.forEach((button) => {
+            const isActive = button.dataset.faqFilter === category;
+            button.classList.toggle("is-active", isActive);
+            button.setAttribute("aria-pressed", String(isActive));
+          });
+
+          faqItems.forEach((item) => {
+            item.hidden = category !== "All" && item.dataset.category !== category;
+          });
+
+          openFirstVisibleItem();
+        };
+
+        filterButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            applyFilter(button.dataset.faqFilter ?? "All");
+          });
+        });
+
+        applyFilter("All");
+      }
+    </script>
+  </body>
+</html>

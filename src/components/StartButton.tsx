@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Magnet from "./Magnet";
+import RollingButtonText from "./RollingButtonText";
 
 interface StartButtonProps {
   className?: string;
@@ -59,7 +60,7 @@ export default function StartButton({
           aria-label={isIcon ? "Start with Chrome extension" : undefined}
         >
           <img className="start-button-chrome-logo" src="/logo/chrome-logo.png" alt="" aria-hidden="true" />
-          {!isIcon && <span>{isLarge ? "Start" : "Start"}</span>}
+          {!isIcon && <RollingButtonText text={isLarge ? "Start" : "Start"} />}
         </a>
       </Magnet>
     </span>

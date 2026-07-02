@@ -1,5 +1,6 @@
 ---
 import FAQAccordion from "../FAQAccordion.astro";
+import RollingButtonText from "../RollingButtonText";
 
 const qa = [
   {
@@ -26,13 +27,13 @@ const qa = [
       </h2>
 
       <div class="qa-preview-actions">
-        <a class="btn btn-primary" href="/faq">Open full FAQ</a>
-        <a class="btn btn-secondary" href="mailto:sarsennbaj.n@gmail.com">Ask a question</a>
+        <a class="btn btn-primary" href="mailto:sarsennbaj.n@gmail.com"><RollingButtonText text="Ask a question" /></a>
+        <a class="qa-preview-link" href="/faq"><RollingButtonText text="Open full FAQ" /></a>
       </div>
     </div>
 
     <div class="qa-preview-list">
-      <FAQAccordion items={qa} className="faq-accordion--preview" startOpenIndex={1} featuredIndex={1} />
+      <FAQAccordion items={qa} className="faq-accordion--preview" startOpenIndex={0} featuredIndex={0} />
     </div>
   </div>
 </section>

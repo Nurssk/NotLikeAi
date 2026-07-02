@@ -92,7 +92,7 @@ const { items, className = "", startOpenIndex = 0, featuredIndex } = Astro.props
       const panelAnimation = panel.animate(
         [{ height: `${startHeight}px` }, { height: `${targetHeight}px` }],
         {
-          duration: shouldOpen ? 520 : 620,
+          duration: shouldOpen ? 260 : 240,
           easing: "cubic-bezier(0.22, 1, 0.36, 1)",
           fill: "forwards",
         },
@@ -110,7 +110,7 @@ const { items, className = "", startOpenIndex = 0, featuredIndex } = Astro.props
           },
         ],
         {
-          duration: shouldOpen ? 440 : 560,
+          duration: shouldOpen ? 220 : 200,
           easing: "cubic-bezier(0.22, 1, 0.36, 1)",
           fill: "forwards",
         },

@@ -1,0 +1,364 @@
+- generic [active] [ref=e1]:
+  - generic "Loading beuniq.design" [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: "["
+      - generic [ref=e6]: beuniq.design
+      - generic [ref=e7]: "]"
+    - generic [ref=e10]: 17%
+  - banner:
+    - generic:
+      - generic:
+        - generic:
+          - navigation "Primary navigation":
+            - link "Design Humanizer home":
+              - /url: /#product
+              - img "Design Humanizer logo"
+            - generic:
+              - menubar:
+                - menuitem "How it works":
+                  - generic:
+                    - generic: How it works
+                    - generic: How it works
+                - menuitem "Pricing":
+                  - generic:
+                    - generic: Pricing
+                    - generic: Pricing
+                - menuitem "Q&A":
+                  - generic:
+                    - generic: Q&A
+                    - generic: Q&A
+                - menuitem "FAQ":
+                  - generic:
+                    - generic: FAQ
+                    - generic: FAQ
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - link "Start":
+                - /url: https://chromewebstore.google.com/detail/mbbhjpbbehelagdnlmppgdhheceijfmm?utm_source=item-share-cb
+                - img
+                - generic "Start":
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: S
+                        - generic: S
+                    - generic:
+                      - generic:
+                        - generic: t
+                        - generic: t
+                    - generic:
+                      - generic:
+                        - generic: a
+                        - generic: a
+                    - generic:
+                      - generic:
+                        - generic: r
+                        - generic: r
+                    - generic:
+                      - generic:
+                        - generic: t
+                        - generic: t
+  - main [ref=e11]:
+    - generic [ref=e14]:
+      - heading "Fix your UI" [level=1] [ref=e15]:
+        - generic [ref=e16]: Fix your UI
+      - paragraph [ref=e17]: Design Humanizer helps turn generic AI-generated interfaces into cleaner, more intentional product screens.
+      - link "Start" [ref=e23] [cursor=pointer]:
+        - /url: https://chromewebstore.google.com/detail/mbbhjpbbehelagdnlmppgdhheceijfmm?utm_source=item-share-cb
+        - img [ref=e24]
+        - generic "Start" [ref=e25]:
+          - generic [ref=e26]:
+            - generic [ref=e28]:
+              - generic [ref=e29]: S
+              - generic [ref=e30]: S
+            - generic [ref=e32]:
+              - generic [ref=e33]: t
+              - generic [ref=e34]: t
+            - generic [ref=e36]:
+              - generic [ref=e37]: a
+              - generic [ref=e38]: a
+            - generic [ref=e40]:
+              - generic [ref=e41]: r
+              - generic [ref=e42]: r
+            - generic [ref=e44]:
+              - generic [ref=e45]: t
+              - generic [ref=e46]: t
+    - generic [ref=e49]:
+      - generic [ref=e50]:
+        - heading "How it works" [level=2] [ref=e52]
+        - generic "How Design Humanizer works" [ref=e53]:
+          - article [ref=e54]:
+            - img [ref=e56]
+            - generic [ref=e58]:
+              - heading "Create screenshot" [level=3] [ref=e59]
+              - generic [ref=e60]:
+                - paragraph [ref=e61]: Design Humanizer captures the page, parses its HTML and CSS, and scans the visible structure of your interface.
+                - list [ref=e62]:
+                  - listitem [ref=e63]: sections and cards
+                  - listitem [ref=e64]: buttons and CTAs
+                  - listitem [ref=e65]: spacing and repeated patterns
+          - article [ref=e66]:
+            - img [ref=e68]
+            - generic [ref=e71]:
+              - heading "Find what feels generic" [level=3] [ref=e72]
+              - generic [ref=e73]:
+                - paragraph [ref=e74]: It detects the patterns that make AI-generated UI feel unfinished.
+                - list [ref=e75]:
+                  - listitem [ref=e76]: weak hierarchy
+                  - listitem [ref=e77]: repeated cards
+                  - listitem [ref=e78]: unclear visual focus
+          - article [ref=e79]:
+            - img [ref=e81]
+            - generic [ref=e84]:
+              - heading "Suggest improvements" [level=3] [ref=e85]
+              - generic [ref=e86]:
+                - paragraph [ref=e87]: It gives practical design recommendations without changing your content.
+                - list [ref=e88]:
+                  - listitem [ref=e89]: stronger grouping
+                  - listitem [ref=e90]: better rhythm
+                  - listitem [ref=e91]: clearer CTA priority
+          - article [ref=e92]:
+            - img [ref=e94]
+            - generic [ref=e96]:
+              - heading "Preview the result" [level=3] [ref=e97]
+              - generic [ref=e98]:
+                - paragraph [ref=e99]: You compare the same content with a cleaner, more intentional structure.
+                - list [ref=e100]:
+                  - listitem [ref=e101]: before and after view
+                  - listitem [ref=e102]: improved composition
+                  - listitem [ref=e103]: ready-to-apply direction
+      - generic [ref=e104]:
+        - figure "Design Humanizer demo video" [ref=e105]
+        - link "Start" [ref=e112] [cursor=pointer]:
+          - /url: https://chromewebstore.google.com/detail/mbbhjpbbehelagdnlmppgdhheceijfmm?utm_source=item-share-cb
+          - img [ref=e113]
+          - generic "Start" [ref=e114]:
+            - generic [ref=e115]:
+              - generic [ref=e117]:
+                - generic [ref=e118]: S
+                - generic [ref=e119]: S
+              - generic [ref=e121]:
+                - generic [ref=e122]: t
+                - generic [ref=e123]: t
+              - generic [ref=e125]:
+                - generic [ref=e126]: a
+                - generic [ref=e127]: a
+              - generic [ref=e129]:
+                - generic [ref=e130]: r
+                - generic [ref=e131]: r
+              - generic [ref=e133]:
+                - generic [ref=e134]: t
+                - generic [ref=e135]: t
+    - region "Buy screenshots" [ref=e136]:
+      - generic [ref=e140]:
+        - heading "Buy screenshots" [level=2] [ref=e142]
+        - generic [ref=e143]:
+          - generic [ref=e144]:
+            - generic [ref=e145]:
+              - generic [ref=e146]: Screenshots selected
+              - strong [ref=e147]: "3"
+            - generic "Free plan allowance" [ref=e148]:
+              - generic [ref=e149]: Free plan
+              - strong [ref=e150]: 3 screenshots included
+              - paragraph [ref=e151]: Start reviewing your UI before buying more screenshots.
+            - generic "Custom screenshot purchase" [ref=e152]:
+              - generic [ref=e153]:
+                - generic [ref=e154]: Screenshots
+                - spinbutton "Screenshots" [ref=e155]: "3"
+              - generic [ref=e156]:
+                - generic [ref=e157]: Budget
+                - generic [ref=e158]:
+                  - generic: $
+                  - spinbutton "Budget" [ref=e159]: "1.00"
+            - generic [ref=e160]:
+              - slider "Screenshot amount" [ref=e161] [cursor=pointer]: "3"
+              - generic [ref=e164]: "3"
+            - generic [ref=e165]:
+              - generic [ref=e166]: 3 screenshots for $1
+              - generic [ref=e167]: 200 screenshots for $65
+          - generic [ref=e168]:
+            - generic [ref=e169]:
+              - generic [ref=e170]: Total today
+              - generic [ref=e171]: one-time purchase
+            - generic [ref=e172]:
+              - strong [ref=e173]: $1
+              - generic [ref=e174]: $0.33 per screenshot
+          - button "Buy 3 screenshots $1 today" [ref=e175]:
+            - generic "Buy 3 screenshots" [ref=e177]:
+              - generic [ref=e178]:
+                - generic [ref=e180]:
+                  - generic [ref=e181]: B
+                  - generic [ref=e182]: B
+                - generic [ref=e184]:
+                  - generic [ref=e185]: u
+                  - generic [ref=e186]: u
+                - generic [ref=e188]:
+                  - generic [ref=e189]: "y"
+                  - generic [ref=e190]: "y"
+                - generic [ref=e196]:
+                  - generic [ref=e197]: "3"
+                  - generic [ref=e198]: "3"
+                - generic [ref=e204]:
+                  - generic [ref=e205]: s
+                  - generic [ref=e206]: s
+                - generic [ref=e208]:
+                  - generic [ref=e209]: c
+                  - generic [ref=e210]: c
+                - generic [ref=e212]:
+                  - generic [ref=e213]: r
+                  - generic [ref=e214]: r
+                - generic [ref=e216]:
+                  - generic [ref=e217]: e
+                  - generic [ref=e218]: e
+                - generic [ref=e220]:
+                  - generic [ref=e221]: e
+                  - generic [ref=e222]: e
+                - generic [ref=e224]:
+                  - generic [ref=e225]: "n"
+                  - generic [ref=e226]: "n"
+                - generic [ref=e228]:
+                  - generic [ref=e229]: s
+                  - generic [ref=e230]: s
+                - generic [ref=e232]:
+                  - generic [ref=e233]: h
+                  - generic [ref=e234]: h
+                - generic [ref=e236]:
+                  - generic [ref=e237]: o
+                  - generic [ref=e238]: o
+                - generic [ref=e240]:
+                  - generic [ref=e241]: t
+                  - generic [ref=e242]: t
+                - generic [ref=e244]:
+                  - generic [ref=e245]: s
+                  - generic [ref=e246]: s
+            - generic [ref=e247]: $1 today
+    - generic [ref=e249]:
+      - generic [ref=e250]:
+        - heading "Answers before you join" [level=2] [ref=e251]:
+          - generic [ref=e252]: Answers before
+          - generic [ref=e253]: you join
+        - generic [ref=e254]:
+          - link "Ask a question" [ref=e255] [cursor=pointer]:
+            - /url: mailto:sarsennbaj.n@gmail.com
+            - generic "Ask a question" [ref=e256]:
+              - generic [ref=e257]:
+                - generic [ref=e259]:
+                  - generic [ref=e260]: A
+                  - generic [ref=e261]: A
+                - generic [ref=e263]:
+                  - generic [ref=e264]: s
+                  - generic [ref=e265]: s
+                - generic [ref=e267]:
+                  - generic [ref=e268]: k
+                  - generic [ref=e269]: k
+                - generic [ref=e275]:
+                  - generic [ref=e276]: a
+                  - generic [ref=e277]: a
+                - generic [ref=e283]:
+                  - generic [ref=e284]: q
+                  - generic [ref=e285]: q
+                - generic [ref=e287]:
+                  - generic [ref=e288]: u
+                  - generic [ref=e289]: u
+                - generic [ref=e291]:
+                  - generic [ref=e292]: e
+                  - generic [ref=e293]: e
+                - generic [ref=e295]:
+                  - generic [ref=e296]: s
+                  - generic [ref=e297]: s
+                - generic [ref=e299]:
+                  - generic [ref=e300]: t
+                  - generic [ref=e301]: t
+                - generic [ref=e303]:
+                  - generic [ref=e304]: i
+                  - generic [ref=e305]: i
+                - generic [ref=e307]:
+                  - generic [ref=e308]: o
+                  - generic [ref=e309]: o
+                - generic [ref=e311]:
+                  - generic [ref=e312]: "n"
+                  - generic [ref=e313]: "n"
+          - link "Open full FAQ" [ref=e314] [cursor=pointer]:
+            - /url: /faq
+            - generic "Open full FAQ" [ref=e315]:
+              - generic [ref=e316]:
+                - generic [ref=e318]:
+                  - generic [ref=e319]: O
+                  - generic [ref=e320]: O
+                - generic [ref=e322]:
+                  - generic [ref=e323]: p
+                  - generic [ref=e324]: p
+                - generic [ref=e326]:
+                  - generic [ref=e327]: e
+                  - generic [ref=e328]: e
+                - generic [ref=e330]:
+                  - generic [ref=e331]: "n"
+                  - generic [ref=e332]: "n"
+                - generic [ref=e338]:
+                  - generic [ref=e339]: f
+                  - generic [ref=e340]: f
+                - generic [ref=e342]:
+                  - generic [ref=e343]: u
+                  - generic [ref=e344]: u
+                - generic [ref=e346]:
+                  - generic [ref=e347]: l
+                  - generic [ref=e348]: l
+                - generic [ref=e350]:
+                  - generic [ref=e351]: l
+                  - generic [ref=e352]: l
+                - generic [ref=e358]:
+                  - generic [ref=e359]: F
+                  - generic [ref=e360]: F
+                - generic [ref=e362]:
+                  - generic [ref=e363]: A
+                  - generic [ref=e364]: A
+                - generic [ref=e366]:
+                  - generic [ref=e367]: Q
+                  - generic [ref=e368]: Q
+      - generic [ref=e370]:
+        - group [ref=e371]:
+          - generic "01 What does Design Humanizer actually do?" [ref=e372] [cursor=pointer]:
+            - generic [ref=e373]: "01"
+            - generic [ref=e374]: What does Design Humanizer actually do?
+          - paragraph [ref=e378]: "It analyzes an AI-generated interface and shows what feels generic: weak hierarchy, repeated cards, unclear focus, poor spacing, and low visual priority. Then it suggests how to make the same content feel more intentional."
+        - group [ref=e379]:
+          - generic "02 Does it change my content?" [ref=e380] [cursor=pointer]:
+            - generic [ref=e381]: "02"
+            - generic [ref=e382]: Does it change my content?
+        - group [ref=e384]:
+          - generic "03 Who is it for?" [ref=e385] [cursor=pointer]:
+            - generic [ref=e386]: "03"
+            - generic [ref=e387]: Who is it for?
+  - contentinfo [ref=e389]:
+    - generic [ref=e390]:
+      - link "Design Humanizer home" [ref=e391] [cursor=pointer]:
+        - /url: /#product
+        - text: Design Humanizer · Built for AI app builders.
+      - navigation "Footer" [ref=e392]:
+        - link "Q&A" [ref=e393] [cursor=pointer]:
+          - /url: /#qa
+        - link "FAQ" [ref=e394] [cursor=pointer]:
+          - /url: /faq
+        - link "Privacy" [ref=e395] [cursor=pointer]:
+          - /url: /privacy
+        - link "GitHub" [ref=e396] [cursor=pointer]:
+          - /url: https://github.com/Nurssk/NotLikeAi
+        - link "sarsennbaj.n@gmail.com" [ref=e397] [cursor=pointer]:
+          - /url: mailto:sarsennbaj.n@gmail.com
+  - generic [ref=e400]:
+    - button "Menu" [ref=e401]:
+      - img [ref=e403]
+      - generic: Menu
+    - button "Inspect" [ref=e407]:
+      - img [ref=e409]
+      - generic: Inspect
+    - button "Audit" [ref=e411]:
+      - generic [ref=e412]:
+        - img [ref=e413]
+        - img [ref=e416]
+      - generic: Audit
+    - button "Settings" [ref=e419]:
+      - img [ref=e421]
+      - generic: Settings

@@ -1,4 +1,6 @@
 ---
+import RollingButtonText from "../RollingButtonText";
+
 const creditPricing = {
   minCredits: 3,
   maxCredits: 200,
@@ -123,7 +125,9 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
             </div>
 
             <button class="btn btn-primary pricing-buy-button" type="button" data-buy-now>
-              <span data-buy-credits-label>Buy {creditPricing.defaultCredits} screenshots</span>
+              <span data-buy-credits-label>
+                <RollingButtonText text={`Buy ${creditPricing.defaultCredits} screenshots`} />
+              </span>
               <small data-buy-price-label>{formatAmount(defaultAmount)} today</small>
             </button>
           </div>
@@ -142,11 +146,9 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
     const maxCredits = Number(pricing.maxCredits || 200);
     const minAmount = Number(pricing.minAmount || 100);
     const maxAmount = Number(pricing.maxAmount || 6500);
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let selectedCredits = Number(flow.getAttribute("data-selected-credits") || pricing.defaultCredits || maxCredits);
     let selectedAmount = 0;
     let selectionMode = "credits";
-    let creditAnimationFrame = 0;
 
     const clampCredits = (value) => Math.min(maxCredits, Math.max(minCredits, Math.round(Number(value) || minCredits)));
 
@@ -175,9 +177,38 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
 
     const formatInputAmount = (amount) => (amount / 100).toFixed(2);
 
+    const escapeHtml = (value) =>
+      String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+
+    const makeRollingMarkup = (value) => {
+      const characters = Array.from(String(value))
+        .map((character, index) => {
+          const glyph = escapeHtml(character === " " ? "\u00a0" : character);
+
+          return `<span class="rolling-button-text__char" style="--rolling-index: ${index}"><span class="rolling-button-text__track"><span class="rolling-button-text__line">${glyph}</span><span class="rolling-button-text__line">${glyph}</span></span></span>`;
+        })
+        .join("");
+
+      return `<span class="rolling-button-text__chars" aria-hidden="true">${characters}</span>`;
+    };
+
     const setText = (selector, value) => {
       const node = flow.querySelector(selector);
-      if (node) node.textContent = value;
+      if (!node) return;
+
+      const rollingText = node.querySelector(".rolling-button-text");
+      if (rollingText) {
+        rollingText.setAttribute("aria-label", value);
+        rollingText.innerHTML = makeRollingMarkup(value);
+        return;
+      }
+
+      node.textContent = value;
     };
 
     const setCreditCount = (value) => {
@@ -187,39 +218,6 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
       const nextValue = clampCredits(value);
       counter.textContent = nextValue.toLocaleString();
       counter.setAttribute("data-current-value", String(nextValue));
-    };
-
-    const animateCreditCount = (credits) => {
-      const counter = flow.querySelector("[data-credit-count]");
-      if (!counter) return;
-
-      window.cancelAnimationFrame(creditAnimationFrame);
-
-      const currentValue = Number(counter.getAttribute("data-current-value") || counter.textContent || minCredits);
-      if (reduceMotion || currentValue === credits) {
-        setCreditCount(credits);
-        return;
-      }
-
-      const startValue = Number.isNaN(currentValue) ? minCredits : currentValue;
-      const distance = credits - startValue;
-      const duration = Math.min(760, Math.max(260, Math.abs(distance) * 5));
-      const startTime = window.performance.now();
-      const easeOutCubic = (value) => 1 - Math.pow(1 - value, 3);
-
-      const tick = (time) => {
-        const progress = Math.min((time - startTime) / duration, 1);
-        const eased = easeOutCubic(progress);
-        setCreditCount(startValue + distance * eased);
-
-        if (progress < 1) {
-          creditAnimationFrame = window.requestAnimationFrame(tick);
-        } else {
-          setCreditCount(credits);
-        }
-      };
-
-      creditAnimationFrame = window.requestAnimationFrame(tick);
     };
 
     const updatePricingInputs = (credits, amount, source) => {
@@ -262,7 +260,7 @@ const defaultAmount = amountForCredits(creditPricing.defaultCredits);
       setText("[data-credit-balance-value]", credits.toLocaleString());
 
       updatePricingInputs(credits, amount, source);
-      animateCreditCount(credits);
+      setCreditCount(credits);
       setText("[data-credit-price]", formatAmount(amount));
       setText(
         "[data-credit-rate]",

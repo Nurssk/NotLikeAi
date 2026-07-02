@@ -17,6 +17,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "../lib/firestore";
+import RollingButtonText from "./RollingButtonText";
 
 interface WaitlistMorphButtonProps {
   buttonText?: string;
@@ -301,7 +302,9 @@ export default function WaitlistMorphButton({
                   </svg>
                 </span>
               )}
-              <motion.span layout="position">{isExpanded ? (isSaving ? "Joining..." : submitText) : buttonText}</motion.span>
+              <motion.span layout="position">
+                <RollingButtonText text={isExpanded ? (isSaving ? "Joining..." : submitText) : buttonText} />
+              </motion.span>
             </motion.button>
           </motion.div>
         )}

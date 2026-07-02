@@ -1,0 +1,496 @@
+- generic [active] [ref=e1]:
+  - navigation "Primary":
+    - generic [ref=e2]:
+      - generic [ref=e3]:
+        - link "BeUinq" [ref=e4] [cursor=pointer]:
+          - /url: "#hero-section"
+        - button "Open menu" [ref=e5] [cursor=pointer]
+      - generic:
+        - link "About Me":
+          - /url: "#about"
+          - generic "About Me":
+            - generic:
+              - generic:
+                - generic:
+                  - generic: A
+                  - generic: A
+              - generic:
+                - generic:
+                  - generic: b
+                  - generic: b
+              - generic:
+                - generic:
+                  - generic: o
+                  - generic: o
+              - generic:
+                - generic:
+                  - generic: u
+                  - generic: u
+              - generic:
+                - generic:
+                  - generic: t
+                  - generic: t
+              - generic:
+                - generic:
+                  - generic: M
+                  - generic: M
+              - generic:
+                - generic:
+                  - generic: e
+                  - generic: e
+        - link "Services":
+          - /url: "#services"
+          - generic "Services":
+            - generic:
+              - generic:
+                - generic:
+                  - generic: S
+                  - generic: S
+              - generic:
+                - generic:
+                  - generic: e
+                  - generic: e
+              - generic:
+                - generic:
+                  - generic: r
+                  - generic: r
+              - generic:
+                - generic:
+                  - generic: v
+                  - generic: v
+              - generic:
+                - generic:
+                  - generic: i
+                  - generic: i
+              - generic:
+                - generic:
+                  - generic: c
+                  - generic: c
+              - generic:
+                - generic:
+                  - generic: e
+                  - generic: e
+              - generic:
+                - generic:
+                  - generic: s
+                  - generic: s
+        - link "Projects":
+          - /url: "#projects"
+          - generic "Projects":
+            - generic:
+              - generic:
+                - generic:
+                  - generic: P
+                  - generic: P
+              - generic:
+                - generic:
+                  - generic: r
+                  - generic: r
+              - generic:
+                - generic:
+                  - generic: o
+                  - generic: o
+              - generic:
+                - generic:
+                  - generic: j
+                  - generic: j
+              - generic:
+                - generic:
+                  - generic: e
+                  - generic: e
+              - generic:
+                - generic:
+                  - generic: c
+                  - generic: c
+              - generic:
+                - generic:
+                  - generic: t
+                  - generic: t
+              - generic:
+                - generic:
+                  - generic: s
+                  - generic: s
+        - link "Contact":
+          - /url: "#contact"
+          - generic "Contact":
+            - generic:
+              - generic:
+                - generic:
+                  - generic: C
+                  - generic: C
+              - generic:
+                - generic:
+                  - generic: o
+                  - generic: o
+              - generic:
+                - generic:
+                  - generic: "n"
+                  - generic: "n"
+              - generic:
+                - generic:
+                  - generic: t
+                  - generic: t
+              - generic:
+                - generic:
+                  - generic: a
+                  - generic: a
+              - generic:
+                - generic:
+                  - generic: c
+                  - generic: c
+              - generic:
+                - generic:
+                  - generic: t
+                  - generic: t
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e20]:
+        - img "Portrait of portfolio creator – back view" [ref=e24]
+        - img "Portrait of portfolio creator – front view" [ref=e28]
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - heading "FIX YOUR DESIGN" [level=1] [ref=e40]:
+            - generic [ref=e41]: FIX YOUR
+            - generic [ref=e42]: DESIGN
+          - generic: ©2026
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - heading "How it works" [level=2] [ref=e46]
+            - generic "How Design Humanizer works" [ref=e47]:
+              - article [ref=e48]:
+                - img [ref=e50]
+                - generic [ref=e52]:
+                  - heading "Create screenshot" [level=3] [ref=e53]
+                  - paragraph [ref=e54]: Design Humanizer captures the page, parses its HTML and CSS, and scans the visible structure of your interface.
+                  - list [ref=e55]:
+                    - listitem [ref=e56]: sections and cards
+                    - listitem [ref=e57]: buttons and CTAs
+                    - listitem [ref=e58]: spacing and repeated patterns
+              - article [ref=e59]:
+                - img [ref=e61]
+                - generic [ref=e64]:
+                  - heading "Find what feels generic" [level=3] [ref=e65]
+                  - paragraph [ref=e66]: It detects the patterns that make AI-generated UI feel unfinished.
+                  - list [ref=e67]:
+                    - listitem [ref=e68]: weak hierarchy
+                    - listitem [ref=e69]: repeated cards
+                    - listitem [ref=e70]: unclear visual focus
+              - article [ref=e71]:
+                - img [ref=e73]
+                - generic [ref=e76]:
+                  - heading "Suggest improvements" [level=3] [ref=e77]
+                  - paragraph [ref=e78]: It gives practical design recommendations without changing your content.
+                  - list [ref=e79]:
+                    - listitem [ref=e80]: stronger grouping
+                    - listitem [ref=e81]: better rhythm
+                    - listitem [ref=e82]: clearer CTA priority
+              - article [ref=e83]:
+                - img [ref=e85]
+                - generic [ref=e87]:
+                  - heading "Preview the result" [level=3] [ref=e88]
+                  - paragraph [ref=e89]: You compare the same content with a cleaner, more intentional structure.
+                  - list [ref=e90]:
+                    - listitem [ref=e91]: before and after view
+                    - listitem [ref=e92]: improved composition
+                    - listitem [ref=e93]: ready-to-apply direction
+          - figure "Design Humanizer demo video" [ref=e95]
+        - generic [ref=e98]:
+          - generic [ref=e99]:
+            - heading "Hey!" [level=2] [ref=e101]:
+              - generic [ref=e102]: Hey!
+            - paragraph [ref=e104]: I’m Majd, a builder based in Syria, currently working on Templyo, a platform for high-quality Framer templates.
+          - generic [ref=e105]:
+            - generic [ref=e106]:
+              - paragraph [ref=e107]: I’m a software engineer and Framer creator with a strong focus on building modern, scalable, and conversion-driven web experiences.
+              - paragraph [ref=e108]: Over the years, I’ve created and shipped multiple SaaS products and Framer templates used by global customers, helping them launch faster.
+            - link "Get Started" [ref=e110] [cursor=pointer]:
+              - /url: https://framer.link/nnhGcWR
+              - paragraph [ref=e112]: Get Started
+    - generic [ref=e120]:
+      - generic [ref=e121]: From
+      - generic [ref=e122]: idea
+      - generic [ref=e123]: to
+      - generic [ref=e124]: launch.
+      - generic [ref=e125]: Clean,
+      - generic [ref=e126]: scalable
+      - generic [ref=e127]: digital
+      - generic [ref=e128]: products
+      - generic [ref=e129]: built
+      - generic [ref=e130]: to
+      - generic [ref=e131]: move
+      - generic [ref=e132]: fast,
+      - generic [ref=e133]: stay
+      - generic [ref=e134]: simple,
+      - generic [ref=e135]: and
+      - generic [ref=e136]: perform
+      - generic [ref=e137]: in
+      - generic [ref=e138]: real-world
+      - generic [ref=e139]: use,
+      - generic [ref=e140]: driven
+      - generic [ref=e141]: by
+      - generic [ref=e142]: clarity,
+      - generic [ref=e143]: structured
+      - generic [ref=e144]: systems,
+      - generic [ref=e145]: and
+      - generic [ref=e146]: intentional
+      - generic [ref=e147]: design.
+    - generic [ref=e149]:
+      - heading "Services" [level=2] [ref=e151]:
+        - generic [ref=e152]: Services
+      - generic [ref=e153]:
+        - generic [ref=e156]:
+          - heading "Website Migration" [level=3] [ref=e158]
+          - generic [ref=e159]:
+            - paragraph [ref=e161]: Web Migration
+            - paragraph [ref=e164]: Optimization
+            - paragraph [ref=e167]: Framer Rebuild
+        - generic [ref=e170]:
+          - heading "Framer Templates" [level=3] [ref=e172]
+          - generic [ref=e173]:
+            - paragraph [ref=e175]: Startup
+            - paragraph [ref=e178]: Agency
+            - paragraph [ref=e181]: SaaS
+        - generic [ref=e184]:
+          - heading "Frontend Development" [level=3] [ref=e186]
+          - generic [ref=e187]:
+            - paragraph [ref=e189]: UI Dev
+            - paragraph [ref=e192]: Responsive Layouts
+            - paragraph [ref=e195]: Web Performance
+        - generic [ref=e198]:
+          - heading "Product Consulting" [level=3] [ref=e200]
+          - generic [ref=e201]:
+            - paragraph [ref=e203]: Product Direction
+            - paragraph [ref=e206]: Web Strategy
+            - paragraph [ref=e209]: Technical Guidance
+    - generic [ref=e211]:
+      - generic [ref=e212]:
+        - heading "Featured Projects" [level=2] [ref=e214]:
+          - generic [ref=e215]: Featured
+          - generic [ref=e216]: Projects
+        - link "View All Work" [ref=e219] [cursor=pointer]:
+          - /url: ./work#hero-section
+          - paragraph [ref=e221]: View All Work
+      - generic [ref=e224]:
+        - link "Damas Agency Framer Template" [ref=e227] [cursor=pointer]:
+          - /url: ./work/damas#work-section
+          - generic [ref=e231]:
+            - heading "Damas" [level=3] [ref=e233]
+            - paragraph [ref=e235]: Agency Framer Template
+        - link "Najm SaaS Framer Template" [ref=e238] [cursor=pointer]:
+          - /url: ./work/najm#work-section
+          - generic [ref=e242]:
+            - heading "Najm" [level=3] [ref=e244]
+            - paragraph [ref=e246]: SaaS Framer Template
+        - link "Kavi AI Framer Template" [ref=e249] [cursor=pointer]:
+          - /url: ./work/kavi#work-section
+          - generic [ref=e253]:
+            - heading "Kavi" [level=3] [ref=e255]
+            - paragraph [ref=e257]: AI Framer Template
+        - link "Sham Studio Framer Template" [ref=e260] [cursor=pointer]:
+          - /url: ./work/sham#work-section
+          - generic [ref=e264]:
+            - heading "Sham" [level=3] [ref=e266]
+            - paragraph [ref=e268]: Studio Framer Template
+    - generic [ref=e270]:
+      - heading "Testimonials" [level=2] [ref=e272]:
+        - generic [ref=e273]: Testimonials
+      - generic [ref=e274]:
+        - generic [ref=e278]:
+          - paragraph [ref=e280]: Templyo completely changed how I approach building sites in Framer. The templates are not just beautiful, they’re actually structured in a way that makes scaling so much easier.
+          - generic [ref=e281]:
+            - img "man standing near balcony" [ref=e284]
+            - generic [ref=e285]:
+              - paragraph [ref=e287]: Yakoub Kashmiri
+              - paragraph [ref=e289]: Marketing Director
+        - generic [ref=e296]:
+          - paragraph [ref=e298]: I’ve tried dozens of Framer templates, but Templyo stands out. Everything feels intentional, from the layout to the smallest interactions.
+          - generic [ref=e299]:
+            - img "grayscale photo of man" [ref=e302]
+            - generic [ref=e303]:
+              - paragraph [ref=e305]: Daniel K.
+              - paragraph [ref=e307]: Indie Maker
+        - generic [ref=e314]:
+          - paragraph [ref=e316]: Templyo saved me weeks of work. I was able to launch my landing page in a day, and it still looks fully custom.
+          - generic [ref=e317]:
+            - img "man standing near white wall" [ref=e320]
+            - generic [ref=e321]:
+              - paragraph [ref=e323]: Mark M.
+              - paragraph [ref=e325]: Startup Founder
+        - generic [ref=e332]:
+          - paragraph [ref=e334]: The quality is insane. Clean structure, smooth animations, and super easy to customize. It feels like a premium product from start to finish.
+          - generic [ref=e335]:
+            - img "man in black button-up shirt" [ref=e338]
+            - generic [ref=e339]:
+              - paragraph [ref=e341]: Omar H.
+              - paragraph [ref=e343]: Frontend Developer
+    - generic [ref=e348]:
+      - heading "Thoughts" [level=2] [ref=e350]:
+        - generic [ref=e351]: Thoughts
+      - generic [ref=e353]:
+        - link "May 5, 2025 Building Trust Through Clear Design How thoughtful visual choices create a stronger sense of reliability for modern brands." [ref=e356] [cursor=pointer]:
+          - /url: ./blog/how-can-designers-prepare-for-the-future#article-section
+          - generic [ref=e361]:
+            - generic [ref=e362]:
+              - paragraph [ref=e364]: May 5, 2025
+              - heading "Building Trust Through Clear Design" [level=3] [ref=e366]
+            - paragraph [ref=e368]: How thoughtful visual choices create a stronger sense of reliability for modern brands.
+        - link "Jun 16, 2025 The Role of Art Direction in Branding Why visual direction helps brands create emotion and a distinct point of view." [ref=e371] [cursor=pointer]:
+          - /url: ./blog/why-every-business-needs-a-professional-website-in-2025#article-section
+          - generic [ref=e376]:
+            - generic [ref=e377]:
+              - paragraph [ref=e379]: Jun 16, 2025
+              - heading "The Role of Art Direction in Branding" [level=3] [ref=e381]
+            - paragraph [ref=e383]: Why visual direction helps brands create emotion and a distinct point of view.
+        - generic [ref=e384]:
+          - paragraph [ref=e386]:
+            - generic [ref=e387]: See
+            - generic [ref=e388]: how
+            - generic [ref=e389]: we
+            - generic [ref=e390]: shape
+            - generic [ref=e391]: brands
+            - generic [ref=e392]: with
+            - generic [ref=e393]: clarity
+            - generic [ref=e394]: and
+            - generic [ref=e395]: craft—
+            - generic [ref=e396]: explore
+            - generic [ref=e397]: our
+            - generic [ref=e398]: blog
+          - link "View All Work" [ref=e400] [cursor=pointer]:
+            - /url: ./blog#hero-section
+            - paragraph [ref=e402]: View All Work
+    - generic [ref=e406]:
+      - generic [ref=e407]:
+        - generic [ref=e408]:
+          - heading "Let’s talk." [level=2] [ref=e410]:
+            - generic [ref=e411]: Let’s
+            - generic [ref=e412]: talk.
+          - paragraph [ref=e414]:
+            - generic [ref=e415]: Have
+            - generic [ref=e416]: a
+            - generic [ref=e417]: project
+            - generic [ref=e418]: or
+            - generic [ref=e419]: need
+            - generic [ref=e420]: help?
+            - generic [ref=e421]: Fill
+            - generic [ref=e422]: out
+            - generic [ref=e423]: the
+            - generic [ref=e424]: form,
+            - generic [ref=e425]: and
+            - generic [ref=e426]: we'll
+            - generic [ref=e427]: get
+            - generic [ref=e428]: back
+            - generic [ref=e429]: to
+            - generic [ref=e430]: you
+            - generic [ref=e431]: soon.
+        - generic [ref=e432]:
+          - link [ref=e434] [cursor=pointer]:
+            - /url: https://x.com/
+          - link [ref=e436] [cursor=pointer]:
+            - /url: https://www.instagram.com/
+          - link [ref=e438] [cursor=pointer]:
+            - /url: https://www.linkedin.com/
+          - link [ref=e440] [cursor=pointer]:
+            - /url: https://www.youtube.com/
+      - generic [ref=e441]:
+        - generic [ref=e442]:
+          - paragraph [ref=e444]: Name
+          - textbox "Name" [ref=e446]:
+            - /placeholder: Enter your name
+        - generic [ref=e447]:
+          - paragraph [ref=e449]: Email
+          - textbox "Email" [ref=e451]:
+            - /placeholder: Enter your email
+        - generic [ref=e452]:
+          - paragraph [ref=e454]: Your Project
+          - textbox "Your Project" [ref=e456]:
+            - /placeholder: Tell us about your project
+        - button "S u b m i t" [ref=e459]:
+          - paragraph [ref=e462]:
+            - generic [ref=e463]: S
+            - generic [ref=e464]: u
+            - generic [ref=e465]: b
+            - generic [ref=e466]: m
+            - generic [ref=e467]: i
+            - generic [ref=e468]: t
+  - link "Use for Free" [ref=e469] [cursor=pointer]:
+    - /url: https://chromewebstore.google.com/detail/mbbhjpbbehelagdnlmppgdhheceijfmm?utm_source=item-share-cb
+    - img [ref=e470]
+    - generic "Use for Free" [ref=e471]:
+      - generic [ref=e472]:
+        - generic [ref=e474]:
+          - generic [ref=e475]: U
+          - generic [ref=e476]: U
+        - generic [ref=e478]:
+          - generic [ref=e479]: s
+          - generic [ref=e480]: s
+        - generic [ref=e482]:
+          - generic [ref=e483]: e
+          - generic [ref=e484]: e
+        - generic [ref=e490]:
+          - generic [ref=e491]: f
+          - generic [ref=e492]: f
+        - generic [ref=e494]:
+          - generic [ref=e495]: o
+          - generic [ref=e496]: o
+        - generic [ref=e498]:
+          - generic [ref=e499]: r
+          - generic [ref=e500]: r
+        - generic [ref=e506]:
+          - generic [ref=e507]: F
+          - generic [ref=e508]: F
+        - generic [ref=e510]:
+          - generic [ref=e511]: r
+          - generic [ref=e512]: r
+        - generic [ref=e514]:
+          - generic [ref=e515]: e
+          - generic [ref=e516]: e
+        - generic [ref=e518]:
+          - generic [ref=e519]: e
+          - generic [ref=e520]: e
+  - link "Buy screenshots" [ref=e521] [cursor=pointer]:
+    - /url: https://framer.link/5Wi1vkP
+    - generic "Buy screenshots" [ref=e522]:
+      - generic [ref=e523]:
+        - generic [ref=e525]:
+          - generic [ref=e526]: B
+          - generic [ref=e527]: B
+        - generic [ref=e529]:
+          - generic [ref=e530]: u
+          - generic [ref=e531]: u
+        - generic [ref=e533]:
+          - generic [ref=e534]: "y"
+          - generic [ref=e535]: "y"
+        - generic [ref=e541]:
+          - generic [ref=e542]: s
+          - generic [ref=e543]: s
+        - generic [ref=e545]:
+          - generic [ref=e546]: c
+          - generic [ref=e547]: c
+        - generic [ref=e549]:
+          - generic [ref=e550]: r
+          - generic [ref=e551]: r
+        - generic [ref=e553]:
+          - generic [ref=e554]: e
+          - generic [ref=e555]: e
+        - generic [ref=e557]:
+          - generic [ref=e558]: e
+          - generic [ref=e559]: e
+        - generic [ref=e561]:
+          - generic [ref=e562]: "n"
+          - generic [ref=e563]: "n"
+        - generic [ref=e565]:
+          - generic [ref=e566]: s
+          - generic [ref=e567]: s
+        - generic [ref=e569]:
+          - generic [ref=e570]: h
+          - generic [ref=e571]: h
+        - generic [ref=e573]:
+          - generic [ref=e574]: o
+          - generic [ref=e575]: o
+        - generic [ref=e577]:
+          - generic [ref=e578]: t
+          - generic [ref=e579]: t
+        - generic [ref=e581]:
+          - generic [ref=e582]: s
+          - generic [ref=e583]: s
+  - generic "Design Humanizer demo video"
