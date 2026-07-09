@@ -7,25 +7,22 @@ const steps = [
     num: "01",
     title: "Make a screenshot",
     body: "Select the exact part of the interface you want BeUniq to review.",
-    src: "/videos/choose-area.gif",
+    src: "/videos/choose-area.mp4",
     label: "Selecting a screenshot region",
-    durationMs: 4200,
   },
   {
     num: "02",
     title: "Open the extension",
     body: "Launch BeUniq on the page you are building and send the capture.",
-    src: "/videos/open-extension.gif",
+    src: "/videos/rec2video.mp4",
     label: "Opening the BeUniq extension",
-    durationMs: 5200,
   },
   {
     num: "03",
     title: "View the report",
     body: "Read practical design fixes for the selected screen area.",
-    src: "/videos/view-report.gif",
+    src: "/videos/new3video.mp4",
     label: "Viewing the design analysis report",
-    durationMs: 6200,
   },
 ];
 ---
@@ -88,13 +85,13 @@ const steps = [
                 aria-labelledby={`hiw-tab-${i}`}
               >
                 <div class="hiw-media">
-                  <img
-                    class="hiw-gif"
-                    src={s.src}
-                    alt={s.label}
-                    loading={i === 0 ? "eager" : "lazy"}
-                    decoding="async"
-                    data-hiw-duration={s.durationMs}
+                  <video
+                    class="hiw-video"
+                    data-src={s.src}
+                    muted
+                    playsinline
+                    preload="metadata"
+                    aria-label={s.label}
                   />
                 </div>
                 <div class="hiw-copy">
@@ -142,7 +139,7 @@ const steps = [
   document.querySelectorAll<HTMLElement>("[data-hiw-carousel]").forEach((root) => {
     const track = root.querySelector<HTMLElement>("[data-hiw-track]");
     const slides = Array.from(root.querySelectorAll<HTMLElement>("[data-hiw-slide]"));
-    const media = Array.from(root.querySelectorAll<HTMLImageElement>(".hiw-gif"));
+    const media = Array.from(root.querySelectorAll<HTMLVideoElement>(".hiw-video"));
     const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-hiw-tab]"));
     const progressBars = tabs.map((tab) =>
       tab.querySelector<HTMLElement>(".hiw-tab-progress span")
@@ -154,9 +151,7 @@ const steps = [
     let active = 0;
     let inView = false;
     let progressRaf = 0;
-    let activeTimer = 0;
-    let activeStartedAt = 0;
-    let activeDuration = 1;
+    let videosEnabled = false;
 
     function carouselIsVisible() {
       const rect = root.getBoundingClientRect();
@@ -180,29 +175,28 @@ const steps = [
     function stopActiveClock() {
       cancelAnimationFrame(progressRaf);
       progressRaf = 0;
-      window.clearTimeout(activeTimer);
-      activeTimer = 0;
+      media.forEach((v) => v.pause());
     }
 
-    function restartGif(image: HTMLImageElement) {
-      const src = image.currentSrc || image.src;
-      if (!src) return;
-      image.src = "";
-      image.src = src;
+    function pauseAllExcept(keep: number) {
+      media.forEach((v, i) => {
+        if (i === keep) return;
+        v.pause();
+        try {
+          v.currentTime = 0;
+        } catch {}
+      });
     }
 
     function playActive() {
-      if (reduceMotion.matches || !inView) return;
-      const image = media[active];
-      if (!image || activeTimer) return;
-      restartGif(image);
-      activeDuration = Number(image.dataset.hiwDuration) || 5000;
-      activeStartedAt = performance.now();
+      if (reduceMotion.matches || !inView || !videosEnabled) return;
+      const video = media[active];
+      if (!video || progressRaf) return;
+      pauseAllExcept(active);
+      video.currentTime = 0;
+      video.play().catch(() => {});
       resetProgress(false);
       startProgressLoop();
-      activeTimer = window.setTimeout(() => {
-        setActive(active + 1, true);
-      }, activeDuration);
     }
 
     function setActive(next: number, shouldPlay = true) {
@@ -237,9 +231,9 @@ const steps = [
 
     function updateProgress(index: number) {
       const bar = progressBars[index];
-      if (!bar || activeStartedAt <= 0 || activeDuration <= 0) return;
-      const progress = Math.min(1, (performance.now() - activeStartedAt) / activeDuration);
-      bar.style.transform = `scaleX(${progress})`;
+      const video = media[index];
+      if (!bar || !video || !video.duration) return;
+      bar.style.transform = `scaleX(${Math.min(1, video.currentTime / video.duration)})`;
     }
 
     function startProgressLoop() {
@@ -254,6 +248,12 @@ const steps = [
     tabs.forEach((tab) => {
       tab.addEventListener("click", () => {
         setActive(Number(tab.dataset.hiwTab ?? 0), true);
+      });
+    });
+
+    media.forEach((video, i) => {
+      video.addEventListener("ended", () => {
+        if (i === active) setActive(active + 1, true);
       });
     });
 
@@ -290,6 +290,24 @@ const steps = [
     );
     if ("ResizeObserver" in window) {
       new ResizeObserver(positionTrack).observe(root);
+    }
+
+    // Stage 3 of the landing load sequence: only fetch/play the demo GIFs
+    // once the page reveal has settled (stage:videos). Reduced motion /
+    // already staged → enabled synchronously.
+    const enableVideos = () => {
+      if (videosEnabled) return;
+      videosEnabled = true;
+      media.forEach((image) => {
+        const src = image.dataset.src;
+        if (src && !image.src) image.src = src;
+      });
+      if (inView) playActive();
+    };
+    if (document.documentElement.classList.contains("stage-videos")) {
+      enableVideos();
+    } else {
+      document.addEventListener("stage:videos", enableVideos, { once: true });
     }
 
     setActive(0, false);
@@ -334,7 +352,7 @@ const steps = [
       0 0 0 1px rgb(115 115 115 / 0.18);
   }
 
-  .hiw-gif {
+  .hiw-video {
     display: block;
     width: 100%;
     height: 100%;

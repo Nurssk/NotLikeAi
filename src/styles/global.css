@@ -110,6 +110,15 @@
   animation-delay: var(--reveal-delay, 0s);
 }
 
+/* Landing load sequence: hold the hero entrance until the rays have loaded
+   (stage-page), then let the normal .enter animation run. Server-rendered
+   only on the landing (html.stage-seq) and requires JS (.js-anim), so no-JS
+   and reduced-motion contexts still see content immediately. */
+html.stage-seq.js-anim:not(.stage-page) .enter {
+  opacity: 0;
+  animation: none;
+}
+
 /* Accordion content: shadcn's accordion-down/up, via the grid-rows trick */
 .acc-body {
   display: grid;

@@ -4,16 +4,18 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  stageSeq?: boolean;
 }
 
 const {
   title = "BeUniq · Fix your UI",
   description = "BeUniq helps turn generic AI-generated interfaces into cleaner, more intentional product screens.",
+  stageSeq = false,
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class={stageSeq ? "stage-seq" : undefined}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

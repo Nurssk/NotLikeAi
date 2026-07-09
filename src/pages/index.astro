@@ -10,7 +10,7 @@ import FinalCTA from "../components/FinalCTA.astro";
 import Footer from "../components/Footer.astro";
 ---
 
-<Base>
+<Base stageSeq={true}>
   <Navbar />
   <main>
     <Hero />
@@ -22,3 +22,32 @@ import Footer from "../components/Footer.astro";
   </main>
   <Footer />
 </Base>
+
+<script>
+  // Landing load sequence: rays → page reveal → videos. Stage classes land
+  // on <html>; events let components react. Reduced motion skips the wait.
+  const docEl = document.documentElement;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const setStage = (name: string) => {
+    docEl.classList.add("stage-" + name);
+    document.dispatchEvent(new CustomEvent("stage:" + name));
+  };
+
+  if (reduce) {
+    setStage("page");
+    setStage("videos");
+  } else {
+    let raysReady = false;
+    const reveal = () => {
+      if (raysReady) return;
+      raysReady = true;
+      setStage("page");
+      // Let the hero entrance settle, then release the demo GIFs.
+      window.setTimeout(() => setStage("videos"), 1000);
+    };
+    document.addEventListener("rays:ready", reveal);
+    // Fail-safe: never trap content behind WebGL.
+    window.setTimeout(reveal, 2500);
+  }
+</script>

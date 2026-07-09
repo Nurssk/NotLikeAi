@@ -63,12 +63,15 @@ const { flipX, flipY, sourceY, angle } = originConfig[origin] ?? originConfig["t
   let oglPromise: Promise<typeof import("ogl")> | null = null;
   const loadOgl = () => (oglPromise ??= import("ogl"));
 
-  // Defer the heavy WebGL init (context creation + shader compile) off the
-  // critical path so it never contends with LCP/INP.
-  const ric: (fn: () => void) => void =
-    (window as any).requestIdleCallback
-      ? (fn) => (window as any).requestIdleCallback(fn, { timeout: 1500 })
-      : (fn) => window.setTimeout(fn, 200);
+  // Signal the landing load sequence as soon as the first ray canvas is up,
+  // so the page reveal (and then the videos) can follow. Fired once, even on
+  // WebGL failure, so the sequence never stalls.
+  let raysSignaled = false;
+  const signalRaysReady = () => {
+    if (raysSignaled) return;
+    raysSignaled = true;
+    document.dispatchEvent(new CustomEvent("rays:ready"));
+  };
 
   // Decorative soft gradients tolerate a low internal render resolution and
   // a capped DPR — big fill / first-frame savings, visually identical.
@@ -195,23 +198,28 @@ void main() {
     };
 
     const init = async () => {
-      const { Renderer, Program, Triangle, Mesh } = await loadOgl();
-      renderer = new Renderer({
-        dpr: Math.min(window.devicePixelRatio || 1, MAX_DPR),
-        alpha: true,
-      });
-      const gl = renderer.gl;
-      gl.canvas.style.width = "100%";
-      gl.canvas.style.height = "100%";
-      container.appendChild(gl.canvas);
-      const geometry = new Triangle(gl);
-      const program = new Program(gl, { vertex: vert, fragment: frag, uniforms });
-      mesh = new Mesh(gl, { geometry, program });
-      window.addEventListener("resize", updateSize);
-      updateSize();
-      ready = true;
-      // Fade the WebGL layer in over the static fallback once it's mounted.
-      requestAnimationFrame(() => container.classList.add("rays-ready"));
+      try {
+        const { Renderer, Program, Triangle, Mesh } = await loadOgl();
+        renderer = new Renderer({
+          dpr: Math.min(window.devicePixelRatio || 1, MAX_DPR),
+          alpha: true,
+        });
+        const gl = renderer.gl;
+        gl.canvas.style.width = "100%";
+        gl.canvas.style.height = "100%";
+        container.appendChild(gl.canvas);
+        const geometry = new Triangle(gl);
+        const program = new Program(gl, { vertex: vert, fragment: frag, uniforms });
+        mesh = new Mesh(gl, { geometry, program });
+        window.addEventListener("resize", updateSize);
+        updateSize();
+        ready = true;
+        // Fade the WebGL layer in over the static fallback once it's mounted.
+        requestAnimationFrame(() => container.classList.add("rays-ready"));
+      } catch {
+        // WebGL unavailable / blocked — let the page sequence proceed.
+      }
+      signalRaysReady();
     };
 
     const loop = (t: number) => {
@@ -238,7 +246,7 @@ void main() {
     };
 
     // Render only while on-screen AND the tab is visible. Init lazily on
-    // first need, booted via requestIdleCallback so it never blocks load.
+    // first need; rays load first so the page reveal can follow.
     const evaluate = () => {
       if (!(intersecting && tabVisible)) {
         stopLoop();
@@ -246,10 +254,8 @@ void main() {
       }
       if (!inited) {
         inited = true;
-        ric(() => {
-          init().then(() => {
-            if (intersecting && tabVisible) startLoop();
-          });
+        init().then(() => {
+          if (intersecting && tabVisible) startLoop();
         });
         return;
       }
