@@ -71,6 +71,9 @@ export const prerender = false;
   const copyBtn = $("copy-btn") as HTMLButtonElement;
   const regenBtn = $("regen-btn") as HTMLButtonElement;
   const signoutBtn = $("signout-btn") as HTMLButtonElement;
+  const CODE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const CODE_LENGTH = 6;
+  const CODE_TTL_MS = 10 * 60 * 1000;
 
   function showError(msg: string) {
     loading.classList.add("hidden");
@@ -86,6 +89,63 @@ export const prerender = false;
     } catch {
       return "";
     }
+  }
+
+  function normalizeEmail(email: string): string {
+    return email.trim().toLowerCase();
+  }
+
+  function emailToCreditDocId(normalizedEmail: string): string {
+    return normalizedEmail.replace(/[.#$[\]/\s]/g, "_");
+  }
+
+  function generateFallbackCode(): string {
+    const values = new Uint32Array(CODE_LENGTH);
+    crypto.getRandomValues(values);
+    let code = "";
+    for (let i = 0; i < CODE_LENGTH; i++) {
+      code += CODE_ALPHABET[values[i] % CODE_ALPHABET.length];
+    }
+    return code;
+  }
+
+  async function createCodeInFirestoreFallback() {
+    const user = auth.currentUser;
+    if (!user?.email) throw new Error("missing_user_email");
+
+    const [{ doc, serverTimestamp, setDoc, Timestamp }, { getFirebaseDb }] =
+      await Promise.all([
+        import("firebase/firestore"),
+        import("../../lib/firestore"),
+      ]);
+
+    const normalizedEmail = normalizeEmail(user.email);
+    const emailKey = emailToCreditDocId(normalizedEmail);
+    const code = generateFallbackCode();
+    const expiresAt = Timestamp.fromMillis(Date.now() + CODE_TTL_MS);
+
+    await setDoc(doc(getFirebaseDb(), "extensionAuthCodes", emailKey), {
+      email: normalizedEmail,
+      normalizedEmail,
+      emailKey,
+      uid: user.uid,
+      code,
+      createdAt: serverTimestamp(),
+      expiresAt,
+      usedAt: null,
+    });
+
+    return {
+      code,
+      expiresInSeconds: Math.floor(CODE_TTL_MS / 1000),
+      email: normalizedEmail,
+    };
+  }
+
+  function showCode(data: { code: string }) {
+    codeEl.textContent = data.code;
+    loading.classList.add("hidden");
+    codeWrap.classList.remove("hidden");
   }
 
   async function fetchCode() {
@@ -123,16 +183,26 @@ export const prerender = false;
           showError("Your sign-in expired. Please sign in again.");
           return;
         }
-        showError("The server could not create a code. Please try again in a minute.");
+        if (res.status < 500 && error !== "server_error") {
+          showError("The server could not create a code. Please try again in a minute.");
+          return;
+        }
+
+        const fallbackData = await createCodeInFirestoreFallback();
+        showCode(fallbackData);
         return;
       }
       const data = await res.json();
-      codeEl.textContent = data.code;
-      loading.classList.add("hidden");
-      codeWrap.classList.remove("hidden");
+      showCode(data);
     } catch (err) {
       console.error("[extension code] failed", err);
-      showError("Could not generate a code. Please refresh and try again.");
+      try {
+        const fallbackData = await createCodeInFirestoreFallback();
+        showCode(fallbackData);
+      } catch (fallbackErr) {
+        console.error("[extension code] fallback failed", fallbackErr);
+        showError("Could not generate a code. Please refresh and try again.");
+      }
     }
   }
 

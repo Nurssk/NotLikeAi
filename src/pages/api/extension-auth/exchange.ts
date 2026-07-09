@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { Timestamp } from "firebase-admin/firestore";
+import type { Timestamp } from "firebase-admin/firestore";
 import { getDb } from "../../../lib/firebase-admin";
 import { emailToCreditDocId, normalizeEmail } from "../../../lib/credits";
 import { requireEnv } from "../../../lib/env";

@@ -1,7 +1,4 @@
 import type { APIRoute } from "astro";
-import { FieldValue, Timestamp } from "firebase-admin/firestore";
-import { getAdminAuth, getDb } from "../../../lib/firebase-admin";
-import { emailToCreditDocId, normalizeEmail } from "../../../lib/credits";
 import {
   CODE_TTL_MS,
   generateCode,
@@ -14,17 +11,29 @@ export const prerender = false;
 
 export const OPTIONS: APIRoute = () => preflight();
 
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+function emailToCreditDocId(normalizedEmail: string): string {
+  return normalizedEmail.replace(/[.#$[\]/\s]/g, "_");
+}
+
 // POST /api/extension-auth/code  (Authorization: Bearer <firebase-id-token>)
-// Creates a fresh one-time code for the verified user. Server-only writer of
-// extensionAuthCodes, so browser clients never touch that collection.
+// Creates a fresh one-time code for the verified user. The code page also has a
+// Firestore browser fallback for production deploys where this route is broken.
 export const POST: APIRoute = async ({ request }) => {
   const idToken = readBearer(request);
   if (!idToken) return json({ error: "missing_authorization" }, 401);
 
   let decoded;
   try {
+    const { getAdminAuth } = await import("../../../lib/firebase-admin");
     decoded = await getAdminAuth().verifyIdToken(idToken);
-  } catch {
+  } catch (err: any) {
+    if (!String(err?.code ?? "").startsWith("auth/")) {
+      console.error("[extension-auth/code] failed to verify id token", err);
+    }
     return json({ error: "invalid_authorization" }, 401);
   }
 
@@ -34,9 +43,14 @@ export const POST: APIRoute = async ({ request }) => {
   const normalizedEmail = normalizeEmail(decoded.email);
   const emailKey = emailToCreditDocId(normalizedEmail);
   const code = generateCode();
-  const expiresAt = Timestamp.fromMillis(Date.now() + CODE_TTL_MS);
 
   try {
+    const [{ FieldValue, Timestamp }, { getDb }] = await Promise.all([
+      import("firebase-admin/firestore"),
+      import("../../../lib/firebase-admin"),
+    ]);
+    const expiresAt = Timestamp.fromMillis(Date.now() + CODE_TTL_MS);
+
     // Doc id = emailKey → creating a new code overwrites any prior one.
     await getDb()
       .collection("extensionAuthCodes")

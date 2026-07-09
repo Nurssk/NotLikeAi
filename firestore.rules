@@ -1,9 +1,8 @@
 rules_version = '2';
 
 // Server code uses the Firebase Admin SDK and bypasses these rules entirely.
-// These rules only constrain BROWSER clients. The design keeps all payment and
-// auth-code writes server-side, so clients get read-only access to their own
-// credit document and nothing else.
+// Browser clients may read their own credit doc and create/update their own
+// one-time extension code as a fallback for the website auth flow.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -17,6 +16,44 @@ service cloud.firestore {
         && request.auth.token.email.lower() == normalized;
     }
 
+    function ownVerifiedEmail(normalized) {
+      return ownEmail(normalized)
+        && request.auth.token.email_verified == true;
+    }
+
+    function validExtensionAuthCodeWrite(emailKey) {
+      return ownVerifiedEmail(request.resource.data.normalizedEmail)
+        && request.resource.data.keys().hasOnly([
+          'email',
+          'normalizedEmail',
+          'emailKey',
+          'uid',
+          'code',
+          'createdAt',
+          'expiresAt',
+          'usedAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'email',
+          'normalizedEmail',
+          'emailKey',
+          'uid',
+          'code',
+          'createdAt',
+          'expiresAt',
+          'usedAt'
+        ])
+        && request.resource.data.email == request.resource.data.normalizedEmail
+        && request.resource.data.emailKey == emailKey
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.code is string
+        && request.resource.data.code.matches('^[A-Z0-9]{6}$')
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.usedAt == null;
+    }
+
     // A user may read only their own credit document (matched by the stored
     // normalizedEmail, so no fragile emailKey reconstruction in rules).
     match /customerCredits/{emailKey} {
@@ -24,9 +61,12 @@ service cloud.firestore {
       allow list, create, update, delete: if false;
     }
 
-    // One-time extension codes are created/consumed only by server APIs.
+    // The website may create/update its own verified-user code. The extension
+    // still consumes codes through the server API, so browser clients never
+    // read or list codes.
     match /extensionAuthCodes/{emailKey} {
-      allow read, write: if false;
+      allow create, update: if validExtensionAuthCodeWrite(emailKey);
+      allow read, list, delete: if false;
     }
 
     // Payment webhook audit log — server-only.
