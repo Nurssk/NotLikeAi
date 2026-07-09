@@ -54,96 +54,9 @@ const year = new Date().getFullYear();
       </nav>
     </div>
 
-    <div class="footer-peeps mt-12" aria-hidden="true">
-      <div class="footer-peeps-track">
-        <img
-          src="/images/peeps/all-peeps.png"
-          alt=""
-          loading="lazy"
-          decoding="async"
-        />
-        <img
-          src="/images/peeps/all-peeps.png"
-          alt=""
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-    </div>
-
-    <div class="mt-8 border-t border-rule pt-6">
+    <div class="mt-12 border-t border-rule pt-6">
       <p class="text-sm text-muted">© {year} BeUniq. All rights reserved.</p>
     </div>
   </div>
 </footer>
 
-<style>
-  .footer-peeps {
-    position: relative;
-    height: clamp(150px, 18vw, 230px);
-    overflow: hidden;
-    border-block: 1px solid var(--color-rule);
-    background: #000;
-  }
-
-  .footer-peeps::before,
-  .footer-peeps::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    z-index: 1;
-    width: min(18vw, 160px);
-    height: 100%;
-    pointer-events: none;
-  }
-
-  .footer-peeps::before {
-    left: 0;
-    background: linear-gradient(to right, #000, transparent);
-  }
-
-  .footer-peeps::after {
-    right: 0;
-    background: linear-gradient(to left, #000, transparent);
-  }
-
-  .footer-peeps-track {
-    display: flex;
-    width: max-content;
-    height: 100%;
-    animation: footer-peeps-scroll 42s linear infinite;
-    will-change: transform;
-  }
-
-  .footer-peeps-track img {
-    width: min(1360px, 210vw);
-    height: 100%;
-    flex: 0 0 auto;
-    object-fit: cover;
-    object-position: center;
-    opacity: 0.92;
-  }
-
-  @keyframes footer-peeps-scroll {
-    to {
-      transform: translateX(-50%);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .footer-peeps-track {
-      animation: none;
-      transform: translateX(-18%);
-    }
-  }
-
-  @media (max-width: 640px) {
-    .footer-peeps {
-      height: 136px;
-    }
-
-    .footer-peeps-track img {
-      width: 920px;
-    }
-  }
-</style>
