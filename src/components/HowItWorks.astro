@@ -200,11 +200,16 @@ const steps = [
 
       pauseAll(true);
       positionTrack();
-      tabs[active]?.scrollIntoView({
-        behavior: reduceMotion.matches ? "auto" : "smooth",
-        block: "nearest",
-        inline: "nearest",
-      });
+      // Keep the active tab horizontally scrolled into view inside the tab
+      // strip (mobile). Guard on visibility so a fresh page load — where the
+      // carousel sits below the hero — can't drag the whole page down to it.
+      if (carouselIsVisible()) {
+        tabs[active]?.scrollIntoView({
+          behavior: reduceMotion.matches ? "auto" : "smooth",
+          block: "nearest",
+          inline: "nearest",
+        });
+      }
 
       if (shouldPlay) playActive();
       else updateProgress(videos[active], active);
