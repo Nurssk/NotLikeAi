@@ -160,8 +160,8 @@ const steps = [
     }
 
     function positionTrack() {
-      const offset = slides[active]?.offsetLeft ?? 0;
-      track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+      // Focus layout: no horizontal slide. Clear any leftover transform.
+      track.style.transform = "";
     }
 
     function resetProgress(resetInactive = false) {
@@ -327,18 +327,25 @@ const steps = [
 
   .hiw-track {
     display: flex;
+    align-items: flex-start;
     gap: clamp(10px, 1.4vw, 16px);
-    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform;
   }
 
+  /* Focus layout: the playing clip grows (~1.7× its siblings) and the
+     others shrink — all three stay visible and morph smoothly when focus
+     moves. Width is driven by flex-grow (animatable); height follows the
+     media aspect-ratio, so the active video is larger in both dimensions. */
   .hiw-slide {
-    flex: 0 0 min(72%, 700px);
-    opacity: 0.45;
-    transition: opacity 0.45s ease;
+    flex: 1 1 0;
+    min-width: 0;
+    opacity: 0.42;
+    transition:
+      flex-grow 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.6s ease;
   }
 
   .hiw-slide[data-active] {
+    flex-grow: 1.7;
     opacity: 1;
   }
 
@@ -433,8 +440,8 @@ const steps = [
       gap: 8px;
     }
 
-    .hiw-slide {
-      flex-basis: 100%;
+    .hiw-slide[data-active] {
+      flex-grow: 1.4;
     }
 
     .hiw-copy {
