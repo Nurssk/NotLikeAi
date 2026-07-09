@@ -127,15 +127,12 @@ const sparkles = Array.from({ length: 40 }, (_, i) => ({
     >
       <a
         href={CTA_URL}
-        class="inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 text-base font-medium text-paper transition-opacity duration-150 hover:opacity-80 sm:w-auto"
+        class="hero-cta inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 text-base font-medium text-paper sm:w-auto"
       >
-        Analyze your first screen
-      </a>
-      <a
-        href="#how-it-works"
-        class="inline-flex min-h-12 items-center text-base font-medium text-ink"
-      >
-        <span class="draw-link">See how it works</span>
+        <svg class="hero-cta-ants" aria-hidden="true">
+          <rect x="1.5" y="1.5"></rect>
+        </svg>
+        <span class="hero-cta-label">Analyze your first screen</span>
       </a>
     </div>
 
@@ -458,6 +455,71 @@ const sparkles = Array.from({ length: 40 }, (_, i) => ({
     background-image: linear-gradient(var(--color-ink), var(--color-ink));
   }
 
+  /* Hero CTA: on hover the field inverts left-to-right (white→black), the
+     label flips to paper, and a marching-ants stroke traces the edge — the
+     same selection language as the headline, slowly sweeping in. */
+  .hero-cta {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .hero-cta::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--color-paper);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .hero-cta-label {
+    position: relative;
+    z-index: 1;
+  }
+  /* Marching-ants stroke: hidden until hover, then fades in just after the
+     fill starts and the dashes march around the perimeter. Mirrors the
+     headline selection boxes (.sel-ants). */
+  .hero-cta-ants {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .hero-cta-ants rect {
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 3;
+    stroke-dasharray: 11 7;
+  }
+  :global(.js-anim) .hero-cta-ants rect {
+    animation: hero-cta-march 1.4s linear infinite;
+  }
+  @keyframes hero-cta-march {
+    to {
+      stroke-dashoffset: -36;
+    }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hero-cta:hover {
+      color: var(--color-ink);
+    }
+    .hero-cta:hover::before {
+      transform: scaleX(1);
+    }
+    .hero-cta:hover .hero-cta-ants {
+      opacity: 1;
+      transition-delay: 0.2s;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .spark,
     .sel-ants,
@@ -466,8 +528,14 @@ const sparkles = Array.from({ length: 40 }, (_, i) => ({
     .tag-capturing,
     .tag-captured,
     .tag-capturing::after,
-    .cur-hero {
+    .cur-hero,
+    .hero-cta-ants rect {
       animation: none !important;
+    }
+    .hero-cta,
+    .hero-cta::before,
+    .hero-cta-ants {
+      transition: none;
     }
   }
 </style>
