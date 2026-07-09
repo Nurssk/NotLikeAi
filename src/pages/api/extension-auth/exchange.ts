@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
-import type { Timestamp } from "firebase-admin/firestore";
-import { getDb } from "../../../lib/firebase-admin";
+import { getAdminAuth, getDb } from "../../../lib/firebase-admin";
 import { emailToCreditDocId, normalizeEmail } from "../../../lib/credits";
 import { requireEnv } from "../../../lib/env";
 import {
@@ -15,8 +14,9 @@ export const prerender = false;
 export const OPTIONS: APIRoute = () => preflight();
 
 // POST /api/extension-auth/exchange  { email, code }
-// Verifies a one-time code and returns an HMAC session token. Codes are
-// single-use: deleted on success. Generic errors on any mismatch.
+// Verifies a one-time code and returns an HMAC session token. The website stores
+// only { email, code } in Firestore; this endpoint resolves the Firebase uid by
+// email and deletes the code on success.
 export const POST: APIRoute = async ({ request }) => {
   let payload: { email?: string; code?: string };
   try {
@@ -38,12 +38,10 @@ export const POST: APIRoute = async ({ request }) => {
     if (!snap.exists) return { ok: false as const };
     const data = snap.data()!;
 
-    const expiresAt: Timestamp | undefined = data.expiresAt;
-    const expired = expiresAt ? expiresAt.toMillis() < Date.now() : false;
-
-    if (data.code !== code || data.usedAt || expired) {
-      // Clean up spent/expired codes so they can't be retried.
-      if (data.usedAt || expired) tx.delete(ref);
+    if (String(data.email ?? "") !== email || String(data.code ?? "") !== code) {
+      if (String(data.email ?? "") === email) {
+        tx.delete(ref);
+      }
       return { ok: false as const };
     }
 
@@ -51,16 +49,23 @@ export const POST: APIRoute = async ({ request }) => {
     tx.delete(ref);
     return {
       ok: true as const,
-      uid: String(data.uid ?? ""),
-      normalizedEmail: String(data.normalizedEmail ?? email),
+      normalizedEmail: email,
     };
   });
 
   if (!result.ok) return json({ error: "invalid_code" }, 401);
 
+  let uid = "";
+  try {
+    const user = await getAdminAuth().getUserByEmail(result.normalizedEmail);
+    uid = user.uid;
+  } catch {
+    return json({ error: "user_not_found" }, 401);
+  }
+
   const { token, expiresInSeconds } = signSessionToken(
     {
-      sub: result.uid,
+      sub: uid,
       email: result.normalizedEmail,
       emailKey: emailToCreditDocId(result.normalizedEmail),
     },

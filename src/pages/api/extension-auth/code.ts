@@ -20,8 +20,8 @@ function emailToCreditDocId(normalizedEmail: string): string {
 }
 
 // POST /api/extension-auth/code  (Authorization: Bearer <firebase-id-token>)
-// Creates a fresh one-time code for the verified user. The code page also has a
-// Firestore browser fallback for production deploys where this route is broken.
+// Legacy endpoint. The current code page writes { email, code } directly to
+// Firestore, but keep this route compatible with the same simple document shape.
 export const POST: APIRoute = async ({ request }) => {
   const idToken = readBearer(request);
   if (!idToken) return json({ error: "missing_authorization" }, 401);
@@ -45,11 +45,7 @@ export const POST: APIRoute = async ({ request }) => {
   const code = generateCode();
 
   try {
-    const [{ FieldValue, Timestamp }, { getDb }] = await Promise.all([
-      import("firebase-admin/firestore"),
-      import("../../../lib/firebase-admin"),
-    ]);
-    const expiresAt = Timestamp.fromMillis(Date.now() + CODE_TTL_MS);
+    const { getDb } = await import("../../../lib/firebase-admin");
 
     // Doc id = emailKey → creating a new code overwrites any prior one.
     await getDb()
@@ -57,13 +53,7 @@ export const POST: APIRoute = async ({ request }) => {
       .doc(emailKey)
       .set({
         email: normalizedEmail,
-        normalizedEmail,
-        emailKey,
-        uid: decoded.uid,
         code,
-        createdAt: FieldValue.serverTimestamp(),
-        expiresAt,
-        usedAt: null,
       });
   } catch (err) {
     console.error("[extension-auth/code] failed to write code", err);

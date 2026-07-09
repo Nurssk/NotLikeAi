@@ -73,22 +73,12 @@ export const prerender = false;
   const signoutBtn = $("signout-btn") as HTMLButtonElement;
   const CODE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   const CODE_LENGTH = 6;
-  const CODE_TTL_MS = 10 * 60 * 1000;
 
   function showError(msg: string) {
     loading.classList.add("hidden");
     codeWrap.classList.add("hidden");
     errorEl.textContent = msg;
     errorEl.classList.remove("hidden");
-  }
-
-  async function readApiError(res: Response): Promise<string> {
-    try {
-      const data = await res.json();
-      return String(data?.error ?? "");
-    } catch {
-      return "";
-    }
   }
 
   function normalizeEmail(email: string): string {
@@ -99,7 +89,7 @@ export const prerender = false;
     return normalizedEmail.replace(/[.#$[\]/\s]/g, "_");
   }
 
-  function generateFallbackCode(): string {
+  function generateCode(): string {
     const values = new Uint32Array(CODE_LENGTH);
     crypto.getRandomValues(values);
     let code = "";
@@ -109,11 +99,11 @@ export const prerender = false;
     return code;
   }
 
-  async function createCodeInFirestoreFallback() {
+  async function createCodeInFirestore() {
     const user = auth.currentUser;
     if (!user?.email) throw new Error("missing_user_email");
 
-    const [{ doc, serverTimestamp, setDoc, Timestamp }, { getFirebaseDb }] =
+    const [{ doc, setDoc }, { getFirebaseDb }] =
       await Promise.all([
         import("firebase/firestore"),
         import("../../lib/firestore"),
@@ -121,23 +111,15 @@ export const prerender = false;
 
     const normalizedEmail = normalizeEmail(user.email);
     const emailKey = emailToCreditDocId(normalizedEmail);
-    const code = generateFallbackCode();
-    const expiresAt = Timestamp.fromMillis(Date.now() + CODE_TTL_MS);
+    const code = generateCode();
 
     await setDoc(doc(getFirebaseDb(), "extensionAuthCodes", emailKey), {
       email: normalizedEmail,
-      normalizedEmail,
-      emailKey,
-      uid: user.uid,
       code,
-      createdAt: serverTimestamp(),
-      expiresAt,
-      usedAt: null,
     });
 
     return {
       code,
-      expiresInSeconds: Math.floor(CODE_TTL_MS / 1000),
       email: normalizedEmail,
     };
   }
@@ -166,43 +148,11 @@ export const prerender = false;
     codeWrap.classList.add("hidden");
     errorEl.classList.add("hidden");
     try {
-      // Force refresh after email verification so the server receives a token
-      // whose email_verified claim matches the freshly reloaded user state.
-      const idToken = await user.getIdToken(true);
-      const res = await fetch("/api/extension-auth/code", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${idToken}` },
-      });
-      if (!res.ok) {
-        const error = await readApiError(res);
-        if (error === "email_not_verified") {
-          window.location.assign("/extension/authorize");
-          return;
-        }
-        if (error === "invalid_authorization" || error === "missing_authorization") {
-          showError("Your sign-in expired. Please sign in again.");
-          return;
-        }
-        if (res.status < 500 && error !== "server_error") {
-          showError("The server could not create a code. Please try again in a minute.");
-          return;
-        }
-
-        const fallbackData = await createCodeInFirestoreFallback();
-        showCode(fallbackData);
-        return;
-      }
-      const data = await res.json();
+      const data = await createCodeInFirestore();
       showCode(data);
     } catch (err) {
       console.error("[extension code] failed", err);
-      try {
-        const fallbackData = await createCodeInFirestoreFallback();
-        showCode(fallbackData);
-      } catch (fallbackErr) {
-        console.error("[extension code] fallback failed", fallbackErr);
-        showError("Could not generate a code. Please refresh and try again.");
-      }
+      showError("Could not generate a code. Please refresh and try again.");
     }
   }
 
