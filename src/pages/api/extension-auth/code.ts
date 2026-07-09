@@ -36,20 +36,25 @@ export const POST: APIRoute = async ({ request }) => {
   const code = generateCode();
   const expiresAt = Timestamp.fromMillis(Date.now() + CODE_TTL_MS);
 
-  // Doc id = emailKey → creating a new code overwrites any prior one.
-  await getDb()
-    .collection("extensionAuthCodes")
-    .doc(emailKey)
-    .set({
-      email: normalizedEmail,
-      normalizedEmail,
-      emailKey,
-      uid: decoded.uid,
-      code,
-      createdAt: FieldValue.serverTimestamp(),
-      expiresAt,
-      usedAt: null,
-    });
+  try {
+    // Doc id = emailKey → creating a new code overwrites any prior one.
+    await getDb()
+      .collection("extensionAuthCodes")
+      .doc(emailKey)
+      .set({
+        email: normalizedEmail,
+        normalizedEmail,
+        emailKey,
+        uid: decoded.uid,
+        code,
+        createdAt: FieldValue.serverTimestamp(),
+        expiresAt,
+        usedAt: null,
+      });
+  } catch (err) {
+    console.error("[extension-auth/code] failed to write code", err);
+    return json({ error: "server_error" }, 500);
+  }
 
   return json({
     code,

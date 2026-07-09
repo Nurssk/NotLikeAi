@@ -89,7 +89,7 @@ const sparkles = Array.from({ length: 40 }, (_, i) => ({
           <span class="tag-capturing">capturing</span>
           <span class="tag-captured">captured</span>
         </span>
-        Fix your
+        Remove AI
       </span>
       <span class="sel sel-b">
         <svg class="sel-ants" aria-hidden="true">
@@ -103,7 +103,7 @@ const sparkles = Array.from({ length: 40 }, (_, i) => ({
           <span class="tag-capturing">capturing</span>
           <span class="tag-captured">captured</span>
         </span>
-        UI.
+        Slop.
       </span>
       <span class="cur-hero" aria-hidden="true">
         <svg class="sel-cursor" viewBox="0 0 24 24">
@@ -187,7 +187,7 @@ const sparkles = Array.from({ length: 40 }, (_, i) => ({
     display: inline-block;
     padding: 0.02em 0.12em 0.06em;
   }
-  /* Pull "UI." toward "Fix your" — swallow the word space plus most of the
+  /* Pull "Slop." toward "Remove AI" — swallow the word space plus most of the
      two selection paddings so the gap reads like a normal word break. */
   .sel-b {
     margin-left: -0.3em;
@@ -364,7 +364,7 @@ const sparkles = Array.from({ length: 40 }, (_, i) => ({
     }
   }
 
-  /* One persistent cursor tours the headline: rest → select "Fix your" →
+  /* One persistent cursor tours the headline: rest → select "Remove AI" →
      back to rest → select "UI." → back to rest. Corner coordinates are
      measured by the script below and exposed as CSS vars on the <h1>, so
      the keyframes hit the real boxes at any viewport size. Never fades. */
@@ -397,13 +397,13 @@ const sparkles = Array.from({ length: 40 }, (_, i) => ({
     2% {
       transform: translate(var(--rx, 0px), var(--ry, 0px));
     }
-    /* up to the corner of "Fix your"; brief pause so the pick-up reads */
+    /* up to the corner of "Remove AI"; brief pause so the pick-up reads */
     5%,
     6% {
       transform: translate(var(--ax1, 0px), var(--ay1, 0px));
       animation-timing-function: linear;
     }
-    /* drag across "Fix your"; release beat at the corner */
+    /* drag across "Remove AI"; release beat at the corner */
     13%,
     14% {
       transform: translate(var(--ax2, 0px), var(--ay2, 0px));
@@ -431,7 +431,7 @@ const sparkles = Array.from({ length: 40 }, (_, i) => ({
     }
   }
 
-  /* Second target runs half a cycle behind the first: capture "Fix your",
+  /* Second target runs half a cycle behind the first: capture "Remove AI",
      mouse returns, capture "UI.", mouse returns — infinite alternation. */
   :global(.js-anim) .sel-b .sel-ants,
   :global(.js-anim) .sel-b .sel-handle,

@@ -79,6 +79,15 @@ export const prerender = false;
     errorEl.classList.remove("hidden");
   }
 
+  async function readApiError(res: Response): Promise<string> {
+    try {
+      const data = await res.json();
+      return String(data?.error ?? "");
+    } catch {
+      return "";
+    }
+  }
+
   async function fetchCode() {
     const user = auth.currentUser;
     if (!user) {
@@ -97,17 +106,32 @@ export const prerender = false;
     codeWrap.classList.add("hidden");
     errorEl.classList.add("hidden");
     try {
-      const idToken = await user.getIdToken();
+      // Force refresh after email verification so the server receives a token
+      // whose email_verified claim matches the freshly reloaded user state.
+      const idToken = await user.getIdToken(true);
       const res = await fetch("/api/extension-auth/code", {
         method: "POST",
         headers: { Authorization: `Bearer ${idToken}` },
       });
-      if (!res.ok) throw new Error(`status ${res.status}`);
+      if (!res.ok) {
+        const error = await readApiError(res);
+        if (error === "email_not_verified") {
+          window.location.assign("/extension/authorize");
+          return;
+        }
+        if (error === "invalid_authorization" || error === "missing_authorization") {
+          showError("Your sign-in expired. Please sign in again.");
+          return;
+        }
+        showError("The server could not create a code. Please try again in a minute.");
+        return;
+      }
       const data = await res.json();
       codeEl.textContent = data.code;
       loading.classList.add("hidden");
       codeWrap.classList.remove("hidden");
-    } catch {
+    } catch (err) {
+      console.error("[extension code] failed", err);
       showError("Could not generate a code. Please refresh and try again.");
     }
   }

@@ -48,6 +48,13 @@ const origin = side === "left" ? "middle-left" : "middle-right";
   </div>
 </div>
 
+<!-- Text-protecting scrim: the white rays use mix-blend-mode: screen and can
+     wash the section background to near-white at their hotspot, hiding light
+     text. This darkens the content area (where text lives) while fading out
+     toward the edges so the ray glow still reads. Painted above the rays
+     (later DOM, same z) and below the z-10 content. -->
+<div class="landing-scrim" aria-hidden="true"></div>
+
 <style>
   .landing-rays {
     position: absolute;
@@ -102,6 +109,19 @@ const origin = side === "left" ? "middle-left" : "middle-right";
   .landing-rays-inner-right {
     -webkit-mask-image: linear-gradient(to left, #000 0%, #000 52%, transparent 100%);
     mask-image: linear-gradient(to left, #000 0%, #000 52%, transparent 100%);
+  }
+
+  .landing-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      120% 90% at 50% 42%,
+      rgb(11 11 11 / 0.74) 22%,
+      rgb(11 11 11 / 0.46) 54%,
+      transparent 78%
+    );
   }
 
   @media (max-width: 760px) {
