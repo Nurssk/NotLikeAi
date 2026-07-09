@@ -1,0 +1,505 @@
+---
+import { CTA_URL } from "../consts";
+import SideRays from "./SideRays.astro";
+
+// Ambient monochrome sparkle field (shadcn-style). Deterministic sin-based
+// PRNG so SSR output is stable. Small squares, not pills — matches the sharp
+// design language. Only animates in a motion-capable context (.js-anim).
+const rand = (seed: number) => {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};
+const sparkles = Array.from({ length: 40 }, (_, i) => ({
+  left: `${(rand(i + 1) * 100).toFixed(2)}%`,
+  top: `${(rand(i + 50) * 100).toFixed(2)}%`,
+  delay: `${(rand(i + 100) * 5).toFixed(2)}s`,
+  dur: `${(2.5 + rand(i + 200) * 3).toFixed(2)}s`,
+  size: 2 + Math.floor(rand(i + 300) * 2),
+}));
+---
+
+<section
+  id="top"
+  class="relative overflow-hidden bg-paper text-ink"
+>
+  <div class="absolute inset-0 z-0">
+    <SideRays
+      origin="top-right"
+      speed={2}
+      rayColor1="#ffffff"
+      rayColor2="#ffffff"
+      intensity={2}
+      spread={2}
+      saturation={0}
+      blend={0.5}
+      falloff={1.5}
+      opacity={0.85}
+    />
+  </div>
+  <div class="absolute inset-0 z-0">
+    <SideRays
+      origin="top-left"
+      speed={2}
+      rayColor1="#ffffff"
+      rayColor2="#ffffff"
+      intensity={2}
+      spread={2}
+      saturation={0}
+      blend={0.5}
+      falloff={1.5}
+      opacity={0.85}
+    />
+  </div>
+
+  <!-- Dissolve the ray canvases into the page background so the section
+       boundary is invisible -->
+  <div
+    class="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-40"
+    style="background: linear-gradient(to bottom, transparent, var(--color-paper))"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="sparkles" aria-hidden="true">
+    {
+      sparkles.map((s) => (
+        <span
+          class="spark"
+          style={`left:${s.left};top:${s.top};width:${s.size}px;height:${s.size}px;animation-delay:${s.delay};animation-duration:${s.dur}`}
+        />
+      ))
+    }
+  </div>
+
+  <div
+    class="relative z-10 mx-auto max-w-6xl px-5 pb-24 pt-36 text-center sm:px-8 sm:pb-40 sm:pt-52"
+  >
+    <h1
+      class="enter relative text-6xl font-bold leading-[1.02] tracking-tight sm:text-8xl sm:leading-[1.0] lg:text-[10rem] lg:leading-[0.96]"
+    >
+      <span class="sel sel-a">
+        <svg class="sel-ants" aria-hidden="true">
+          <rect x="1.5" y="1.5" rx="0" ry="0"></rect>
+        </svg>
+        <span class="sel-handle sel-tl" aria-hidden="true"></span>
+        <span class="sel-handle sel-tr" aria-hidden="true"></span>
+        <span class="sel-handle sel-bl" aria-hidden="true"></span>
+        <span class="sel-handle sel-br" aria-hidden="true"></span>
+        <span class="sel-tag" aria-hidden="true">
+          <span class="tag-capturing">capturing</span>
+          <span class="tag-captured">captured</span>
+        </span>
+        Fix your
+      </span>
+      <span class="sel sel-b">
+        <svg class="sel-ants" aria-hidden="true">
+          <rect x="1.5" y="1.5" rx="0" ry="0"></rect>
+        </svg>
+        <span class="sel-handle sel-tl" aria-hidden="true"></span>
+        <span class="sel-handle sel-tr" aria-hidden="true"></span>
+        <span class="sel-handle sel-bl" aria-hidden="true"></span>
+        <span class="sel-handle sel-br" aria-hidden="true"></span>
+        <span class="sel-tag" aria-hidden="true">
+          <span class="tag-capturing">capturing</span>
+          <span class="tag-captured">captured</span>
+        </span>
+        UI.
+      </span>
+      <span class="cur-hero" aria-hidden="true">
+        <svg class="sel-cursor" viewBox="0 0 24 24">
+          <line x1="12" y1="2" x2="12" y2="22"></line>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+        </svg>
+      </span>
+    </h1>
+
+    <p
+      class="enter mx-auto mt-10 max-w-xl text-xl leading-relaxed text-ink/70"
+      style="--reveal-delay: 0.08s"
+    >
+      BeUniq helps turn generic AI-generated interfaces into cleaner, more
+      intentional product screens.
+    </p>
+
+    <div
+      class="enter mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
+      style="--reveal-delay: 0.16s"
+    >
+      <a
+        href={CTA_URL}
+        class="inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 text-base font-medium text-paper transition-opacity duration-150 hover:opacity-80 sm:w-auto"
+      >
+        Analyze your first screen
+      </a>
+      <a
+        href="#how-it-works"
+        class="inline-flex min-h-12 items-center text-base font-medium text-ink"
+      >
+        <span class="draw-link">See how it works</span>
+      </a>
+    </div>
+
+    <p
+      class="enter mt-7 text-sm text-ink/60"
+      style="--reveal-delay: 0.24s"
+    >
+      Start with 3 free screenshots. No payment required.
+    </p>
+  </div>
+</section>
+
+<style>
+  /* Ambient sparkle field — small monochrome squares that twinkle softly to
+     fill the space around the centered hero. Static by default; the twinkle
+     only runs in a motion-capable context (.js-anim). */
+  .sparkles {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .spark {
+    position: absolute;
+    background: var(--color-ink);
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+  :global(.js-anim) .spark {
+    animation-name: sparkle;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+  }
+  @keyframes sparkle {
+    0%,
+    100% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    50% {
+      opacity: 0.32;
+      transform: scale(1);
+    }
+  }
+
+  /* Screenshot-selection marquee around "UI." — the product mechanic, acted
+     out by a cursor: glide in, drag corner to corner (the box draws under
+     it), release, tag flips capturing → captured. One 12s CSS timeline, loop.
+     Static contexts (no-JS, bots, reduced motion) see the finished capture. */
+  .sel {
+    position: relative;
+    display: inline-block;
+    padding: 0.02em 0.12em 0.06em;
+  }
+  /* Pull "UI." toward "Fix your" — swallow the word space plus most of the
+     two selection paddings so the gap reads like a normal word break. */
+  .sel-b {
+    margin-left: -0.3em;
+  }
+
+  .sel-ants {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .sel-ants rect {
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    fill: rgb(0 0 0 / 0.08);
+    stroke: var(--color-ink);
+    stroke-width: 3;
+    stroke-dasharray: 11 7;
+  }
+  :global(.js-anim) .sel-ants {
+    animation: box-reveal 12s infinite;
+  }
+  :global(.js-anim) .sel-ants rect {
+    animation: sel-march 1.4s linear infinite;
+  }
+  @keyframes sel-march {
+    to {
+      stroke-dashoffset: -36;
+    }
+  }
+  /* One 12s cycle, two captures: each box is active in the first half of its
+     own (possibly delayed) timeline and hidden in the second half. */
+  @keyframes box-reveal {
+    0%,
+    6% {
+      clip-path: inset(-8px 100% 100% -8px);
+      opacity: 1;
+      animation-timing-function: linear;
+    }
+    13% {
+      clip-path: inset(-8px -8px -8px -8px);
+    }
+    40% {
+      clip-path: inset(-8px -8px -8px -8px);
+      opacity: 1;
+    }
+    44%,
+    100% {
+      clip-path: inset(-8px -8px -8px -8px);
+      opacity: 0;
+    }
+  }
+
+  .sel-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--color-paper);
+    border: 3px solid var(--color-ink);
+    pointer-events: none;
+  }
+  .sel-tl { left: -6px; top: -6px; }
+  .sel-tr { right: -6px; top: -6px; }
+  .sel-bl { left: -6px; bottom: -6px; }
+  .sel-br { right: -6px; bottom: -6px; }
+  /* Handles pop on release */
+  :global(.js-anim) .sel-handle {
+    animation: handle-pop 12s infinite;
+  }
+  @keyframes handle-pop {
+    0%,
+    14% {
+      opacity: 0;
+    }
+    16%,
+    40% {
+      opacity: 1;
+    }
+    44%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Tag: two stacked labels — "capturing" during the drag, "captured" after */
+  .sel-tag {
+    position: absolute;
+    right: -6px;
+    top: -6px;
+    transform: translateY(-100%);
+    display: grid;
+  }
+  /* When the headline wraps (small screens), the line above is occupied —
+     hang the tag below the box instead. */
+  @media (max-width: 639px) {
+    .sel-tag {
+      top: auto;
+      bottom: -6px;
+      transform: translateY(100%);
+    }
+  }
+  .sel-tag {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .sel-tag > span {
+    grid-area: 1 / 1;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    padding: 5px 8px;
+    width: max-content;
+    justify-self: end;
+  }
+  .tag-capturing {
+    opacity: 0;
+  }
+  .tag-captured {
+    opacity: 1;
+  }
+  :global(.js-anim) .tag-capturing {
+    animation: tag-capturing 12s infinite;
+  }
+  :global(.js-anim) .tag-captured {
+    animation: tag-captured 12s infinite;
+  }
+  @keyframes tag-capturing {
+    0%,
+    6% {
+      opacity: 0;
+    }
+    7%,
+    13% {
+      opacity: 1;
+    }
+    15%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes tag-captured {
+    0%,
+    15% {
+      opacity: 0;
+    }
+    17%,
+    40% {
+      opacity: 1;
+    }
+    44%,
+    100% {
+      opacity: 0;
+    }
+  }
+  /* Blinking record-dot while capturing */
+  :global(.js-anim) .tag-capturing::after {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-left: 6px;
+    background: var(--color-paper);
+    animation: sel-blink 1.1s steps(1) infinite;
+    vertical-align: 1px;
+  }
+  @keyframes sel-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* One persistent cursor tours the headline: rest → select "Fix your" →
+     back to rest → select "UI." → back to rest. Corner coordinates are
+     measured by the script below and exposed as CSS vars on the <h1>, so
+     the keyframes hit the real boxes at any viewport size. Never fades. */
+  .cur-hero {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .sel-cursor {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 28px;
+    transform: translate(-50%, -50%);
+    stroke: var(--color-ink);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 2px var(--color-paper))
+      drop-shadow(0 0 1px var(--color-paper));
+  }
+  :global(.js-anim) .cur-hero {
+    opacity: 1;
+    animation: cursor-tour 12s infinite;
+  }
+  @keyframes cursor-tour {
+    /* resting at the starter place */
+    0%,
+    2% {
+      transform: translate(var(--rx, 0px), var(--ry, 0px));
+    }
+    /* up to the corner of "Fix your"; brief pause so the pick-up reads */
+    5%,
+    6% {
+      transform: translate(var(--ax1, 0px), var(--ay1, 0px));
+      animation-timing-function: linear;
+    }
+    /* drag across "Fix your"; release beat at the corner */
+    13%,
+    14% {
+      transform: translate(var(--ax2, 0px), var(--ay2, 0px));
+    }
+    /* back to the starter place, wait for the next capture */
+    19%,
+    52% {
+      transform: translate(var(--rx, 0px), var(--ry, 0px));
+    }
+    /* up to the corner of "UI."; pause */
+    55%,
+    56% {
+      transform: translate(var(--bx1, 0px), var(--by1, 0px));
+      animation-timing-function: linear;
+    }
+    /* drag across "UI."; release beat */
+    63%,
+    64% {
+      transform: translate(var(--bx2, 0px), var(--by2, 0px));
+    }
+    /* home again until the loop restarts */
+    69%,
+    100% {
+      transform: translate(var(--rx, 0px), var(--ry, 0px));
+    }
+  }
+
+  /* Second target runs half a cycle behind the first: capture "Fix your",
+     mouse returns, capture "UI.", mouse returns — infinite alternation. */
+  :global(.js-anim) .sel-b .sel-ants,
+  :global(.js-anim) .sel-b .sel-handle,
+  :global(.js-anim) .sel-b .tag-capturing,
+  :global(.js-anim) .sel-b .tag-captured {
+    animation-delay: -6s;
+  }
+
+  /* Static contexts (no-JS, bots, reduced motion) show one finished capture
+     on "UI." only — box A stays invisible without animation. */
+  .sel-a .sel-ants,
+  .sel-a .sel-handle,
+  .sel-a .tag-captured {
+    opacity: 0;
+  }
+
+  /* Dark-hero override: the global draw-link draws in ink; here it must
+     draw in paper to read on the black field. Scoped to this component. */
+  .draw-link {
+    border-bottom-color: rgb(0 0 0 / 0.3);
+    background-image: linear-gradient(var(--color-ink), var(--color-ink));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spark,
+    .sel-ants,
+    .sel-ants rect,
+    .sel-handle,
+    .tag-capturing,
+    .tag-captured,
+    .tag-capturing::after,
+    .cur-hero {
+      animation: none !important;
+    }
+  }
+</style>
+
+<script>
+  // Measure the two selection boxes and expose their corners (plus a resting
+  // spot) as CSS vars on the <h1>, so the cursor tour hits real coordinates
+  // at any viewport size. Re-measured on resize and after fonts load.
+  const h1 = document.querySelector<HTMLElement>("#top h1");
+  const boxA = h1?.querySelector<HTMLElement>(".sel-a");
+  const boxB = h1?.querySelector<HTMLElement>(".sel-b");
+  if (h1 && boxA && boxB) {
+    const measure = () => {
+      const hr = h1.getBoundingClientRect();
+      const set = (name: string, r: DOMRect) => {
+        h1.style.setProperty(`--${name}x1`, `${r.left - hr.left}px`);
+        h1.style.setProperty(`--${name}y1`, `${r.top - hr.top}px`);
+        h1.style.setProperty(`--${name}x2`, `${r.right - hr.left}px`);
+        h1.style.setProperty(`--${name}y2`, `${r.bottom - hr.top}px`);
+      };
+      const a = boxA.getBoundingClientRect();
+      set("a", a);
+      set("b", boxB.getBoundingClientRect());
+      // resting spot: just below the start of the headline
+      h1.style.setProperty("--rx", `${a.left - hr.left + 10}px`);
+      h1.style.setProperty("--ry", `${a.bottom - hr.top + 26}px`);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    if (document.fonts?.ready) document.fonts.ready.then(measure);
+    // Window resize events can be unreliable (emulation, rotation); observe
+    // the headline itself so any reflow re-measures the tour coordinates.
+    if ("ResizeObserver" in window) new ResizeObserver(measure).observe(h1);
+  }
+</script>

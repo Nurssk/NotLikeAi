@@ -1,0 +1,214 @@
+---
+interface Props {
+  origin?: "top-right" | "top-left" | "bottom-right" | "bottom-left" | "middle-right" | "middle-left";
+  speed?: number;
+  rayColor1?: string;
+  rayColor2?: string;
+  intensity?: number;
+  spread?: number;
+  saturation?: number;
+  blend?: number;
+  falloff?: number;
+  opacity?: number;
+}
+
+const {
+  origin = "top-right",
+  speed = 2,
+  rayColor1 = "#ffffff",
+  rayColor2 = "#ffffff",
+  intensity = 2,
+  spread = 2,
+  saturation = 0,
+  blend = 0.5,
+  falloff = 1.5,
+  opacity = 0.85,
+} = Astro.props;
+
+const originConfig: Record<string, { flipX: number; flipY: number; sourceY: number; angle: number }> = {
+  "top-right": { flipX: 0, flipY: 0, sourceY: -0.5, angle: 0.785398 },
+  "top-left": { flipX: 1, flipY: 0, sourceY: -0.5, angle: 0.785398 },
+  "bottom-right": { flipX: 0, flipY: 1, sourceY: -0.5, angle: 0.785398 },
+  "bottom-left": { flipX: 1, flipY: 1, sourceY: -0.5, angle: 0.785398 },
+  "middle-right": { flipX: 0, flipY: 0, sourceY: 0.5, angle: 3.141593 },
+  "middle-left": { flipX: 1, flipY: 0, sourceY: 0.5, angle: 3.141593 },
+};
+const { flipX, flipY, sourceY, angle } = originConfig[origin] ?? originConfig["top-right"];
+---
+
+<div
+  class="siderays absolute inset-0 h-full w-full overflow-hidden"
+  data-speed={speed}
+  data-c1={rayColor1}
+  data-c2={rayColor2}
+  data-intensity={intensity}
+  data-spread={spread}
+  data-saturation={saturation}
+  data-blend={blend}
+  data-falloff={falloff}
+  data-opacity={opacity}
+  data-flipx={flipX}
+  data-flipy={flipY}
+  data-sourcey={sourceY}
+  data-angle={angle}
+  aria-hidden="true"
+></div>
+
+<script>
+  import { Renderer, Program, Triangle, Mesh } from "ogl";
+
+  const hexToRgb = (hex: string): [number, number, number] => {
+    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return m
+      ? [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255]
+      : [1, 1, 1];
+  };
+
+  const vert = `
+attribute vec2 position;
+void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
+
+  const frag = `
+precision highp float;
+uniform float iTime;
+uniform vec2 iResolution;
+uniform float iSpeed;
+uniform vec3 iRayColor1;
+uniform vec3 iRayColor2;
+uniform float iIntensity;
+uniform float iSpread;
+uniform float iFlipX;
+uniform float iFlipY;
+uniform float iSourceY;
+uniform float iBaseAngle;
+uniform float iSaturation;
+uniform float iBlend;
+uniform float iFalloff;
+uniform float iOpacity;
+
+float rayStrength(vec2 raySource, vec2 rayRefDirection, vec2 coord, float seedA, float seedB, float speed) {
+  vec2 sourceToCoord = coord - raySource;
+  float cosAngle = dot(normalize(sourceToCoord), rayRefDirection);
+  return clamp(
+    (0.45 + 0.15 * sin(cosAngle * seedA + iTime * speed)) +
+    (0.3 + 0.2 * cos(-cosAngle * seedB + iTime * speed)),
+    0.0, 1.0) *
+    clamp((iResolution.x - length(sourceToCoord)) / iResolution.x, 0.5, 1.0);
+}
+
+void main() {
+  vec2 fragCoord = gl_FragCoord.xy;
+  if (iFlipX > 0.5) fragCoord.x = iResolution.x - fragCoord.x;
+  if (iFlipY > 0.5) fragCoord.y = iResolution.y - fragCoord.y;
+  vec2 coord = vec2(fragCoord.x, iResolution.y - fragCoord.y);
+  vec2 rayPos = vec2(iResolution.x * 1.1, iSourceY * iResolution.y);
+  float tiltRad = 0.0;
+  float cs = cos(tiltRad);
+  float sn = sin(tiltRad);
+  vec2 rel = coord - rayPos;
+  vec2 tiltedCoord = vec2(rel.x * cs - rel.y * sn, rel.x * sn + rel.y * cs) + rayPos;
+  float halfSpread = iSpread * 0.275;
+  vec2 rayRefDir1 = normalize(vec2(cos(iBaseAngle + halfSpread), sin(iBaseAngle + halfSpread)));
+  vec2 rayRefDir2 = normalize(vec2(cos(iBaseAngle - halfSpread), sin(iBaseAngle - halfSpread)));
+  vec4 rays1 = vec4(iRayColor1, 1.0) * rayStrength(rayPos, rayRefDir1, tiltedCoord, 36.2214, 21.11349, iSpeed);
+  vec4 rays2 = vec4(iRayColor2, 1.0) * rayStrength(rayPos, rayRefDir2, tiltedCoord, 22.3991, 18.0234, iSpeed * 0.2);
+  vec4 color = rays1 * (1.0 - iBlend) * 0.9 + rays2 * iBlend * 0.9;
+  float distanceToLight = length(fragCoord.xy - vec2(rayPos.x, iResolution.y - rayPos.y)) / iResolution.y;
+  float brightness = iIntensity * 0.4 / pow(max(distanceToLight, 0.001), iFalloff);
+  color.rgb *= brightness;
+  float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+  color.rgb = mix(vec3(gray), color.rgb, iSaturation);
+  color.a = max(color.r, max(color.g, color.b)) * iOpacity;
+  gl_FragColor = color;
+}`;
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const containers = document.querySelectorAll<HTMLElement>(".siderays");
+
+  containers.forEach((container) => {
+    if (reduce) return;
+
+    const uniforms = {
+      iTime: { value: 0 },
+      iResolution: { value: [1, 1] as number[] },
+      iSpeed: { value: Number(container.dataset.speed) },
+      iRayColor1: { value: hexToRgb(container.dataset.c1 ?? "#ffffff") },
+      iRayColor2: { value: hexToRgb(container.dataset.c2 ?? "#ffffff") },
+      iIntensity: { value: Number(container.dataset.intensity) },
+      iSpread: { value: Number(container.dataset.spread) },
+      iFlipX: { value: Number(container.dataset.flipx) },
+      iFlipY: { value: Number(container.dataset.flipy) },
+      iSourceY: { value: Number(container.dataset.sourcey) },
+      iBaseAngle: { value: Number(container.dataset.angle) },
+      iSaturation: { value: Number(container.dataset.saturation) },
+      iBlend: { value: Number(container.dataset.blend) },
+      iFalloff: { value: Number(container.dataset.falloff) },
+      iOpacity: { value: Number(container.dataset.opacity) },
+    };
+
+    let renderer: Renderer | null = null;
+    let mesh: Mesh | null = null;
+    let raf = 0;
+    let started = false;
+    let paused = true;
+
+    const updateSize = () => {
+      if (!renderer) return;
+      renderer.dpr = Math.min(window.devicePixelRatio, 2);
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w === 0 || h === 0) return;
+      renderer.setSize(w, h);
+      uniforms.iResolution.value = [w * renderer.dpr, h * renderer.dpr];
+    };
+
+    const init = () => {
+      if (renderer) return;
+      renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio, 2), alpha: true });
+      const gl = renderer.gl;
+      gl.canvas.style.width = "100%";
+      gl.canvas.style.height = "100%";
+      container.appendChild(gl.canvas);
+      const geometry = new Triangle(gl);
+      const program = new Program(gl, { vertex: vert, fragment: frag, uniforms });
+      mesh = new Mesh(gl, { geometry, program });
+      window.addEventListener("resize", updateSize);
+      updateSize();
+    };
+
+    const loop = (t: number) => {
+      if (!renderer || !mesh) return;
+      if (!paused) {
+        uniforms.iTime.value = t * 0.001;
+        renderer.render({ scene: mesh });
+      }
+      raf = requestAnimationFrame(loop);
+    };
+
+    const start = () => {
+      if (!started) {
+        init();
+        started = true;
+      }
+      paused = false;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(loop);
+    };
+
+    const stop = () => {
+      paused = true;
+      cancelAnimationFrame(raf);
+    };
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) start();
+        else stop();
+      },
+      { threshold: 0.01 }
+    );
+    io.observe(container);
+
+    if (document.fonts?.ready) document.fonts.ready.then(updateSize);
+  });
+</script>

@@ -1,0 +1,42 @@
+rules_version = '2';
+
+// Server code uses the Firebase Admin SDK and bypasses these rules entirely.
+// These rules only constrain BROWSER clients. The design keeps all payment and
+// auth-code writes server-side, so clients get read-only access to their own
+// credit document and nothing else.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownEmail(normalized) {
+      return signedIn()
+        && request.auth.token.email != null
+        && request.auth.token.email.lower() == normalized;
+    }
+
+    // A user may read only their own credit document (matched by the stored
+    // normalizedEmail, so no fragile emailKey reconstruction in rules).
+    match /customerCredits/{emailKey} {
+      allow get: if ownEmail(resource.data.normalizedEmail);
+      allow list, create, update, delete: if false;
+    }
+
+    // One-time extension codes are created/consumed only by server APIs.
+    match /extensionAuthCodes/{emailKey} {
+      allow read, write: if false;
+    }
+
+    // Payment webhook audit log — server-only.
+    match /polarEvents/{eventId} {
+      allow read, write: if false;
+    }
+
+    // Deny everything else by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

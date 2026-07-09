@@ -1,0 +1,139 @@
+---
+import Base from "../../layouts/Base.astro";
+
+export const prerender = false;
+---
+
+<Base title="Your extension code · BeUniq">
+  <main class="mx-auto flex min-h-screen max-w-md flex-col justify-center px-5 py-16">
+    <a href="/" class="text-lg font-bold tracking-tight">BeUniq</a>
+    <p class="mt-2 font-mono text-xs text-muted">One-time extension code</p>
+
+    <div class="mt-8 border border-ink p-6 sm:p-8">
+      <p id="signed-in" class="hidden font-mono text-xs text-muted"></p>
+
+      <div id="loading" class="py-8 text-center text-sm text-muted">
+        Generating your code…
+      </div>
+
+      <div id="code-wrap" class="hidden">
+        <p class="text-sm text-ink-70">
+          Paste this code into the BeUniq extension to connect your account.
+        </p>
+        <div
+          id="code"
+          class="mt-4 select-all border border-ink px-4 py-6 text-center font-mono text-4xl font-bold tracking-[0.3em]"
+        >
+          ······
+        </div>
+        <p id="expiry" class="mt-3 font-mono text-xs text-muted">
+          Expires in 10 minutes.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button
+            id="copy-btn"
+            class="inline-flex min-h-11 items-center justify-center bg-ink px-6 text-sm font-medium text-paper transition-opacity duration-150 hover:opacity-80"
+          >
+            Copy code
+          </button>
+          <button
+            id="regen-btn"
+            class="inline-flex min-h-11 items-center justify-center border border-ink px-6 text-sm font-medium text-ink transition-colors duration-150 hover:bg-ink hover:text-paper"
+          >
+            New code
+          </button>
+        </div>
+      </div>
+
+      <p id="error" class="hidden text-sm text-ink" role="status"></p>
+
+      <button
+        id="signout-btn"
+        class="mt-6 font-mono text-xs text-muted underline underline-offset-4 hover:text-ink"
+      >
+        Sign out
+      </button>
+    </div>
+  </main>
+</Base>
+
+<script>
+  import { getFirebaseAuth } from "../../lib/firebase";
+  import { onAuthStateChanged, signOut } from "firebase/auth";
+
+  const auth = getFirebaseAuth();
+  const $ = (id: string) => document.getElementById(id)!;
+  const loading = $("loading");
+  const codeWrap = $("code-wrap");
+  const codeEl = $("code");
+  const errorEl = $("error");
+  const signedInEl = $("signed-in");
+  const copyBtn = $("copy-btn") as HTMLButtonElement;
+  const regenBtn = $("regen-btn") as HTMLButtonElement;
+  const signoutBtn = $("signout-btn") as HTMLButtonElement;
+
+  function showError(msg: string) {
+    loading.classList.add("hidden");
+    codeWrap.classList.add("hidden");
+    errorEl.textContent = msg;
+    errorEl.classList.remove("hidden");
+  }
+
+  async function fetchCode() {
+    const user = auth.currentUser;
+    if (!user) {
+      window.location.assign("/extension/authorize");
+      return;
+    }
+    await user.reload();
+    if (!user.emailVerified) {
+      window.location.assign("/extension/authorize");
+      return;
+    }
+    signedInEl.textContent = `Signed in as ${user.email}`;
+    signedInEl.classList.remove("hidden");
+
+    loading.classList.remove("hidden");
+    codeWrap.classList.add("hidden");
+    errorEl.classList.add("hidden");
+    try {
+      const idToken = await user.getIdToken();
+      const res = await fetch("/api/extension-auth/code", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      const data = await res.json();
+      codeEl.textContent = data.code;
+      loading.classList.add("hidden");
+      codeWrap.classList.remove("hidden");
+    } catch {
+      showError("Could not generate a code. Please refresh and try again.");
+    }
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.assign("/extension/authorize");
+    } else {
+      fetchCode();
+    }
+  });
+
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(codeEl.textContent?.trim() ?? "");
+      copyBtn.textContent = "Copied";
+      setTimeout(() => (copyBtn.textContent = "Copy code"), 1500);
+    } catch {
+      copyBtn.textContent = "Press to select";
+    }
+  });
+
+  regenBtn.addEventListener("click", () => fetchCode());
+
+  signoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.assign("/extension/authorize");
+  });
+</script>

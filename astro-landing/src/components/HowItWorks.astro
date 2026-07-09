@@ -1,0 +1,430 @@
+---
+import { CTA_URL } from "../consts";
+import LandingRays from "./LandingRays.astro";
+
+const steps = [
+  {
+    num: "01",
+    title: "Make a screenshot",
+    body: "Select the exact part of the interface you want BeUniq to review.",
+    src: "/videos/choose-area.mp4",
+    label: "Selecting a screenshot region",
+  },
+  {
+    num: "02",
+    title: "Open the extension",
+    body: "Launch BeUniq on the page you are building and send the capture.",
+    src: "/videos/open-extension.mp4",
+    label: "Opening the BeUniq extension",
+  },
+  {
+    num: "03",
+    title: "View the report",
+    body: "Read practical design fixes for the selected screen area.",
+    src: "/videos/view-report.mp4",
+    label: "Viewing the design analysis report",
+  },
+];
+---
+
+<section id="how-it-works" class="relative overflow-hidden">
+  <LandingRays
+    side="left"
+    width="min(86vw, 980px)"
+    offset="-7%"
+    opacity={0.92}
+    intensity={1.8}
+    spread={2.35}
+    falloff={1.45}
+    speed={1.08}
+    blend={0.36}
+  />
+  <div class="relative z-10 mx-auto max-w-5xl px-5 py-12 sm:px-8 sm:py-20">
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h2
+          data-reveal
+          class="max-w-3xl text-3xl font-bold leading-tight tracking-tight sm:text-5xl"
+        >
+          How it works
+        </h2>
+        <p
+          data-reveal
+          style="--reveal-delay: 0.08s"
+          class="mt-5 max-w-2xl text-lg leading-relaxed text-ink-70"
+        >
+          Three short clips play one after another: capture the screen, open the
+          extension, then read the report.
+        </p>
+      </div>
+
+      <a
+        href={CTA_URL}
+        data-reveal
+        style="--reveal-delay: 0.12s"
+        class="inline-flex min-h-11 items-center justify-center bg-ink px-5 text-sm font-medium text-paper transition-opacity duration-150 hover:opacity-80"
+      >
+        Analyze your first screen
+      </a>
+    </div>
+
+    <div
+      class="hiw-carousel mt-8"
+      data-hiw-carousel
+      data-reveal
+      style="--reveal-delay: 0.16s"
+    >
+      <div class="hiw-window">
+        <div class="hiw-track" data-hiw-track>
+          {
+            steps.map((s, i) => (
+              <article
+                class="hiw-slide"
+                data-hiw-slide
+                role="tabpanel"
+                aria-labelledby={`hiw-tab-${i}`}
+              >
+                <div class="hiw-media">
+                  <video
+                    class="hiw-video"
+                    src={s.src}
+                    muted
+                    playsinline
+                    preload="metadata"
+                    aria-label={s.label}
+                  />
+                </div>
+                <div class="hiw-copy">
+                  <span class="font-mono text-xs text-muted">{s.num}</span>
+                  <h3 class="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+                    {s.title}
+                  </h3>
+                  <p class="mt-3 max-w-xl text-sm leading-relaxed text-ink-70">
+                    {s.body}
+                  </p>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="hiw-controls">
+        <div class="hiw-tabs" role="tablist" aria-label="How it works videos">
+          {
+            steps.map((s, i) => (
+              <button
+                id={`hiw-tab-${i}`}
+                class="hiw-tab"
+                type="button"
+                role="tab"
+                aria-selected={i === 0 ? "true" : "false"}
+                data-hiw-tab={i}
+              >
+                <span class="font-mono text-xs text-muted">{s.num}</span>
+                <span class="hiw-tab-title">{s.title}</span>
+                <span class="hiw-tab-progress" aria-hidden="true">
+                  <span></span>
+                </span>
+              </button>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-hiw-carousel]").forEach((root) => {
+    const track = root.querySelector<HTMLElement>("[data-hiw-track]");
+    const slides = Array.from(root.querySelectorAll<HTMLElement>("[data-hiw-slide]"));
+    const videos = Array.from(root.querySelectorAll<HTMLVideoElement>(".hiw-video"));
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-hiw-tab]"));
+    const progressBars = tabs.map((tab) =>
+      tab.querySelector<HTMLElement>(".hiw-tab-progress span")
+    );
+
+    if (!track || !slides.length || !videos.length || !tabs.length) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let active = 0;
+    let inView = false;
+    let progressRaf = 0;
+
+    function carouselIsVisible() {
+      const rect = root.getBoundingClientRect();
+      const visible = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+      return visible > Math.min(rect.height * 0.18, 160);
+    }
+
+    function positionTrack() {
+      const offset = slides[active]?.offsetLeft ?? 0;
+      track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+    }
+
+    function pauseAll(resetInactive = false) {
+      videos.forEach((video, i) => {
+        video.pause();
+        if (resetInactive && i !== active) {
+          video.currentTime = 0;
+          if (progressBars[i]) progressBars[i]!.style.transform = "scaleX(0)";
+        }
+      });
+    }
+
+    function stopProgressLoop() {
+      cancelAnimationFrame(progressRaf);
+      progressRaf = 0;
+    }
+
+    function playActive() {
+      if (reduceMotion.matches || !inView) return;
+      const video = videos[active];
+      if (!video) return;
+      video.play().catch(() => {});
+      startProgressLoop();
+    }
+
+    function setActive(next: number, shouldPlay = true) {
+      active = (next + slides.length) % slides.length;
+      root.dataset.active = String(active);
+
+      slides.forEach((slide, i) => {
+        slide.toggleAttribute("data-active", i === active);
+      });
+
+      tabs.forEach((tab, i) => {
+        tab.setAttribute("aria-selected", String(i === active));
+      });
+
+      pauseAll(true);
+      positionTrack();
+      tabs[active]?.scrollIntoView({
+        behavior: reduceMotion.matches ? "auto" : "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+
+      if (shouldPlay) playActive();
+      else updateProgress(videos[active], active);
+    }
+
+    function updateProgress(video: HTMLVideoElement, index: number) {
+      const bar = progressBars[index];
+      if (!bar || !Number.isFinite(video.duration) || video.duration <= 0) return;
+      const progress = Math.min(1, video.currentTime / video.duration);
+      bar.style.transform = `scaleX(${progress})`;
+    }
+
+    function startProgressLoop() {
+      if (progressRaf) return;
+      const tick = () => {
+        updateProgress(videos[active], active);
+        progressRaf = requestAnimationFrame(tick);
+      };
+      progressRaf = requestAnimationFrame(tick);
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        setActive(Number(tab.dataset.hiwTab ?? 0), true);
+      });
+    });
+
+    videos.forEach((video, i) => {
+      video.addEventListener("ended", () => {
+        if (i === active) setActive(active + 1, true);
+      });
+      video.addEventListener("timeupdate", () => updateProgress(video, i));
+    });
+
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          inView = Boolean(entry?.isIntersecting) || carouselIsVisible();
+          if (inView) playActive();
+          else {
+            stopProgressLoop();
+            pauseAll(false);
+          }
+        },
+        { threshold: 0.18 }
+      );
+      io.observe(root);
+    } else {
+      inView = true;
+    }
+
+    reduceMotion.addEventListener("change", () => {
+      if (reduceMotion.matches) {
+        stopProgressLoop();
+        pauseAll(false);
+      } else playActive();
+    });
+
+    window.addEventListener(
+      "resize",
+      () => {
+        positionTrack();
+        inView = carouselIsVisible();
+        if (inView) playActive();
+      },
+      { passive: true }
+    );
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(positionTrack).observe(root);
+    }
+
+    setActive(0, false);
+    inView = carouselIsVisible();
+    playActive();
+  });
+</script>
+
+<style>
+  .hiw-carousel {
+    overflow: hidden;
+  }
+
+  .hiw-window {
+    overflow: hidden;
+  }
+
+  .hiw-track {
+    display: flex;
+    gap: clamp(10px, 1.4vw, 16px);
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+
+  .hiw-slide {
+    flex: 0 0 min(72%, 700px);
+    opacity: 0.45;
+    transition: opacity 0.45s ease;
+  }
+
+  .hiw-slide[data-active] {
+    opacity: 1;
+  }
+
+  .hiw-media {
+    aspect-ratio: 16 / 7;
+    border: 1px solid rgb(255 255 255 / 0.28);
+    overflow: hidden;
+    background: #070707;
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.08),
+      0 0 0 1px rgb(115 115 115 / 0.18);
+  }
+
+  .hiw-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hiw-copy {
+    min-height: 96px;
+    padding: clamp(14px, 1.8vw, 20px);
+  }
+
+  .hiw-controls {
+    margin-top: 14px;
+  }
+
+  .hiw-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border: 1px solid var(--color-rule);
+    scrollbar-width: none;
+  }
+
+  .hiw-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hiw-tab {
+    position: relative;
+    min-height: 56px;
+    border-right: 1px solid var(--color-rule);
+    padding: 10px 12px 15px;
+    text-align: left;
+    color: var(--color-ink);
+    opacity: 0.52;
+    transition:
+      background-color 0.2s ease,
+      opacity 0.2s ease;
+  }
+
+  .hiw-tab:last-child {
+    border-right: 0;
+  }
+
+  .hiw-tab[aria-selected="true"] {
+    background: rgb(255 255 255 / 0.04);
+    opacity: 1;
+  }
+
+  .hiw-tab-title {
+    display: block;
+    margin-top: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .hiw-tab-progress {
+    position: absolute;
+    inset-inline: 12px;
+    bottom: 8px;
+    height: 2px;
+    overflow: hidden;
+    background: var(--color-rule);
+  }
+
+  .hiw-tab-progress span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(0);
+    transform-origin: left;
+    background: var(--color-ink);
+    will-change: transform;
+  }
+
+  @media (max-width: 760px) {
+    .hiw-track {
+      gap: 8px;
+    }
+
+    .hiw-slide {
+      flex-basis: 100%;
+    }
+
+    .hiw-copy {
+      min-height: 92px;
+      padding: 14px;
+    }
+
+    .hiw-tabs {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+
+    .hiw-tab {
+      min-width: 56%;
+      scroll-snap-align: start;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hiw-track,
+    .hiw-slide,
+    .hiw-tab {
+      transition: none;
+    }
+  }
+</style>

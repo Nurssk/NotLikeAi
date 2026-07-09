@@ -2,7 +2,19 @@
 .env.*
 !.env.example
 
+# dependencies
 node_modules/
+
+# build/cache output
 dist/
 .astro/
 .vercel/
+
+# local tooling artifacts
+.playwright-cli/
+.playwright-mcp/
+.codex-*.png
+*.log
+
+# OS/editor
+.DS_Store

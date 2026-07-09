@@ -1,0 +1,233 @@
+---
+interface Props {
+  height?: number;
+  baseWidth?: number;
+  animationType?: "rotate" | "hover" | "3drotate";
+  glow?: number;
+  noise?: number;
+  transparent?: boolean;
+  scale?: number;
+  hueShift?: number;
+  colorFrequency?: number;
+  timeScale?: number;
+  suspendWhenOffscreen?: boolean;
+}
+
+const {
+  height = 3.5,
+  baseWidth = 5.5,
+  animationType = "rotate",
+  glow = 1,
+  noise = 0.5,
+  transparent = true,
+  scale = 3.6,
+  hueShift = 0,
+  colorFrequency = 1,
+  timeScale = 0.5,
+  suspendWhenOffscreen = false,
+} = Astro.props;
+---
+
+<div
+  class="prism-wrap"
+  data-h={height}
+  data-bw={baseWidth}
+  data-anim={animationType}
+  data-glow={glow}
+  data-noise={noise}
+  data-alpha={transparent ? "1" : "0"}
+  data-scale={scale}
+  data-hue={hueShift}
+  data-cfreq={colorFrequency}
+  data-ts={timeScale}
+  data-suspend={suspendWhenOffscreen ? "1" : "0"}
+>
+</div>
+
+<script>
+  import { Renderer, Triangle, Program, Mesh } from "ogl";
+
+  document.querySelectorAll<HTMLElement>(".prism-wrap").forEach((el) => {
+    const H = Math.max(0.001, parseFloat(el.dataset.h || "3.5"));
+    const BW = Math.max(0.001, parseFloat(el.dataset.bw || "5.5"));
+    const BASE_HALF = BW * 0.5;
+    const GLOW = Math.max(0, parseFloat(el.dataset.glow || "1"));
+    const NOISE = Math.max(0, parseFloat(el.dataset.noise || "0.5"));
+    const transparent = el.dataset.alpha === "1";
+    const SAT = transparent ? 1.5 : 1;
+    const SCALE = Math.max(0.001, parseFloat(el.dataset.scale || "3.6"));
+    const HUE = parseFloat(el.dataset.hue || "0");
+    const CFREQ = Math.max(0, parseFloat(el.dataset.cfreq || "1"));
+    const TS = Math.max(0, parseFloat(el.dataset.ts || "0.5"));
+    const animType = el.dataset.anim || "rotate";
+    const suspend = el.dataset.suspend === "1";
+
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const renderer = new Renderer({ dpr, alpha: transparent, antialias: false });
+    const gl = renderer.gl;
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.CULL_FACE);
+    gl.disable(gl.BLEND);
+
+    const canvas = gl.canvas as HTMLCanvasElement;
+    canvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;display:block;";
+    el.appendChild(canvas);
+
+    const vertex = `attribute vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}`;
+
+    const fragment = `
+      precision highp float;
+      uniform vec2 iResolution;uniform float iTime;
+      uniform float uHeight,uBaseHalf,uGlow,uNoise,uSaturation,uScale;
+      uniform float uHueShift,uColorFreq,uBloom,uCenterShift;
+      uniform float uInvBaseHalf,uInvHeight,uMinAxis,uPxScale,uTimeScale;
+      uniform mat3 uRot;uniform int uUseBaseWobble;uniform vec2 uOffsetPx;
+
+      vec4 tanh4(vec4 x){vec4 e2x=exp(2.0*x);return(e2x-1.0)/(e2x+1.0);}
+      float rand(vec2 co){return fract(sin(dot(co,vec2(12.9898,78.233)))*43758.5453);}
+      float sdOctaAnisoInv(vec3 p){vec3 q=vec3(abs(p.x)*uInvBaseHalf,abs(p.y)*uInvHeight,abs(p.z)*uInvBaseHalf);float m=q.x+q.y+q.z-1.0;return m*uMinAxis*0.57735027;}
+      float sdPyramidUpInv(vec3 p){return max(sdOctaAnisoInv(p),-p.y);}
+      mat3 hueRot(float a){float c=cos(a),s=sin(a);return mat3(.299,.587,.114,.299,.587,.114,.299,.587,.114)+mat3(.701,-.587,-.114,-.299,.413,-.114,-.300,-.588,.886)*c+mat3(.168,-.331,.500,.328,.035,-.500,-.497,.296,.201)*s;}
+
+      void main(){
+        vec2 f=(gl_FragCoord.xy-0.5*iResolution.xy-uOffsetPx)*uPxScale;
+        float z=5.0,d;vec3 p;vec4 o=vec4(0.0);
+        mat2 wob=mat2(1.0);
+        if(uUseBaseWobble==1){float t=iTime*uTimeScale;wob=mat2(cos(t),cos(t+33.0),cos(t+11.0),cos(t));}
+        for(int i=0;i<60;i++){p=vec3(f,z);p.xz*=wob;p=uRot*p;vec3 q=p;q.y+=uCenterShift;d=0.1+0.2*abs(sdPyramidUpInv(q));z-=d;float v=(sin((p.y+z)*uColorFreq)+1.0)/d;o+=vec4(v,v,v,v);}
+        o=tanh4(o*o*(uGlow*uBloom)/1e5);
+        vec3 col=o.rgb;col+=(rand(gl_FragCoord.xy+vec2(iTime))-0.5)*uNoise;col=clamp(col,0.0,1.0);
+        float L=dot(col,vec3(.2126,.7152,.0722));col=clamp(mix(vec3(L),col,uSaturation),0.0,1.0);
+        if(abs(uHueShift)>0.0001)col=clamp(hueRot(uHueShift)*col,0.0,1.0);
+        gl_FragColor=vec4(col,o.a);
+      }
+    `;
+
+    const geometry = new Triangle(gl);
+    const iResBuf = new Float32Array(2);
+    const offsetPxBuf = new Float32Array([0, 0]);
+
+    const program = new Program(gl, {
+      vertex,
+      fragment,
+      uniforms: {
+        iResolution: { value: iResBuf },
+        iTime: { value: 0 },
+        uHeight: { value: H },
+        uBaseHalf: { value: BASE_HALF },
+        uUseBaseWobble: { value: animType === "rotate" ? 1 : 0 },
+        uRot: { value: new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]) },
+        uGlow: { value: GLOW },
+        uOffsetPx: { value: offsetPxBuf },
+        uNoise: { value: NOISE },
+        uSaturation: { value: SAT },
+        uScale: { value: SCALE },
+        uHueShift: { value: HUE },
+        uColorFreq: { value: CFREQ },
+        uBloom: { value: 1 },
+        uCenterShift: { value: H * 0.25 },
+        uInvBaseHalf: { value: 1 / BASE_HALF },
+        uInvHeight: { value: 1 / H },
+        uMinAxis: { value: Math.min(BASE_HALF, H) },
+        uPxScale: { value: 1 },
+        uTimeScale: { value: TS },
+      },
+    });
+    const mesh = new Mesh(gl, { geometry, program });
+
+    let w = 1, ht = 1;
+    const resize = () => {
+      w = el.clientWidth || 1;
+      ht = el.clientHeight || 1;
+      renderer.setSize(w, ht);
+      iResBuf[0] = gl.drawingBufferWidth;
+      iResBuf[1] = gl.drawingBufferHeight;
+      program.uniforms.uPxScale.value = 1 / (gl.drawingBufferHeight * 0.1 * SCALE);
+    };
+
+    requestAnimationFrame(() => {
+      resize();
+      const ro = new ResizeObserver(resize);
+      ro.observe(el);
+
+      const rotBuf = new Float32Array(9);
+      const setMat3 = (yaw: number, pitch: number, roll: number, out: Float32Array) => {
+        const cy = Math.cos(yaw), sy = Math.sin(yaw);
+        const cx = Math.cos(pitch), sx = Math.sin(pitch);
+        const cz = Math.cos(roll), sz = Math.sin(roll);
+        out[0] = cy * cz + sy * sx * sz; out[1] = cx * sz; out[2] = -sy * cz + cy * sx * sz;
+        out[3] = -cy * sz + sy * sx * cz; out[4] = cx * cz; out[5] = sy * sz + cy * sx * cz;
+        out[6] = sy * cx; out[7] = -sx; out[8] = cy * cx;
+        return out;
+      };
+
+      let raf = 0;
+      const t0 = performance.now();
+      const start = () => { if (!raf) raf = requestAnimationFrame(render); };
+
+      const rnd = () => Math.random();
+      const wX = 0.3 + rnd() * 0.6, wY = 0.2 + rnd() * 0.7, wZ = 0.1 + rnd() * 0.5;
+      const phX = rnd() * Math.PI * 2, phZ = rnd() * Math.PI * 2;
+
+      let yaw = 0, pitch = 0, roll = 0, targetYaw = 0, targetPitch = 0;
+      const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+      const pointer = { x: 0, y: 0, inside: true };
+
+      let onMove: ((e: PointerEvent) => void) | null = null;
+      if (animType === "hover") {
+        onMove = (e: PointerEvent) => {
+          const ww = Math.max(1, window.innerWidth);
+          const wh = Math.max(1, window.innerHeight);
+          pointer.x = Math.max(-1, Math.min(1, (e.clientX - ww * 0.5) / (ww * 0.5)));
+          pointer.y = Math.max(-1, Math.min(1, (e.clientY - wh * 0.5) / (wh * 0.5)));
+          pointer.inside = true;
+          start();
+        };
+        window.addEventListener("pointermove", onMove, { passive: true });
+        window.addEventListener("mouseleave", () => { pointer.inside = false; });
+      }
+
+      const render = (t: number) => {
+        program.uniforms.iTime.value = (t - t0) * 0.001;
+
+        if (animType === "hover") {
+          targetYaw = (pointer.inside ? -pointer.x : 0) * 0.6;
+          targetPitch = (pointer.inside ? pointer.y : 0) * 0.6;
+          yaw = lerp(yaw, targetYaw, 0.05);
+          pitch = lerp(pitch, targetPitch, 0.05);
+          roll = lerp(roll, 0, 0.1);
+          program.uniforms.uRot.value = setMat3(yaw, pitch, roll, rotBuf);
+        } else if (animType === "3drotate") {
+          const ts = (t - t0) * 0.001 * TS;
+          yaw = ts * wY;
+          pitch = Math.sin(ts * wX + phX) * 0.6;
+          roll = Math.sin(ts * wZ + phZ) * 0.5;
+          program.uniforms.uRot.value = setMat3(yaw, pitch, roll, rotBuf);
+        }
+
+        renderer.render({ scene: mesh });
+        raf = requestAnimationFrame(render);
+      };
+
+      if (suspend) {
+        const io = new IntersectionObserver((entries) => {
+          entries.some((e) => e.isIntersecting) ? start() : stop();
+        });
+        io.observe(el);
+      }
+      start();
+    });
+  });
+</script>
+
+<style>
+  .prism-wrap {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: var(--color-paper);
+  }
+</style>

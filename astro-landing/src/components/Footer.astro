@@ -1,0 +1,149 @@
+---
+import { CTA_URL } from "../consts";
+
+const links = [
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "FAQ", href: "/faq" },
+];
+
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-paper">
+  <div class="mx-auto max-w-6xl px-5 py-14 sm:px-8">
+    <div class="grid gap-10 sm:grid-cols-12">
+      <div class="sm:col-span-7">
+        <a href="#top" class="text-lg font-bold tracking-tight">BeUniq</a>
+        <p class="mt-4 max-w-sm text-base leading-relaxed text-ink-70">
+          A Chrome extension that reviews the interface you are building and
+          tells you what makes it feel generated. Built for AI app builders.
+        </p>
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          <a
+            href={CTA_URL}
+            class="inline-flex min-h-11 items-center bg-ink px-4 text-sm font-medium text-paper transition-opacity duration-150 hover:opacity-80"
+          >
+            Add to Chrome
+          </a>
+          <a
+            href="mailto:sarsennbaj.n@gmail.com"
+            class="inline-flex min-h-11 items-center px-1 text-sm text-ink transition-opacity duration-150 hover:opacity-60"
+          >
+            <span class="draw-link">Contact</span>
+          </a>
+        </div>
+      </div>
+
+      <nav class="sm:col-span-5">
+        <p class="mb-2 text-xs text-muted">On this page</p>
+        <ul>
+          {
+            links.map((l) => (
+              <li class="border-t border-rule">
+                <a
+                  href={l.href}
+                  class="flex min-h-11 items-center text-sm text-ink transition-opacity duration-150 hover:opacity-60"
+                >
+                  {l.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+
+    <div class="footer-peeps mt-12" aria-hidden="true">
+      <div class="footer-peeps-track">
+        <img
+          src="/images/peeps/all-peeps.png"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          src="/images/peeps/all-peeps.png"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+
+    <div class="mt-8 border-t border-rule pt-6">
+      <p class="text-sm text-muted">© {year} BeUniq. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer-peeps {
+    position: relative;
+    height: clamp(150px, 18vw, 230px);
+    overflow: hidden;
+    border-block: 1px solid var(--color-rule);
+    background: #000;
+  }
+
+  .footer-peeps::before,
+  .footer-peeps::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    width: min(18vw, 160px);
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .footer-peeps::before {
+    left: 0;
+    background: linear-gradient(to right, #000, transparent);
+  }
+
+  .footer-peeps::after {
+    right: 0;
+    background: linear-gradient(to left, #000, transparent);
+  }
+
+  .footer-peeps-track {
+    display: flex;
+    width: max-content;
+    height: 100%;
+    animation: footer-peeps-scroll 42s linear infinite;
+    will-change: transform;
+  }
+
+  .footer-peeps-track img {
+    width: min(1360px, 210vw);
+    height: 100%;
+    flex: 0 0 auto;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.92;
+  }
+
+  @keyframes footer-peeps-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .footer-peeps-track {
+      animation: none;
+      transform: translateX(-18%);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .footer-peeps {
+      height: 136px;
+    }
+
+    .footer-peeps-track img {
+      width: 920px;
+    }
+  }
+</style>

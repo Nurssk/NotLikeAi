@@ -1,0 +1,141 @@
+---
+import SideRays from "./SideRays.astro";
+
+interface Props {
+  side?: "left" | "right";
+  width?: string;
+  offset?: string;
+  opacity?: number;
+  intensity?: number;
+  spread?: number;
+  falloff?: number;
+  speed?: number;
+  blend?: number;
+}
+
+const {
+  side = "right",
+  width = "min(72vw, 840px)",
+  offset = "0px",
+  opacity = 0.8,
+  intensity = 1.45,
+  spread = 1.75,
+  falloff = 1.65,
+  speed = 1.35,
+  blend = 0.45,
+} = Astro.props;
+const origin = side === "left" ? "middle-left" : "middle-right";
+---
+
+<div
+  class:list={["landing-rays", `landing-rays-${side}`]}
+  style={`--ray-width: ${width}; --ray-offset: ${offset}; --ray-opacity: ${opacity};`}
+  aria-hidden="true"
+>
+  <div class:list={["landing-rays-inner", `landing-rays-inner-${side}`]}>
+    <SideRays
+      origin={origin}
+      speed={speed}
+      rayColor1="#ffffff"
+      rayColor2="#ffffff"
+      intensity={intensity}
+      spread={spread}
+      saturation={0}
+      blend={blend}
+      falloff={falloff}
+      opacity={0.32}
+    />
+  </div>
+</div>
+
+<style>
+  .landing-rays {
+    position: absolute;
+    top: -56%;
+    bottom: -56%;
+    z-index: 0;
+    width: var(--ray-width);
+    overflow: hidden;
+    pointer-events: none;
+    opacity: var(--ray-opacity);
+    mix-blend-mode: screen;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 30%,
+      #000 42%,
+      #000 58%,
+      transparent 70%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 30%,
+      #000 42%,
+      #000 58%,
+      transparent 70%,
+      transparent 100%
+    );
+  }
+
+  .landing-rays-inner {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    transform: translateY(var(--ray-offset));
+  }
+
+  .landing-rays-left {
+    left: min(-18vw, -180px);
+  }
+
+  .landing-rays-right {
+    right: min(-18vw, -180px);
+  }
+
+  .landing-rays-inner-left {
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 52%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 0%, #000 52%, transparent 100%);
+  }
+
+  .landing-rays-inner-right {
+    -webkit-mask-image: linear-gradient(to left, #000 0%, #000 52%, transparent 100%);
+    mask-image: linear-gradient(to left, #000 0%, #000 52%, transparent 100%);
+  }
+
+  @media (max-width: 760px) {
+    .landing-rays {
+      top: -48%;
+      bottom: -48%;
+      width: 100vw;
+      opacity: calc(var(--ray-opacity) * 0.72);
+      -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 28%,
+        #000 42%,
+        #000 58%,
+        transparent 72%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 28%,
+        #000 42%,
+        #000 58%,
+        transparent 72%,
+        transparent 100%
+      );
+    }
+
+    .landing-rays-left {
+      left: -42vw;
+    }
+
+    .landing-rays-right {
+      right: -42vw;
+    }
+  }
+</style>

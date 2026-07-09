@@ -1,0 +1,68 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "BeUniq · Fix your UI",
+  description = "BeUniq helps turn generic AI-generated interfaces into cleaner, more intentional product screens.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <slot />
+    <script>
+      // Scroll reveal
+      if (
+        !document.hidden &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
+        "IntersectionObserver" in window
+      ) {
+        document.documentElement.classList.add("js-anim");
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.setAttribute("data-shown", "");
+                io.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0, rootMargin: "0px 4000px -120px 4000px" }
+        );
+        document.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
+      }
+
+      // Accordion close animation
+      document.querySelectorAll("details").forEach((d) => {
+        const summary = d.querySelector("summary");
+        if (!summary) return;
+        summary.addEventListener("click", (e) => {
+          if (!d.open) return;
+          e.preventDefault();
+          d.classList.add("closing");
+          setTimeout(() => {
+            d.classList.remove("closing");
+            d.open = false;
+          }, 200);
+        });
+      });
+    </script>
+  </body>
+</html>

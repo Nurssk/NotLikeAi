@@ -1,0 +1,46 @@
+---
+const useCases = [
+  "Landing pages",
+  "SaaS dashboards",
+  "MVP screens",
+  "Chrome extensions",
+  "Internal tools",
+  "Product onboarding",
+  "AI-generated prototypes",
+];
+---
+
+<section class="border-b border-rule">
+  <div class="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-24">
+    <h2
+      data-reveal
+      class="max-w-3xl text-3xl font-bold leading-tight tracking-tight sm:text-5xl"
+    >
+      For people building products faster with AI
+    </h2>
+    <p
+      data-reveal
+      style="--reveal-delay: 0.1s"
+      class="mt-8 max-w-prose text-lg leading-relaxed text-ink-70"
+    >
+      BeUniq is made for developers, indie hackers, no-code builders, students,
+      designers, and startup teams who use AI to create interfaces but still
+      care about the final product.
+    </p>
+
+    <ul class="mt-10 grid border-t border-rule sm:grid-cols-2">
+      {
+        useCases.map((u, i) => (
+          <li
+            data-reveal
+            style={`--reveal-delay: ${i * 0.05}s`}
+            class="flex items-center gap-4 border-b border-rule py-4"
+          >
+            <span class="size-1.5 shrink-0 bg-ink" />
+            <span class="text-lg font-medium tracking-tight">{u}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

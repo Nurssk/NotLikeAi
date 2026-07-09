@@ -1,0 +1,85 @@
+---
+import LandingRays from "./LandingRays.astro";
+
+const featured = {
+  title: "Visual hierarchy",
+  body: "Understand whether users can immediately identify the most important content and action. Hierarchy is the single biggest difference between a screen that feels designed and one that feels generated.",
+};
+
+const compact = [
+  {
+    title: "Spacing and rhythm",
+    body: "Find inconsistent gaps, crowded areas, and sections that feel disconnected.",
+  },
+  {
+    title: "Repetition",
+    body: "Detect repeated cards, containers, and layouts that make the interface feel generated.",
+  },
+  {
+    title: "Calls to action",
+    body: "See whether primary and secondary actions have a clear order.",
+  },
+  {
+    title: "Content grouping",
+    body: "Identify information that belongs together and areas that need stronger separation.",
+  },
+  {
+    title: "Product clarity",
+    body: "Check whether the screen communicates what the product does without extra explanation.",
+  },
+];
+---
+
+<section class="relative overflow-hidden">
+  <LandingRays
+    side="right"
+    width="min(64vw, 720px)"
+    offset="9%"
+    opacity={0.58}
+    intensity={1.18}
+    spread={1.28}
+    falloff={1.95}
+    speed={1.72}
+    blend={0.62}
+  />
+  <div class="relative z-10 mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-24">
+    <h2
+      data-reveal
+      class="max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-5xl"
+    >
+      What BeUniq reviews
+    </h2>
+
+    <!-- Featured: the one that matters most, given dominant weight -->
+    <div data-reveal class="mt-12 border-t border-ink pt-8">
+      <div class="grid gap-6 sm:grid-cols-12 sm:gap-10">
+        <h3
+          class="text-2xl font-bold tracking-tight sm:col-span-5 sm:text-3xl"
+        >
+          {featured.title}
+        </h3>
+        <p class="max-w-prose text-lg leading-relaxed text-ink-70 sm:col-span-7">
+          {featured.body}
+        </p>
+      </div>
+    </div>
+
+    <!-- Compact: supporting checks, quieter and denser -->
+    <dl class="mt-10 grid gap-x-12 sm:grid-cols-2">
+      {
+        compact.map((it, i) => (
+          <div
+            data-reveal
+            style={`--reveal-delay: ${(i % 2) * 0.08}s`}
+            class="border-t border-rule py-5"
+          >
+            <dt class="text-base font-semibold tracking-tight">{it.title}</dt>
+            <dd class="mt-1.5 max-w-sm text-sm leading-relaxed text-ink-70">
+              {it.body}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>

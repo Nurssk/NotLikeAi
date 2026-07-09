@@ -1,0 +1,47 @@
+---
+import { CTA_URL } from "../consts";
+import LandingRays from "./LandingRays.astro";
+---
+
+<section class="relative overflow-hidden bg-paper text-ink">
+  <LandingRays
+    side="left"
+    width="min(70vw, 780px)"
+    offset="6%"
+    opacity={0.62}
+    intensity={1.25}
+    spread={1.45}
+    falloff={1.82}
+    speed={1.48}
+    blend={0.58}
+  />
+  <div class="relative z-10 mx-auto max-w-5xl px-5 py-20 sm:px-8 sm:py-32">
+    <h2
+      data-reveal
+      class="max-w-4xl text-4xl font-bold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl"
+    >
+      Do not ship the first version AI gives you.
+    </h2>
+    <p
+      data-reveal
+      style="--reveal-delay: 0.1s"
+      class="mt-8 max-w-prose text-lg leading-relaxed text-ink/70"
+    >
+      Review your interface, understand what feels generic, and make your
+      product look intentional.
+    </p>
+    <div
+      data-reveal
+      style="--reveal-delay: 0.18s"
+      class="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center"
+    >
+      <a
+        href={CTA_URL}
+        class="inline-flex min-h-12 w-full items-center justify-center bg-ink px-6 text-base font-medium text-paper transition-opacity duration-150 hover:opacity-80 sm:w-auto"
+      >
+        Analyze your first screen
+      </a>
+      <p class="text-sm text-ink/60">3 screenshots free.</p>
+    </div>
+  </div>
+</section>
