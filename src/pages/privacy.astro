@@ -1,0 +1,214 @@
+---
+import Base from "../layouts/Base.astro";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+
+const collect = [
+  {
+    term: "Selected screenshot area",
+    body: "only the area you choose to capture.",
+  },
+  {
+    term: "Page structure and styling data",
+    body: "DOM, text snippets, CSS, layout, and computed style information from the selected area.",
+  },
+  {
+    term: "Page metadata",
+    body: "page URL and title for context.",
+  },
+  {
+    term: "Account data",
+    body: "email address, sign-in code, and authentication token when you connect your account.",
+  },
+  {
+    term: "Usage data",
+    body: "screenshot credit usage and basic request status.",
+  },
+];
+
+const uses = [
+  "Analyze the selected UI area.",
+  "Generate design feedback and previews.",
+  "Authenticate your account.",
+  "Track screenshot usage limits.",
+  "Improve reliability and debug errors.",
+];
+---
+
+<Base title="Privacy Policy | BeUniq">
+  <Navbar />
+  <main>
+    <section class="px-5 py-16 sm:px-8 sm:py-24">
+      <div class="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1fr_2fr] lg:gap-16">
+        <!-- Left column -->
+        <div>
+          <a
+            href="/"
+            class="inline-flex items-center gap-2 text-sm text-muted transition-colors duration-150 hover:text-ink"
+          >
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to home
+          </a>
+          <h1 class="mt-6 text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+            Privacy Policy
+          </h1>
+          <p class="mt-4 font-mono text-sm text-muted">
+            BeUniq / PolishPilot
+          </p>
+          <p class="mt-1 font-mono text-sm text-muted">
+            Effective date: July 9, 2026
+          </p>
+          <div class="mt-8">
+            <a
+              href="mailto:sarsennbaj.n@gmail.com"
+              class="inline-flex min-h-11 items-center rounded-full bg-ink px-6 text-sm font-medium text-paper transition-opacity duration-150 hover:opacity-80"
+            >
+              Contact
+            </a>
+          </div>
+        </div>
+
+        <!-- Right column — policy -->
+        <div class="policy max-w-2xl">
+          <p class="text-lg leading-relaxed text-ink-70">
+            BeUniq / PolishPilot is a Chrome extension that helps users analyze
+            selected UI areas on webpages.
+          </p>
+
+          <h2>Data We Collect</h2>
+          <p>When you use the extension, we may process:</p>
+          <ul class="policy-list">
+            {
+              collect.map((c) => (
+                <li>
+                  <strong class="font-semibold text-ink">{c.term}:</strong>
+                  <span class="text-ink-70"> {c.body}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="text-ink-70">
+            The extension does not collect passwords, payment card numbers,
+            health data, precise location, or full browsing history.
+          </p>
+
+          <h2>How We Use Data</h2>
+          <p>We use this data to:</p>
+          <ul class="policy-list">
+            {uses.map((u) => <li class="text-ink-70">{u}</li>)}
+          </ul>
+
+          <h2>When Data Is Collected</h2>
+          <p class="text-ink-70">
+            Screenshots and page content are collected only when you actively
+            start a capture, for example by clicking &ldquo;Analyze this
+            screen&rdquo; or using the keyboard shortcut.
+          </p>
+
+          <h2>Data Sharing</h2>
+          <p class="text-ink-70">
+            Captured screenshot and selected page context may be sent securely
+            to our backend at
+            <a
+              href="https://polish-pilot.vercel.app"
+              class="draw-link text-ink"
+              rel="nofollow noopener"
+              target="_blank">https://polish-pilot.vercel.app</a
+            >.
+          </p>
+          <p class="text-ink-70">
+            Our backend may use AI service providers, including Google Gemini,
+            to analyze the selected UI and generate feedback.
+          </p>
+          <p class="text-ink-70">We do not sell user data.</p>
+
+          <h2>Storage</h2>
+          <p class="text-ink-70">
+            The extension stores the latest capture and analysis result in
+            <code>chrome.storage.session</code>. This is temporary browser
+            session storage.
+          </p>
+          <p class="text-ink-70">
+            Account profile data and authentication tokens may be stored in
+            <code>chrome.storage.local</code> until token expiry or sign-out.
+          </p>
+
+          <h2>Authentication</h2>
+          <p class="text-ink-70">
+            The extension uses a website-based sign-in code flow. The extension
+            does not see your Google password. You can sign out in the
+            extension, which clears locally stored account data and tokens.
+          </p>
+
+          <h2>Security</h2>
+          <p class="text-ink-70">
+            Data is transmitted over HTTPS. Authentication tokens are used only
+            to authorize requests to our backend.
+          </p>
+
+          <h2>Limited Use Disclosure</h2>
+          <p class="text-ink-70">
+            Our use of information received from Chrome APIs complies with the
+            Chrome Web Store User Data Policy, including the Limited Use
+            requirements. We use Chrome API data only to provide and improve
+            the extension&rsquo;s visible user-facing features. We do not sell
+            this data, use it for advertising, or transfer it for unrelated
+            purposes.
+          </p>
+
+          <h2>Contact</h2>
+          <p class="text-ink-70">
+            For privacy questions or deletion requests, contact:
+            <a href="mailto:sarsennbaj.n@gmail.com" class="draw-link text-ink"
+              >sarsennbaj.n@gmail.com</a
+            >.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .policy h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+  }
+  .policy p {
+    margin-bottom: 0.85rem;
+    line-height: 1.7;
+  }
+  .policy-list {
+    list-style: none;
+    margin: 0.5rem 0 1rem;
+    padding: 0;
+  }
+  .policy-list li {
+    position: relative;
+    padding-left: 1.25rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.65;
+  }
+  .policy-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 7px;
+    height: 1px;
+    background: var(--color-muted);
+  }
+  .policy code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: rgb(255 255 255 / 0.06);
+    padding: 0.1em 0.35em;
+  }
+</style>
