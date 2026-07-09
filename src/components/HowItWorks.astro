@@ -7,22 +7,25 @@ const steps = [
     num: "01",
     title: "Make a screenshot",
     body: "Select the exact part of the interface you want BeUniq to review.",
-    src: "/videos/choose-area.mp4",
+    src: "/videos/choose-area.gif",
     label: "Selecting a screenshot region",
+    durationMs: 4200,
   },
   {
     num: "02",
     title: "Open the extension",
     body: "Launch BeUniq on the page you are building and send the capture.",
-    src: "/videos/open-extension.mp4",
+    src: "/videos/open-extension.gif",
     label: "Opening the BeUniq extension",
+    durationMs: 5200,
   },
   {
     num: "03",
     title: "View the report",
     body: "Read practical design fixes for the selected screen area.",
-    src: "/videos/view-report.mp4",
+    src: "/videos/view-report.gif",
     label: "Viewing the design analysis report",
+    durationMs: 6200,
   },
 ];
 ---
@@ -53,7 +56,7 @@ const steps = [
           style="--reveal-delay: 0.08s"
           class="mt-5 max-w-2xl text-lg leading-relaxed text-ink-70"
         >
-          Three short clips play one after another: capture the screen, open the
+          Three short demos play one after another: capture the screen, open the
           extension, then read the report.
         </p>
       </div>
@@ -85,13 +88,13 @@ const steps = [
                 aria-labelledby={`hiw-tab-${i}`}
               >
                 <div class="hiw-media">
-                  <video
-                    class="hiw-video"
+                  <img
+                    class="hiw-gif"
                     src={s.src}
-                    muted
-                    playsinline
-                    preload="metadata"
-                    aria-label={s.label}
+                    alt={s.label}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    data-hiw-duration={s.durationMs}
                   />
                 </div>
                 <div class="hiw-copy">
@@ -110,7 +113,7 @@ const steps = [
       </div>
 
       <div class="hiw-controls">
-        <div class="hiw-tabs" role="tablist" aria-label="How it works videos">
+        <div class="hiw-tabs" role="tablist" aria-label="How it works demos">
           {
             steps.map((s, i) => (
               <button
@@ -139,18 +142,21 @@ const steps = [
   document.querySelectorAll<HTMLElement>("[data-hiw-carousel]").forEach((root) => {
     const track = root.querySelector<HTMLElement>("[data-hiw-track]");
     const slides = Array.from(root.querySelectorAll<HTMLElement>("[data-hiw-slide]"));
-    const videos = Array.from(root.querySelectorAll<HTMLVideoElement>(".hiw-video"));
+    const media = Array.from(root.querySelectorAll<HTMLImageElement>(".hiw-gif"));
     const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-hiw-tab]"));
     const progressBars = tabs.map((tab) =>
       tab.querySelector<HTMLElement>(".hiw-tab-progress span")
     );
 
-    if (!track || !slides.length || !videos.length || !tabs.length) return;
+    if (!track || !slides.length || !media.length || !tabs.length) return;
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let active = 0;
     let inView = false;
     let progressRaf = 0;
+    let activeTimer = 0;
+    let activeStartedAt = 0;
+    let activeDuration = 1;
 
     function carouselIsVisible() {
       const rect = root.getBoundingClientRect();
@@ -163,27 +169,40 @@ const steps = [
       track.style.transform = `translate3d(${-offset}px, 0, 0)`;
     }
 
-    function pauseAll(resetInactive = false) {
-      videos.forEach((video, i) => {
-        video.pause();
-        if (resetInactive && i !== active) {
-          video.currentTime = 0;
-          if (progressBars[i]) progressBars[i]!.style.transform = "scaleX(0)";
-        }
+    function resetProgress(resetInactive = false) {
+      progressBars.forEach((bar, i) => {
+        if (!bar) return;
+        if (i === active) bar.style.transform = "scaleX(0)";
+        else if (resetInactive) bar.style.transform = "scaleX(0)";
       });
     }
 
-    function stopProgressLoop() {
+    function stopActiveClock() {
       cancelAnimationFrame(progressRaf);
       progressRaf = 0;
+      window.clearTimeout(activeTimer);
+      activeTimer = 0;
+    }
+
+    function restartGif(image: HTMLImageElement) {
+      const src = image.currentSrc || image.src;
+      if (!src) return;
+      image.src = "";
+      image.src = src;
     }
 
     function playActive() {
       if (reduceMotion.matches || !inView) return;
-      const video = videos[active];
-      if (!video) return;
-      video.play().catch(() => {});
+      const image = media[active];
+      if (!image || activeTimer) return;
+      restartGif(image);
+      activeDuration = Number(image.dataset.hiwDuration) || 5000;
+      activeStartedAt = performance.now();
+      resetProgress(false);
       startProgressLoop();
+      activeTimer = window.setTimeout(() => {
+        setActive(active + 1, true);
+      }, activeDuration);
     }
 
     function setActive(next: number, shouldPlay = true) {
@@ -198,7 +217,8 @@ const steps = [
         tab.setAttribute("aria-selected", String(i === active));
       });
 
-      pauseAll(true);
+      stopActiveClock();
+      resetProgress(true);
       positionTrack();
       // Keep the active tab horizontally scrolled into view inside the tab
       // strip (mobile). Guard on visibility so a fresh page load — where the
@@ -212,20 +232,20 @@ const steps = [
       }
 
       if (shouldPlay) playActive();
-      else updateProgress(videos[active], active);
+      else updateProgress(active);
     }
 
-    function updateProgress(video: HTMLVideoElement, index: number) {
+    function updateProgress(index: number) {
       const bar = progressBars[index];
-      if (!bar || !Number.isFinite(video.duration) || video.duration <= 0) return;
-      const progress = Math.min(1, video.currentTime / video.duration);
+      if (!bar || activeStartedAt <= 0 || activeDuration <= 0) return;
+      const progress = Math.min(1, (performance.now() - activeStartedAt) / activeDuration);
       bar.style.transform = `scaleX(${progress})`;
     }
 
     function startProgressLoop() {
       if (progressRaf) return;
       const tick = () => {
-        updateProgress(videos[active], active);
+        updateProgress(active);
         progressRaf = requestAnimationFrame(tick);
       };
       progressRaf = requestAnimationFrame(tick);
@@ -237,21 +257,13 @@ const steps = [
       });
     });
 
-    videos.forEach((video, i) => {
-      video.addEventListener("ended", () => {
-        if (i === active) setActive(active + 1, true);
-      });
-      video.addEventListener("timeupdate", () => updateProgress(video, i));
-    });
-
     if ("IntersectionObserver" in window) {
       const io = new IntersectionObserver(
         ([entry]) => {
           inView = Boolean(entry?.isIntersecting) || carouselIsVisible();
           if (inView) playActive();
           else {
-            stopProgressLoop();
-            pauseAll(false);
+            stopActiveClock();
           }
         },
         { threshold: 0.18 }
@@ -263,8 +275,7 @@ const steps = [
 
     reduceMotion.addEventListener("change", () => {
       if (reduceMotion.matches) {
-        stopProgressLoop();
-        pauseAll(false);
+        stopActiveClock();
       } else playActive();
     });
 
@@ -323,7 +334,7 @@ const steps = [
       0 0 0 1px rgb(115 115 115 / 0.18);
   }
 
-  .hiw-video {
+  .hiw-gif {
     display: block;
     width: 100%;
     height: 100%;
