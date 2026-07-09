@@ -26,6 +26,12 @@ const {
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>
   <body>
+    <div id="site-cursor" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <line x1="12" y1="2" x2="12" y2="22"></line>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+      </svg>
+    </div>
     <slot />
     <script>
       // Scroll reveal
@@ -63,6 +69,72 @@ const {
           }, 200);
         });
       });
+
+      // Site-wide "+" pointer cursor (mirrors the hero selection crosshair).
+      // Fine-pointer devices only; touch keeps native behavior. 1:1 tracking,
+      // no easing, so it never lags the native pointer it replaces.
+      const cursor = document.getElementById("site-cursor");
+      if (
+        cursor &&
+        window.matchMedia("(hover: hover) and (pointer: fine)").matches
+      ) {
+        document.documentElement.classList.add("has-cursor");
+        window.addEventListener(
+          "pointermove",
+          (e) => {
+            cursor.classList.add("visible");
+            cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+          },
+          { passive: true }
+        );
+        document.addEventListener("pointerleave", () =>
+          cursor.classList.remove("visible")
+        );
+        window.addEventListener("blur", () =>
+          cursor.classList.remove("visible")
+        );
+      }
     </script>
+
+    <style>
+      /* Site-wide "+" pointer cursor. A 0×0 anchor fixed at the pointer
+         hotspot; the SVG centers on it. Sits above the navbar (z-40) and
+         never intercepts pointer events. */
+      #site-cursor {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        z-index: 60;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+      #site-cursor.visible {
+        opacity: 1;
+      }
+      #site-cursor svg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 26px;
+        height: 26px;
+        overflow: visible;
+        transform: translate(-50%, -50%);
+      }
+      #site-cursor line {
+        stroke: var(--color-ink);
+        stroke-width: 2.5;
+      }
+      /* Hide the OS cursor only on precise-pointer devices. Touch keeps
+         native behavior (there is no hover cursor to replace). */
+      @media (hover: hover) and (pointer: fine) {
+        :global(html.has-cursor),
+        :global(html.has-cursor *) {
+          cursor: none !important;
+        }
+      }
+    </style>
   </body>
 </html>

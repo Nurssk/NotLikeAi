@@ -55,7 +55,25 @@ const { flipX, flipY, sourceY, angle } = originConfig[origin] ?? originConfig["t
 ></div>
 
 <script>
-  import { Renderer, Program, Triangle, Mesh } from "ogl";
+  import type { Renderer, Mesh } from "ogl";
+
+  // Lazily fetch ogl as a separate async chunk (cached so every container
+  // shares one load). This leaves the eager bundle, so first paint isn't
+  // blocked by WebGL code.
+  let oglPromise: Promise<typeof import("ogl")> | null = null;
+  const loadOgl = () => (oglPromise ??= import("ogl"));
+
+  // Defer the heavy WebGL init (context creation + shader compile) off the
+  // critical path so it never contends with LCP/INP.
+  const ric: (fn: () => void) => void =
+    (window as any).requestIdleCallback
+      ? (fn) => (window as any).requestIdleCallback(fn, { timeout: 1500 })
+      : (fn) => window.setTimeout(fn, 200);
+
+  // Decorative soft gradients tolerate a low internal render resolution and
+  // a capped DPR — big fill / first-frame savings, visually identical.
+  const RES = 0.5;
+  const MAX_DPR = 1.5;
 
   const hexToRgb = (hex: string): [number, number, number] => {
     const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -149,22 +167,39 @@ void main() {
     let renderer: Renderer | null = null;
     let mesh: Mesh | null = null;
     let raf = 0;
-    let started = false;
-    let paused = true;
+    let inited = false;
+    let ready = false;
+    let running = false;
+    let intersecting = false;
+    let tabVisible = !document.hidden;
 
     const updateSize = () => {
       if (!renderer) return;
-      renderer.dpr = Math.min(window.devicePixelRatio, 2);
+      renderer.dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
       const w = container.clientWidth;
       const h = container.clientHeight;
       if (w === 0 || h === 0) return;
-      renderer.setSize(w, h);
-      uniforms.iResolution.value = [w * renderer.dpr, h * renderer.dpr];
+      // Render at reduced internal resolution; re-assert 100% CSS because
+      // ogl's setSize rewrites the canvas style to the given px.
+      renderer.setSize(
+        Math.max(1, Math.round(w * RES)),
+        Math.max(1, Math.round(h * RES))
+      );
+      const gl = renderer.gl;
+      gl.canvas.style.width = "100%";
+      gl.canvas.style.height = "100%";
+      uniforms.iResolution.value = [
+        gl.drawingBufferWidth,
+        gl.drawingBufferHeight,
+      ];
     };
 
-    const init = () => {
-      if (renderer) return;
-      renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio, 2), alpha: true });
+    const init = async () => {
+      const { Renderer, Program, Triangle, Mesh } = await loadOgl();
+      renderer = new Renderer({
+        dpr: Math.min(window.devicePixelRatio || 1, MAX_DPR),
+        alpha: true,
+      });
       const gl = renderer.gl;
       gl.canvas.style.width = "100%";
       gl.canvas.style.height = "100%";
@@ -174,41 +209,98 @@ void main() {
       mesh = new Mesh(gl, { geometry, program });
       window.addEventListener("resize", updateSize);
       updateSize();
+      ready = true;
+      // Fade the WebGL layer in over the static fallback once it's mounted.
+      requestAnimationFrame(() => container.classList.add("rays-ready"));
     };
 
     const loop = (t: number) => {
-      if (!renderer || !mesh) return;
-      if (!paused) {
-        uniforms.iTime.value = t * 0.001;
-        renderer.render({ scene: mesh });
+      if (!renderer || !mesh) {
+        raf = 0;
+        return;
       }
+      uniforms.iTime.value = t * 0.001;
+      renderer.render({ scene: mesh });
       raf = requestAnimationFrame(loop);
     };
 
-    const start = () => {
-      if (!started) {
-        init();
-        started = true;
-      }
-      paused = false;
+    const startLoop = () => {
+      if (running || !ready) return;
+      running = true;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(loop);
     };
 
-    const stop = () => {
-      paused = true;
+    const stopLoop = () => {
+      running = false;
       cancelAnimationFrame(raf);
+      raf = 0;
+    };
+
+    // Render only while on-screen AND the tab is visible. Init lazily on
+    // first need, booted via requestIdleCallback so it never blocks load.
+    const evaluate = () => {
+      if (!(intersecting && tabVisible)) {
+        stopLoop();
+        return;
+      }
+      if (!inited) {
+        inited = true;
+        ric(() => {
+          init().then(() => {
+            if (intersecting && tabVisible) startLoop();
+          });
+        });
+        return;
+      }
+      startLoop();
     };
 
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) start();
-        else stop();
+        intersecting = entry.isIntersecting;
+        evaluate();
       },
       { threshold: 0.01 }
     );
     io.observe(container);
 
-    if (document.fonts?.ready) document.fonts.ready.then(updateSize);
+    document.addEventListener("visibilitychange", () => {
+      tabVisible = !document.hidden;
+      evaluate();
+    });
+
+    if (document.fonts?.ready)
+      document.fonts.ready.then(() => {
+        if (inited) updateSize();
+      });
   });
 </script>
+
+<style>
+  /* Static fallback glow so sections look finished instantly; the WebGL
+     canvas fades in over it (and takes over) once ready. The canvas is
+     injected at runtime, so target it via :global() under the scoped
+     .siderays anchor. */
+  .siderays::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      120% 120% at 50% 45%,
+      rgb(255 255 255 / 0.1),
+      transparent 60%
+    );
+    transition: opacity 0.6s ease;
+  }
+  .siderays :global(canvas) {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .siderays.rays-ready::before {
+    opacity: 0;
+  }
+  .siderays.rays-ready :global(canvas) {
+    opacity: 1;
+  }
+</style>
