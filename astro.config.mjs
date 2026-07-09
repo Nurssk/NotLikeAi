@@ -10,7 +10,7 @@ export default defineConfig({
   output: "static",
   adapter: vercel(),
   vite: {
-    envDir: "..",
+    envDir: ".",
     plugins: [tailwindcss()],
     optimizeDeps: {
       include: ["ogl"],
