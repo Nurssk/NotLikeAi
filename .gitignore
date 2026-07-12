@@ -30,3 +30,4 @@ bun-debug.log*
 
 # macOS
 .DS_Store
+.firestore.rules
