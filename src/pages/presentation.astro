@@ -1,0 +1,548 @@
+---
+import Base from "../layouts/Base.astro";
+import SideRays from "../components/SideRays.astro";
+
+const slides = [
+  {
+    kicker: "00:00",
+    title: "BeUniq",
+    body: "A focused way to turn AI-generated screens into sharper product interfaces.",
+    note: "Most teams can generate UI now. The gap is making it feel intentional.",
+    meta: "Opening",
+  },
+  {
+    kicker: "00:20",
+    title: "AI ships shape, not taste.",
+    body: "Generated screens often have the same soft cards, loose hierarchy, and vague visual rhythm.",
+    note: "The result looks complete at a glance, but weak under inspection.",
+    meta: "Problem",
+  },
+  {
+    kicker: "00:40",
+    title: "BeUniq reviews the screen like a designer.",
+    body: "It looks for spacing, hierarchy, contrast, alignment, density, and repeated AI defaults.",
+    note: "The product gives practical fixes instead of rewriting the whole interface.",
+    meta: "Approach",
+  },
+  {
+    kicker: "01:00",
+    title: "Keep the product. Remove the slop.",
+    body: "BeUniq preserves the user's original direction while making the interface cleaner and more deliberate.",
+    note: "That makes it useful for builders who move fast but still care about presentation.",
+    meta: "Value",
+  },
+  {
+    kicker: "01:20",
+    title: "A designer's second pass, on demand.",
+    body: "Upload a screen, get a clear critique, and apply the highest-impact changes first.",
+    note: "The workflow is short enough to fit between prompt, prototype, and publish.",
+    meta: "Workflow",
+  },
+  {
+    kicker: "01:40",
+    title: "Better first impressions in two minutes.",
+    body: "BeUniq helps AI-built products look more credible before users, clients, or investors see them.",
+    note: "The end goal is simple: make the interface feel designed.",
+    meta: "Close",
+  },
+];
+---
+
+<Base
+  title="BeUniq Presentation"
+  description="A two-minute BeUniq presentation with animated rays and numbered slides."
+>
+  <main class="presentation-page">
+    <section id="slides" class="presentation-stage" aria-label="BeUniq presentation slides">
+      <div class="ray-layer ray-layer-right">
+        <SideRays
+          origin="middle-right"
+          speed={1.7}
+          rayColor1="#ffffff"
+          rayColor2="#ffffff"
+          intensity={2.2}
+          spread={2.15}
+          saturation={0}
+          blend={0.44}
+          falloff={1.45}
+          opacity={0.48}
+        />
+      </div>
+      <div class="ray-layer ray-layer-left">
+        <SideRays
+          origin="middle-left"
+          speed={1.2}
+          rayColor1="#ffffff"
+          rayColor2="#ffffff"
+          intensity={1.55}
+          spread={1.7}
+          saturation={0}
+          blend={0.52}
+          falloff={1.7}
+          opacity={0.32}
+        />
+      </div>
+
+      <div class="presentation-shell">
+        <header class="presentation-top" aria-label="Presentation controls">
+          <a class="brand-mark" href="/">
+            <span class="brand-dot" aria-hidden="true"></span>
+            <span>BeUniq</span>
+          </a>
+          <div class="timer" aria-live="polite">
+            <span data-current-time>00:00</span>
+            <span class="timer-rule" aria-hidden="true"></span>
+            <span>02:00</span>
+          </div>
+        </header>
+
+        <div class="deck" data-deck data-total={slides.length}>
+          {
+            slides.map((slide, index) => (
+              <article
+                class:list={["slide", index === 0 && "is-active"]}
+                data-slide
+                data-index={index}
+                aria-hidden={index === 0 ? "false" : "true"}
+              >
+                <div class="slide-copy">
+                  <p class="slide-kicker">{slide.kicker} / {slide.meta}</p>
+                  <h1>{slide.title}</h1>
+                  <p class="slide-body">{slide.body}</p>
+                </div>
+                <aside class="slide-note">
+                  <span class="note-index">{String(index + 1).padStart(2, "0")}</span>
+                  <p>{slide.note}</p>
+                </aside>
+              </article>
+            ))
+          }
+        </div>
+
+        <footer class="presentation-bottom">
+          <div class="progress-shell" aria-hidden="true">
+            <span class="progress-bar" data-progress></span>
+          </div>
+          <div class="slide-nav" aria-label="Slide navigation">
+            {
+              slides.map((slide, index) => (
+                <button
+                  type="button"
+                  class:list={["slide-dot", index === 0 && "is-active"]}
+                  data-slide-button={index}
+                  aria-label={`Go to slide ${index + 1}: ${slide.meta}`}
+                  aria-current={index === 0 ? "step" : undefined}
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </button>
+              ))
+            }
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<script>
+  const deck = document.querySelector<HTMLElement>("[data-deck]");
+  const slideEls = Array.from(document.querySelectorAll<HTMLElement>("[data-slide]"));
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-slide-button]"));
+  const progress = document.querySelector<HTMLElement>("[data-progress]");
+  const currentTime = document.querySelector<HTMLElement>("[data-current-time]");
+
+  if (deck && slideEls.length && buttons.length) {
+    const totalSlides = Number(deck.dataset.total || slideEls.length);
+    const durationMs = 120000;
+    const slideMs = durationMs / totalSlides;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let startedAt = performance.now();
+    let manualOffset = 0;
+    let raf = 0;
+    let activeIndex = 0;
+
+    const pad = (value: number) => String(Math.max(0, value)).padStart(2, "0");
+    const formatTime = (elapsedMs: number) => {
+      const seconds = Math.min(120, Math.floor(elapsedMs / 1000));
+      return `${pad(Math.floor(seconds / 60))}:${pad(seconds % 60)}`;
+    };
+
+    const setHash = (index: number) => {
+      const hash = index === 0 ? "#slides" : `#slides-${index + 1}`;
+      if (window.location.hash !== hash) history.replaceState(null, "", hash);
+    };
+
+    const setSlide = (index: number, fromUser = false) => {
+      activeIndex = (index + totalSlides) % totalSlides;
+      slideEls.forEach((slide, i) => {
+        const active = i === activeIndex;
+        slide.classList.toggle("is-active", active);
+        slide.setAttribute("aria-hidden", active ? "false" : "true");
+      });
+      buttons.forEach((button, i) => {
+        const active = i === activeIndex;
+        button.classList.toggle("is-active", active);
+        if (active) button.setAttribute("aria-current", "step");
+        else button.removeAttribute("aria-current");
+      });
+      if (fromUser) {
+        manualOffset = activeIndex * slideMs;
+        startedAt = performance.now();
+      }
+      setHash(activeIndex);
+    };
+
+    const readHash = () => {
+      const match = window.location.hash.match(/^#slides(?:-(\d+))?$/);
+      if (!match) return 0;
+      const numeric = match[1] ? Number(match[1]) - 1 : 0;
+      return Number.isFinite(numeric) ? Math.min(Math.max(numeric, 0), totalSlides - 1) : 0;
+    };
+
+    const tick = (now: number) => {
+      const elapsed = reduce ? manualOffset : Math.min(durationMs, manualOffset + now - startedAt);
+      const nextIndex = Math.min(totalSlides - 1, Math.floor(elapsed / slideMs));
+      if (nextIndex !== activeIndex) setSlide(nextIndex);
+      if (progress) progress.style.transform = `scaleX(${elapsed / durationMs})`;
+      if (currentTime) currentTime.textContent = formatTime(elapsed);
+      if (!reduce && elapsed < durationMs) raf = requestAnimationFrame(tick);
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        setSlide(Number(button.dataset.slideButton), true);
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(tick);
+      });
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "PageDown") {
+        setSlide(activeIndex + 1, true);
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(tick);
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        setSlide(activeIndex - 1, true);
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(tick);
+      }
+    });
+
+    window.addEventListener("hashchange", () => setSlide(readHash(), true));
+
+    setSlide(readHash(), true);
+    raf = requestAnimationFrame(tick);
+  }
+</script>
+
+<style>
+  .presentation-page {
+    min-height: 100dvh;
+    background:
+      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.1), transparent 34rem),
+      var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  .presentation-stage {
+    position: relative;
+    min-height: 100dvh;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .presentation-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 68% 46%, rgb(11 11 11 / 0.34), rgb(11 11 11 / 0.72) 58%, rgb(11 11 11 / 0.88)),
+      linear-gradient(to bottom, rgb(11 11 11 / 0.42), rgb(11 11 11 / 0.58) 42%, rgb(11 11 11 / 0.82)),
+      repeating-linear-gradient(
+        to right,
+        rgb(255 255 255 / 0.055) 0,
+        rgb(255 255 255 / 0.055) 1px,
+        transparent 1px,
+        transparent 96px
+      );
+  }
+
+  .ray-layer {
+    position: absolute;
+    top: -20%;
+    bottom: -20%;
+    z-index: 0;
+    width: min(78vw, 980px);
+    opacity: 0.74;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  :global(#site-cursor) {
+    display: none;
+  }
+
+  .ray-layer-right {
+    right: -18vw;
+  }
+
+  .ray-layer-left {
+    left: -24vw;
+  }
+
+  .presentation-shell {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    min-height: 100dvh;
+    grid-template-rows: auto 1fr auto;
+    gap: clamp(1.25rem, 2vw, 2rem);
+    padding: clamp(1rem, 2.5vw, 2rem);
+  }
+
+  .presentation-top,
+  .presentation-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .brand-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .brand-dot {
+    width: 0.65rem;
+    height: 0.65rem;
+    background: var(--color-ink);
+  }
+
+  .timer {
+    display: inline-flex;
+    min-width: 9.75rem;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.7rem;
+    color: rgb(255 255 255 / 0.72);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  .timer-rule {
+    display: block;
+    width: 2.25rem;
+    height: 1px;
+    background: rgb(255 255 255 / 0.28);
+  }
+
+  .deck {
+    position: relative;
+    min-height: 34rem;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 24rem);
+    align-items: end;
+    gap: clamp(1.5rem, 4vw, 5rem);
+    opacity: 0;
+    transform: translateY(1.2rem);
+    visibility: hidden;
+    filter: blur(10px);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0.7s;
+  }
+
+  .slide.is-active {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+    filter: none;
+  }
+
+  .slide-copy {
+    max-width: 78rem;
+  }
+
+  .slide-kicker,
+  .note-index {
+    color: rgb(255 255 255 / 0.62);
+    font-family: var(--font-mono);
+    font-size: clamp(0.72rem, 1vw, 0.85rem);
+    text-transform: uppercase;
+  }
+
+  .slide h1 {
+    margin-top: clamp(1.1rem, 2vw, 1.6rem);
+    max-width: 12ch;
+    font-size: clamp(4rem, 11vw, 10.8rem);
+    line-height: 0.9;
+    letter-spacing: 0;
+  }
+
+  .slide-body {
+    margin-top: clamp(1.4rem, 2.4vw, 2rem);
+    max-width: 46rem;
+    color: rgb(255 255 255 / 0.76);
+    font-size: clamp(1.2rem, 2.1vw, 2rem);
+    line-height: 1.25;
+  }
+
+  .slide-note {
+    border-left: 1px solid rgb(255 255 255 / 0.22);
+    padding: 1.15rem 0 1.15rem clamp(1.1rem, 2vw, 1.6rem);
+  }
+
+  .slide-note p {
+    margin-top: 1.6rem;
+    color: rgb(255 255 255 / 0.78);
+    font-size: clamp(1rem, 1.25vw, 1.25rem);
+    line-height: 1.45;
+  }
+
+  .progress-shell {
+    position: relative;
+    height: 1px;
+    flex: 1 1 auto;
+    overflow: hidden;
+    background: rgb(255 255 255 / 0.18);
+  }
+
+  .progress-bar {
+    position: absolute;
+    inset: 0;
+    transform: scaleX(0);
+    transform-origin: left center;
+    background: var(--color-ink);
+  }
+
+  .slide-nav {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .slide-dot {
+    width: 2.6rem;
+    height: 2.1rem;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    background: rgb(255 255 255 / 0.03);
+    color: rgb(255 255 255 / 0.55);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    transition:
+      border-color 0.25s ease,
+      background 0.25s ease,
+      color 0.25s ease;
+  }
+
+  .slide-dot.is-active {
+    border-color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .slide-dot:hover {
+      border-color: rgb(255 255 255 / 0.6);
+      color: var(--color-ink);
+    }
+  }
+
+  @media (max-width: 860px) {
+    .presentation-shell {
+      padding: 1rem;
+    }
+
+    .presentation-stage::before {
+      background:
+        radial-gradient(circle at 68% 42%, rgb(11 11 11 / 0.48), rgb(11 11 11 / 0.78) 58%, rgb(11 11 11 / 0.92)),
+        linear-gradient(to bottom, rgb(11 11 11 / 0.58), rgb(11 11 11 / 0.7) 42%, rgb(11 11 11 / 0.88)),
+        repeating-linear-gradient(
+          to right,
+          rgb(255 255 255 / 0.05) 0,
+          rgb(255 255 255 / 0.05) 1px,
+          transparent 1px,
+          transparent 78px
+        );
+    }
+
+    .ray-layer {
+      opacity: 0.48;
+    }
+
+    .presentation-top,
+    .presentation-bottom {
+      align-items: flex-start;
+    }
+
+    .presentation-bottom {
+      flex-direction: column;
+    }
+
+    .progress-shell {
+      width: 100%;
+      flex-basis: 1px;
+    }
+
+    .deck {
+      min-height: 37rem;
+    }
+
+    .slide {
+      grid-template-columns: 1fr;
+      align-content: end;
+    }
+
+    .slide h1 {
+      max-width: 9ch;
+      font-size: clamp(3.6rem, 16vw, 6.8rem);
+    }
+
+    .slide-note {
+      border-left: 0;
+      border-top: 1px solid rgb(255 255 255 / 0.22);
+      padding: 1rem 0 0;
+    }
+
+    .slide-note p {
+      margin-top: 0.7rem;
+      max-width: 34rem;
+    }
+
+    .slide-nav {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .slide-dot {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide {
+      transform: none;
+      filter: none;
+      transition: opacity 0.01s linear;
+    }
+  }
+</style>
