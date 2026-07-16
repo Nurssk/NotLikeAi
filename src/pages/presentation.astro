@@ -1,10 +1,7 @@
 ---
-import { existsSync } from "node:fs";
 import Base from "../layouts/Base.astro";
 import Aurora from "../components/Aurora.astro";
 import SideRays from "../components/SideRays.astro";
-
-const hasBobImage = existsSync(new URL("../../public/images/bob.jpg", import.meta.url));
 
 const slides = [
   {
@@ -64,7 +61,6 @@ const slides = [
     meta: "Bob",
     image: "/images/bob.jpg",
     imageAlt: "bob.jpg",
-    imageMissing: !hasBobImage,
   },
   {
     kicker: "",
@@ -358,12 +354,8 @@ const slides = [
                       </ul>
                     </div>
                   ) : slide.image ? (
-                    <div class:list={["slide-image-frame", slide.imageMissing && "image-missing"]}>
-                      {!slide.imageMissing && <img src={slide.image} alt={slide.imageAlt || slide.meta} />}
-                      <div class="image-fallback">
-                        <span>bob.jpg</span>
-                        <p>Добавь файл в <code>public/images/bob.jpg</code></p>
-                      </div>
+                    <div class="slide-image-frame">
+                      <img src={slide.image} alt={slide.imageAlt || slide.meta} />
                     </div>
                   ) : slide.logoReveal ? (
                     <div class="logo-reveal-layout">
@@ -559,7 +551,7 @@ const slides = [
   const loopVideos = Array.from(document.querySelectorAll<HTMLVideoElement>(".before-after-video"));
   const typeTextTargets = Array.from(
     document.querySelectorAll<HTMLElement>(
-      ".slide:not(.slide-yc-founders):not(.slide-full-catch) h1, .slide .slide-body, .slide .product-points li, .slide .logo-reveal-primary p, .slide .logo-reveal-card span, .slide .image-fallback span, .slide .image-fallback p"
+      ".slide:not(.slide-yc-founders):not(.slide-full-catch) h1, .slide .slide-body, .slide .product-points li, .slide .logo-reveal-primary p, .slide .logo-reveal-card span"
     )
   );
   const typeTimers = new WeakMap<HTMLElement, number[]>();
@@ -820,6 +812,22 @@ const slides = [
     });
 
     window.addEventListener("keydown", (event) => {
+      const target = event.target as HTMLElement | null;
+      const isTyping =
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+
+      if (!isTyping && event.key.toLowerCase() === "f") {
+        event.preventDefault();
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        } else {
+          (stage ?? document.documentElement).requestFullscreen().catch(() => {});
+        }
+        return;
+      }
+
       if (event.key === "ArrowRight" || event.key === "PageDown") {
         goNext();
       }
@@ -2126,35 +2134,6 @@ const slides = [
     object-fit: contain;
     border: 1px solid rgb(255 255 255 / 0.16);
     box-shadow: 0 0 4rem rgb(0 0 0 / 0.36);
-  }
-
-  .image-fallback {
-    display: none;
-    width: min(100%, 42rem);
-    border: 1px dashed rgb(255 255 255 / 0.28);
-    padding: 3rem;
-    text-align: center;
-  }
-
-  .image-missing .image-fallback {
-    display: grid;
-    gap: 0.8rem;
-  }
-
-  .image-fallback span {
-    font-family: var(--font-display);
-    font-size: clamp(3rem, 8vw, 7rem);
-    line-height: 1;
-  }
-
-  .image-fallback p {
-    margin: 0;
-    color: rgb(255 255 255 / 0.62);
-  }
-
-  .image-fallback code {
-    font-family: var(--font-mono);
-    color: var(--color-ink);
   }
 
   .slide-steps {
