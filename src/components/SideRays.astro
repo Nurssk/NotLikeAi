@@ -1,6 +1,7 @@
 ---
 interface Props {
   origin?: "top-right" | "top-left" | "bottom-right" | "bottom-left" | "middle-right" | "middle-left";
+  channel?: string;
   speed?: number;
   rayColor1?: string;
   rayColor2?: string;
@@ -14,6 +15,7 @@ interface Props {
 
 const {
   origin = "top-right",
+  channel,
   speed = 2,
   rayColor1 = "#ffffff",
   rayColor2 = "#ffffff",
@@ -51,6 +53,7 @@ const { flipX, flipY, sourceY, angle } = originConfig[origin] ?? originConfig["t
   data-flipy={flipY}
   data-sourcey={sourceY}
   data-angle={angle}
+  data-channel={channel}
   aria-hidden="true"
 ></div>
 
@@ -145,6 +148,14 @@ void main() {
 
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const containers = document.querySelectorAll<HTMLElement>(".siderays");
+  const originConfig = {
+    "top-right": { flipX: 0, flipY: 0, sourceY: -0.5, angle: 0.785398 },
+    "top-left": { flipX: 1, flipY: 0, sourceY: -0.5, angle: 0.785398 },
+    "bottom-right": { flipX: 0, flipY: 1, sourceY: -0.5, angle: 0.785398 },
+    "bottom-left": { flipX: 1, flipY: 1, sourceY: -0.5, angle: 0.785398 },
+    "middle-right": { flipX: 0, flipY: 0, sourceY: 0.5, angle: 3.141593 },
+    "middle-left": { flipX: 1, flipY: 0, sourceY: 0.5, angle: 3.141593 },
+  } as const;
 
   containers.forEach((container) => {
     if (reduce) return;
@@ -166,6 +177,22 @@ void main() {
       iFalloff: { value: Number(container.dataset.falloff) },
       iOpacity: { value: Number(container.dataset.opacity) },
     };
+
+    const applyOrigin = (origin: keyof typeof originConfig) => {
+      const next = originConfig[origin];
+      if (!next) return;
+      uniforms.iFlipX.value = next.flipX;
+      uniforms.iFlipY.value = next.flipY;
+      uniforms.iSourceY.value = next.sourceY;
+      uniforms.iBaseAngle.value = next.angle;
+    };
+
+    window.addEventListener("siderays:set-origin", (event) => {
+      const detail = (event as CustomEvent<{ channel?: string; origin?: keyof typeof originConfig }>).detail;
+      if (!detail?.origin) return;
+      if (detail.channel && detail.channel !== container.dataset.channel) return;
+      applyOrigin(detail.origin);
+    });
 
     let renderer: Renderer | null = null;
     let mesh: Mesh | null = null;

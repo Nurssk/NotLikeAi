@@ -1,6 +1,10 @@
 ---
+import { existsSync } from "node:fs";
 import Base from "../layouts/Base.astro";
+import Aurora from "../components/Aurora.astro";
 import SideRays from "../components/SideRays.astro";
+
+const hasBobImage = existsSync(new URL("../../public/images/bob.jpg", import.meta.url));
 
 const slides = [
   {
@@ -13,46 +17,175 @@ const slides = [
   },
   {
     kicker: "",
-    title: "Помните, что было, когда вышел ChatGPT?",
-    titleHtml: 'Помните запуск <span class="capture-word">ChatGPT<svg class="capture-ants" aria-hidden="true"><rect x="1.5" y="1.5"></rect></svg><span class="capture-handle capture-tl" aria-hidden="true"></span><span class="capture-handle capture-tr" aria-hidden="true"></span><span class="capture-handle capture-bl" aria-hidden="true"></span><span class="capture-handle capture-br" aria-hidden="true"></span></span>?',
-    body: "",
+    title: "Помните, когда появился ChatGPT?",
+    titleHtml: 'Помните, когда появился <span class="capture-word capture-word-white">ChatGPT<svg class="capture-ants" aria-hidden="true"><rect x="1.5" y="1.5"></rect></svg><span class="capture-handle capture-tl" aria-hidden="true"></span><span class="capture-handle capture-tr" aria-hidden="true"></span><span class="capture-handle capture-bl" aria-hidden="true"></span><span class="capture-handle capture-br" aria-hidden="true"></span></span>?',
+    body: "Все начали писать курсовики, дипломки, эссе, домашку через ChatGPT. Для студентов стало быстрее, для проверяющего почти невозможно проверить вручную.",
     note: "",
     meta: "ChatGPT",
-    compact: true,
-    steps: [
-      "Все начали писать через ИИ: эссе, курсовые, документы.",
+    fullCatch: true,
+    bodyReveal: true,
+  },
+  {
+    kicker: "",
+    title: "Что было дальше?",
+    body: "",
+    note: "",
+    meta: "After ChatGPT",
+    logoReveal: true,
+    revealLogos: [
+      {
+        name: "GPTZero",
+        src: "/images/gptzero-seeklogo.png",
+        metric: "$30M ARR",
+      },
+      {
+        name: "QuillBot",
+        src: "/images/quillbot-logo-transparent.png",
+        metric: "~$27.4M ARR",
+      },
     ],
   },
   {
     kicker: "",
-    title: "Потом вышел GPTZero.",
-    titleHtml: 'Потом вышел <span class="capture-word">GPTZero<svg class="capture-ants" aria-hidden="true"><rect x="1.5" y="1.5"></rect></svg><span class="capture-handle capture-tl" aria-hidden="true"></span><span class="capture-handle capture-tr" aria-hidden="true"></span><span class="capture-handle capture-bl" aria-hidden="true"></span><span class="capture-handle capture-br" aria-hidden="true"></span></span>.',
+    title: "История повторяется",
     body: "",
     note: "",
-    meta: "Detection",
-    compact: true,
-    products: [
-      { name: "GPTZero", mark: "0", tone: "blue", metric: "$30M ARR" },
-      { name: "QuillBot", mark: "Q", tone: "green", metric: "~$27.4M ARR" },
-    ],
-    steps: [
-      "А потом вышел QuillBot.",
-      "Один ловит AI-текст. Другой помогает его переписать.",
+    meta: "Pattern",
+    longTitle: true,
+    statementSplit: true,
+    statementImage: "/images/history-repeat.png",
+    statementImageAlt: "История повторяется дважды",
+  },
+  {
+    kicker: "",
+    title: "",
+    body: "",
+    note: "",
+    meta: "Bob",
+    image: "/images/bob.jpg",
+    imageAlt: "bob.jpg",
+    imageMissing: !hasBobImage,
+  },
+  {
+    kicker: "",
+    title: "We need a hero",
+    body: "",
+    note: "",
+    meta: "Hero",
+    longTitle: true,
+    statementHero: true,
+    statementImage: "/images/hero.avif",
+    statementImageAlt: "Hero",
+  },
+  {
+    kicker: "",
+    title: "",
+    body: "",
+    note: "",
+    meta: "Demo",
+    video: "/videos/maindemo.mp4",
+  },
+  {
+    kicker: "",
+    title: "",
+    body: "",
+    note: "",
+    meta: "Before / After",
+    beforeAfter: true,
+    beforeImage: "/images/vzyal-before.png",
+    beforeImageAlt: "Before landing page screenshot",
+    afterVideo: "/videos/vzyal-after.mov",
+  },
+  {
+    kicker: "",
+    title: "Моя идея понравилась\nYC фаундеры",
+    titleHtml: 'Моя идея понравилась<br /><span class="yc-title-line"><span class="accent-orange">YC</span> фаундеры</span>',
+    body: "",
+    note: "",
+    meta: "YC founders",
+    ycFounders: true,
+    ycImages: [
+      {
+        src: "/images/yc-founder-ilyas.png",
+        alt: "Ilyas founder screenshot",
+      },
+      {
+        src: "/images/yc-founder-pcstyle.png",
+        alt: "pcstyle founder screenshot",
+      },
+      {
+        src: "/images/yc-founder-yahia.png",
+        alt: "Yahia Bakour founder screenshot",
+      },
     ],
   },
   {
-    kicker: "01:12",
-    title: "[NNN] installs, growing [Y]%/wk.",
-    body: "[NNN] developers have installed BeUniq, growing ~[Y]% week over week — pay-as-you-go from $0.33 a review, no subscription.",
-    note: "3 free screenshots to start. The first paid credit packs are already live.",
+    kicker: "",
+    title: "Остальные\nполюбили\nэту идею",
+    body: "",
+    note: "",
+    meta: "Founder feedback",
+    founderPraise: true,
+    founderImage: "/images/founder-liked-idea.png",
+    founderImageAlt: "Founder feedback screenshot",
+  },
+  {
+    kicker: "",
+    title: "270 юзеров",
+    body: "1 job offer full-stack",
+    note: "",
     meta: "Traction",
+    traction: true,
+    tractionImage: "/images/job-offer-fullstack.png",
+    tractionImageAlt: "Full-stack job offer screenshot",
   },
   {
-    kicker: "01:36",
-    title: "Built by one person.",
-    body: "I designed, built, and shipped BeUniq end to end — the extension, the review engine, and this site.",
-    note: "[Your name] — solo technical founder. I built the design reviewer I kept wishing I had.",
+    kicker: "",
+    title: "",
+    body: "",
+    note: "",
     meta: "About me",
+    about: true,
+    aboutImage: "/images/my-photo.jpg",
+    aboutImageAlt: "Portrait",
+    aboutLines: [
+      "Гений (надеюсь)",
+      "Милиардер (почти)",
+      "Филантроп (вряд ли)",
+    ],
+  },
+  {
+    kicker: "",
+    title: "",
+    body: "",
+    note: "",
+    meta: "Achievements",
+    achievements: true,
+    achievementImages: [
+      {
+        src: "/images/achievements-digital-ertis.jpg",
+        alt: "Digital Ertis hackathon win",
+      },
+      {
+        src: "/images/achievements-presentation.jpg",
+        alt: "Project presentation",
+      },
+      {
+        src: "/images/achievements-enactus.jpg",
+        alt: "Enactus win",
+      },
+      {
+        src: "/images/achievements-extra.jpg",
+        alt: "Achievement photo",
+      },
+    ],
+    achievementLines: [
+      "Разработчик в Flowleads",
+      "Teenpreneurs Incubator",
+      "StartUp: $1600 revenue",
+      "Хакатоны: 7 wins",
+      "Еще куча побед в научных проектах и дебатах",
+    ],
   },
 ];
 ---
@@ -63,8 +196,18 @@ const slides = [
 >
   <main class="presentation-page">
     <section id="slides" class="presentation-stage" aria-label="BeUniq presentation slides">
+      <div class="aurora-layer">
+        <Aurora
+          colorStops={["#ffffff", "#ffffff", "#ffffff"]}
+          speed={0.42}
+          blend={0.44}
+          amplitude={0.86}
+          opacity={0.2}
+        />
+      </div>
       <div class="hero-ray-layer">
         <SideRays
+          channel="right"
           origin="top-right"
           speed={2}
           rayColor1="#ffffff"
@@ -79,6 +222,7 @@ const slides = [
       </div>
       <div class="hero-ray-layer">
         <SideRays
+          channel="left"
           origin="top-left"
           speed={2}
           rayColor1="#ffffff"
@@ -108,6 +252,20 @@ const slides = [
                   "slide",
                   slide.cover && "slide-cover",
                   slide.compact && "slide-compact",
+                  slide.image && "slide-image",
+                  slide.longTitle && "slide-long",
+                  slide.productPoints && "slide-product",
+                  slide.fullCatch && "slide-full-catch",
+                  slide.logoReveal && "slide-logo-reveal",
+                  slide.statementHero && "slide-statement-hero",
+                  slide.statementSplit && "slide-statement-split",
+                  slide.video && "slide-video",
+                  slide.beforeAfter && "slide-before-after",
+                  slide.ycFounders && "slide-yc-founders",
+                  slide.founderPraise && "slide-founder-praise",
+                  slide.traction && "slide-traction",
+                  slide.about && "slide-about",
+                  slide.achievements && "slide-achievements",
                   index === 0 && "is-active",
                 ]}
                 data-slide
@@ -120,10 +278,123 @@ const slides = [
                       <img src="/icon-d-light.svg" alt="BeUniq logo" />
                       <h1>{slide.title}</h1>
                     </div>
+                  ) : slide.video ? (
+                    <video
+                      class="slide-demo-video"
+                      src={slide.video}
+                      loop
+                      playsinline
+                      preload="auto"
+                    />
+                  ) : slide.beforeAfter ? (
+                    <div class="before-after-layout">
+                      <section class="before-after-panel" aria-label="Before">
+                        <span>До</span>
+                        <img src={slide.beforeImage} alt={slide.beforeImageAlt || ""} />
+                      </section>
+                      <section class="before-after-panel" aria-label="After">
+                        <span>После</span>
+                        <video
+                          class="before-after-video"
+                          src={slide.afterVideo}
+                          autoplay
+                          muted
+                          loop
+                          playsinline
+                          preload="auto"
+                        />
+                      </section>
+                    </div>
+                  ) : slide.ycFounders ? (
+                    <div class="yc-founder-layout">
+                      {slide.titleHtml ? <h1 set:html={slide.titleHtml} /> : <h1>{slide.title}</h1>}
+                      <div class="yc-founder-collage" aria-label="YC founder screenshots">
+                        {slide.ycImages.map((image, imageIndex) => (
+                          <img
+                            class:list={["yc-founder-shot", `yc-founder-shot-${imageIndex + 1}`]}
+                            src={image.src}
+                            alt={image.alt}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : slide.founderPraise ? (
+                    <div class="founder-praise-layout">
+                      <h1>{slide.title}</h1>
+                      <img src={slide.founderImage} alt={slide.founderImageAlt || ""} />
+                    </div>
+                  ) : slide.traction ? (
+                    <div class="traction-layout">
+                      <section class="traction-copy" aria-label="Traction">
+                        <h1>{slide.title}</h1>
+                        <p>{slide.body}</p>
+                      </section>
+                      <img src={slide.tractionImage} alt={slide.tractionImageAlt || ""} />
+                    </div>
+                  ) : slide.about ? (
+                    <div class="about-layout">
+                      <img src={slide.aboutImage} alt={slide.aboutImageAlt || ""} />
+                      <ul aria-label="About me">
+                        {slide.aboutLines.map((line) => (
+                          <li>{line}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : slide.achievements ? (
+                    <div class="achievements-layout">
+                      <div class="achievements-collage" aria-label="Achievement photos">
+                        {slide.achievementImages.map((image, imageIndex) => (
+                          <img
+                            class:list={["achievement-photo", `achievement-photo-${imageIndex + 1}`]}
+                            src={image.src}
+                            alt={image.alt}
+                          />
+                        ))}
+                      </div>
+                      <ul aria-label="Achievements">
+                        {slide.achievementLines.map((line) => (
+                          <li>{line}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : slide.image ? (
+                    <div class:list={["slide-image-frame", slide.imageMissing && "image-missing"]}>
+                      {!slide.imageMissing && <img src={slide.image} alt={slide.imageAlt || slide.meta} />}
+                      <div class="image-fallback">
+                        <span>bob.jpg</span>
+                        <p>Добавь файл в <code>public/images/bob.jpg</code></p>
+                      </div>
+                    </div>
+                  ) : slide.logoReveal ? (
+                    <div class="logo-reveal-layout">
+                      <section class="logo-reveal-catch" aria-label="Catch">
+                        <h1>{slide.title}</h1>
+                      </section>
+
+                      <section class="logo-reveal-products" aria-label="Click reveals">
+                        {slide.revealLogos.map((logo, stepIndex) => (
+                          <div
+                            class:list={["slide-step", "logo-reveal-card", stepIndex === 0 && "logo-left", stepIndex === 1 && "logo-right"]}
+                            data-step
+                            data-step-index={stepIndex}
+                          >
+                            <div class="logo-glass">
+                              <img src={logo.src} alt={logo.name} />
+                            </div>
+                            <span>{logo.metric}</span>
+                          </div>
+                        ))}
+                      </section>
+                    </div>
+                  ) : slide.longTitle ? (
+                    <div class="statement-slide">
+                      <h1>{slide.title}</h1>
+                      {slide.statementImage && <img src={slide.statementImage} alt={slide.statementImageAlt || ""} />}
+                    </div>
                   ) : (
-                    <>
-                      <div class="slide-copy">
-                        <p class="slide-kicker">{slide.kicker} / {slide.meta}</p>
+                    <div class="story-layout">
+                      <section class="catch-panel" aria-label="Catch">
+                        <p class="zone-label">catch / {slide.meta}</p>
                         {
                           slide.titleHtml ? (
                             <h1 set:html={slide.titleHtml} />
@@ -131,6 +402,49 @@ const slides = [
                             <h1>{slide.title}</h1>
                           )
                         }
+                      </section>
+
+                      <section class="info-panel" aria-label="Additional information">
+                        <p class="zone-label">доп. инфа</p>
+                        {
+                          slide.body && slide.bodyReveal ? (
+                            <div class="slide-step body-reveal-step" data-step data-step-index={0}>
+                              <p class="slide-body">{slide.body}</p>
+                            </div>
+                          ) : (
+                            slide.body && <p class="slide-body">{slide.body}</p>
+                          )
+                        }
+                        {
+                          slide.productPoints && (
+                            <ol class="product-points">
+                              {slide.productPoints.map((point) => (
+                                <li>{point}</li>
+                              ))}
+                            </ol>
+                          )
+                        }
+                        {
+                          slide.reveals && slide.reveals.some((item) => item.kind !== "product") && (
+                            <div class="slide-steps reveal-stack" aria-label="Click reveals">
+                              {slide.reveals.map((item, stepIndex) => (
+                                item.kind !== "product" && (
+                                  <div
+                                    class:list={["slide-step", `reveal-${item.kind}`]}
+                                    data-step
+                                    data-step-index={stepIndex}
+                                  >
+                                    <p>{item.text}</p>
+                                  </div>
+                                )
+                              ))}
+                            </div>
+                          )
+                        }
+                      </section>
+
+                      <section class="visual-panel" aria-label="Pictures and visuals">
+                        <p class="zone-label">картинки</p>
                         {
                           slide.products && (
                             <div class="product-logos" aria-label="Products">
@@ -144,32 +458,54 @@ const slides = [
                             </div>
                           )
                         }
-                        {slide.body && <p class="slide-body">{slide.body}</p>}
                         {
-                          slide.steps && (
-                            <div class="slide-steps" aria-label="Click reveals">
-                              {slide.steps.map((step, stepIndex) => (
-                                <p
-                                  class="slide-step"
-                                  data-step
-                                  data-step-index={stepIndex}
-                                >
-                                  {step}
-                                </p>
+                          slide.metric && (
+                            <div class="big-metric" aria-label={slide.metricLabel}>
+                              <strong>{slide.metric}</strong>
+                              <span>{slide.metricLabel}</span>
+                            </div>
+                          )
+                        }
+                        {
+                          slide.loop && (
+                            <div class="loop-list" aria-label="Market loop">
+                              {slide.loop.map((item, itemIndex) => (
+                                <>
+                                  <span>{item}</span>
+                                  {itemIndex < slide.loop.length - 1 && <em>→</em>}
+                                </>
                               ))}
                             </div>
                           )
                         }
-                      </div>
-                      {
-                        slide.note && (
-                          <aside class="slide-note">
-                            <span class="note-index">{String(index + 1).padStart(2, "0")}</span>
-                            <p>{slide.note}</p>
-                          </aside>
-                        )
-                      }
-                    </>
+                        {
+                          slide.reveals && slide.reveals.some((item) => item.kind === "product") && (
+                            <div class="visual-products" aria-label="Product visuals">
+                              {slide.reveals.map((item, stepIndex) => (
+                                item.kind === "product" && (
+                                  <div
+                                    class="slide-step reveal-product"
+                                    data-step
+                                    data-step-index={stepIndex}
+                                  >
+                                    <div class:list={["product-logo", `product-logo-${item.tone}`]}>
+                                      <span class="product-mark">{item.mark}</span>
+                                      <span class="product-name">{item.name}</span>
+                                      {item.metric && <span class="product-metric">{item.metric}</span>}
+                                    </div>
+                                  </div>
+                                )
+                              ))}
+                            </div>
+                          )
+                        }
+                        {!slide.products && !slide.metric && !slide.loop && !slide.reveals && !slide.productPoints && (
+                          <div class="visual-placeholder" aria-hidden="true">
+                            <span>{String(index + 1).padStart(2, "0")}</span>
+                          </div>
+                        )}
+                      </section>
+                    </div>
                   )
                 }
               </article>
@@ -178,36 +514,202 @@ const slides = [
         </div>
 
         <footer class="presentation-bottom">
+          <div class="slide-arrows" aria-label="Slide arrows">
+            <button type="button" class="slide-arrow" data-arrow-button="previous" aria-label="Previous slide">
+              ←
+            </button>
+            <button type="button" class="slide-arrow" data-arrow-button="next" aria-label="Next slide">
+              →
+            </button>
+          </div>
           <div class="slide-nav" aria-label="Slide navigation">
             {
               slides.map((slide, index) => (
-                <button
-                  type="button"
+                <span
                   class:list={["slide-dot", index === 0 && "is-active"]}
-                  data-slide-button={index}
-                  aria-label={`Go to slide ${index + 1}: ${slide.meta}`}
+                  data-slide-indicator={index}
+                  aria-label={`Slide ${index + 1}: ${slide.meta}`}
                   aria-current={index === 0 ? "step" : undefined}
                 >
                   {String(index + 1).padStart(2, "0")}
-                </button>
+                </span>
               ))
             }
           </div>
         </footer>
       </div>
+
+      <audio
+        data-hero-audio
+        src="/audio/weneedhero.mp3"
+        preload="auto"
+      ></audio>
     </section>
   </main>
 </Base>
 
 <script>
+  const stage = document.querySelector<HTMLElement>(".presentation-stage");
   const deck = document.querySelector<HTMLElement>("[data-deck]");
   const slideEls = Array.from(document.querySelectorAll<HTMLElement>("[data-slide]"));
-  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-slide-button]"));
+  const indicators = Array.from(document.querySelectorAll<HTMLElement>("[data-slide-indicator]"));
+  const arrowButtons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-arrow-button]"));
+  const heroAudio = document.querySelector<HTMLAudioElement>("[data-hero-audio]");
+  const slideVideos = Array.from(document.querySelectorAll<HTMLVideoElement>(".slide-demo-video"));
+  const loopVideos = Array.from(document.querySelectorAll<HTMLVideoElement>(".before-after-video"));
+  const typeTextTargets = Array.from(
+    document.querySelectorAll<HTMLElement>(
+      ".slide:not(.slide-yc-founders):not(.slide-full-catch) h1, .slide .slide-body, .slide .product-points li, .slide .logo-reveal-primary p, .slide .logo-reveal-card span, .slide .image-fallback span, .slide .image-fallback p"
+    )
+  );
+  const typeTimers = new WeakMap<HTMLElement, number[]>();
 
-  if (deck && slideEls.length && buttons.length) {
+  const prepareTypeText = (element: HTMLElement) => {
+    if (element.dataset.typePrepared === "true") return;
+    element.dataset.typeText = element.textContent ?? "";
+    element.dataset.typePrepared = "true";
+    element.classList.add("text-type");
+  };
+
+  const clearTypeTimers = (element: HTMLElement) => {
+    typeTimers.get(element)?.forEach((timer) => window.clearTimeout(timer));
+    typeTimers.delete(element);
+  };
+
+  const typeElement = (element: HTMLElement) => {
+    const text = element.dataset.typeText ?? "";
+    clearTypeTimers(element);
+    element.textContent = "";
+    element.classList.remove("is-typed");
+    element.classList.add("is-typing");
+
+    const cursor = document.createElement("span");
+    cursor.className = "text-type-cursor";
+    cursor.textContent = "|";
+    element.appendChild(cursor);
+
+    const timers: number[] = [];
+    const speed = Math.max(14, Math.min(34, 720 / Math.max(text.length, 1)));
+    const startDelay = Number(element.dataset.typeDelay || 0);
+
+    Array.from(text).forEach((char, index) => {
+      const timer = window.setTimeout(() => {
+        cursor.before(document.createTextNode(char));
+        if (index === text.length - 1) {
+          element.classList.remove("is-typing");
+          element.classList.add("is-typed");
+        }
+      }, startDelay + index * speed);
+      timers.push(timer);
+    });
+
+    if (!text) element.classList.add("is-typed");
+    typeTimers.set(element, timers);
+  };
+
+  const typeVisibleText = (root: ParentNode) => {
+    Array.from(root.querySelectorAll<HTMLElement>(".text-type")).forEach((element, index) => {
+      const revealParent = element.closest<HTMLElement>(".slide-step");
+      if (revealParent && !revealParent.classList.contains("is-visible")) return;
+      element.dataset.typeDelay = String(index * 75);
+      typeElement(element);
+    });
+  };
+
+  typeTextTargets.forEach(prepareTypeText);
+
+  if (heroAudio) {
+    heroAudio.volume = 0.8;
+  }
+
+  if (deck && slideEls.length && indicators.length) {
     const totalSlides = Number(deck.dataset.total || slideEls.length);
     let activeIndex = 0;
     const revealedSteps = new Map<number, number>();
+    const softLightSlides = new Set([1, 2, 5, 6, 7, 9, 10, 11, 12]);
+    const backgroundPresets = [
+      {
+        left: "top-left",
+        right: "top-right",
+        aurora: { colorStops: ["#ffffff", "#ffffff", "#ffffff"], speed: 0.42, blend: 0.44, amplitude: 0.86, opacity: 0.2 },
+      },
+      {
+        left: "bottom-left",
+        right: "middle-right",
+        aurora: { colorStops: ["#58a6ff", "#ffffff", "#ff8a45"], speed: 0.74, blend: 0.56, amplitude: 1.18, opacity: 0.24 },
+      },
+      {
+        left: "middle-left",
+        right: "top-right",
+        aurora: { colorStops: ["#ffffff", "#ff8a45", "#ffffff"], speed: 0.92, blend: 0.6, amplitude: 1.34, opacity: 0.26 },
+      },
+      {
+        left: "top-left",
+        right: "bottom-right",
+        aurora: { colorStops: ["#7cffd4", "#ffffff", "#5d9cff"], speed: 0.68, blend: 0.48, amplitude: 1.08, opacity: 0.22 },
+      },
+      {
+        left: "bottom-left",
+        right: "top-right",
+        aurora: { colorStops: ["#ffffff", "#a7b3ff", "#ff8a45"], speed: 1.04, blend: 0.5, amplitude: 1.4, opacity: 0.2 },
+      },
+      {
+        left: "middle-left",
+        right: "bottom-right",
+        aurora: { colorStops: ["#ffffff", "#ffd0a8", "#ffffff"], speed: 0.58, blend: 0.66, amplitude: 1.2, opacity: 0.24 },
+      },
+      {
+        left: "top-left",
+        right: "middle-right",
+        aurora: { colorStops: ["#5d9cff", "#ffffff", "#8fffcb"], speed: 0.86, blend: 0.52, amplitude: 1.28, opacity: 0.23 },
+      },
+      {
+        left: "bottom-left",
+        right: "middle-right",
+        aurora: { colorStops: ["#ffffff", "#ff8a45", "#5d9cff"], speed: 0.72, blend: 0.58, amplitude: 1.18, opacity: 0.22 },
+      },
+      {
+        left: "middle-left",
+        right: "top-right",
+        aurora: { colorStops: ["#ff8a45", "#ffffff", "#ffe2bd"], speed: 0.64, blend: 0.52, amplitude: 1.1, opacity: 0.16 },
+      },
+      {
+        left: "bottom-left",
+        right: "top-right",
+        aurora: { colorStops: ["#ffffff", "#8fffcb", "#ff8a45"], speed: 0.66, blend: 0.54, amplitude: 1.08, opacity: 0.16 },
+      },
+      {
+        left: "top-left",
+        right: "middle-right",
+        aurora: { colorStops: ["#ff8a45", "#ffffff", "#8fffcb"], speed: 0.62, blend: 0.5, amplitude: 1.02, opacity: 0.18 },
+      },
+      {
+        left: "middle-left",
+        right: "bottom-right",
+        aurora: { colorStops: ["#ff8a45", "#10ff9b", "#ffffff"], speed: 0.7, blend: 0.58, amplitude: 1.18, opacity: 0.18 },
+      },
+      {
+        left: "top-left",
+        right: "bottom-right",
+        aurora: { colorStops: ["#ffffff", "#ff8a45", "#5d9cff"], speed: 0.76, blend: 0.5, amplitude: 1.24, opacity: 0.18 },
+      },
+      {
+        left: "bottom-left",
+        right: "top-right",
+        aurora: { colorStops: ["#ffffff", "#ff8a45", "#10ff9b"], speed: 0.68, blend: 0.6, amplitude: 1.16, opacity: 0.2 },
+      },
+    ] as const;
+
+    const applySlideBackground = (index: number) => {
+      const preset = backgroundPresets[index] ?? backgroundPresets[0];
+      window.dispatchEvent(new CustomEvent("siderays:set-origin", {
+        detail: { channel: "left", origin: preset.left },
+      }));
+      window.dispatchEvent(new CustomEvent("siderays:set-origin", {
+        detail: { channel: "right", origin: preset.right },
+      }));
+      window.dispatchEvent(new CustomEvent("aurora:chaos", { detail: preset.aurora }));
+    };
 
     const setHash = (index: number) => {
       const hash = index === 0 ? "#slides" : `#slides-${index + 1}`;
@@ -215,6 +717,7 @@ const slides = [
     };
 
     const setSlide = (index: number) => {
+      typeTextTargets.forEach(clearTypeTimers);
       activeIndex = (index + totalSlides) % totalSlides;
       slideEls.forEach((slide, i) => {
         const active = i === activeIndex;
@@ -226,11 +729,46 @@ const slides = [
           step.classList.toggle("is-visible", stepIndex <= visibleSteps);
         });
       });
-      buttons.forEach((button, i) => {
+      indicators.forEach((indicator, i) => {
         const active = i === activeIndex;
-        button.classList.toggle("is-active", active);
-        if (active) button.setAttribute("aria-current", "step");
-        else button.removeAttribute("aria-current");
+        indicator.classList.toggle("is-active", active);
+        if (active) indicator.setAttribute("aria-current", "step");
+        else indicator.removeAttribute("aria-current");
+      });
+      if (stage) {
+        stage.dataset.light = softLightSlides.has(activeIndex) ? "soft" : "normal";
+        stage.dataset.mode = slideEls[activeIndex]?.classList.contains("slide-video") ? "video" : "slides";
+      }
+      applySlideBackground(activeIndex);
+      typeVisibleText(slideEls[activeIndex]);
+      if (heroAudio) {
+        if (activeIndex === 5) {
+          heroAudio.currentTime = 0;
+          heroAudio.volume = 0.8;
+          heroAudio.play().catch(() => {});
+        } else {
+          heroAudio.pause();
+          heroAudio.currentTime = 0;
+        }
+      }
+      slideVideos.forEach((video) => {
+        const activeVideo = video.closest<HTMLElement>("[data-slide]")?.dataset.index === String(activeIndex);
+        if (activeVideo) {
+          video.currentTime = 0;
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+          video.currentTime = 0;
+        }
+      });
+      loopVideos.forEach((video) => {
+        const activeLoopVideo = video.closest<HTMLElement>("[data-slide]")?.dataset.index === String(activeIndex);
+        if (activeLoopVideo) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+          video.currentTime = 0;
+        }
       });
       setHash(activeIndex);
     };
@@ -243,7 +781,9 @@ const slides = [
       if (current >= steps.length - 1) return false;
       const next = current + 1;
       revealedSteps.set(activeIndex, next);
-      steps[next]?.classList.add("is-visible");
+      const step = steps[next];
+      step?.classList.add("is-visible");
+      if (step) typeVisibleText(step);
       return true;
     };
 
@@ -254,23 +794,37 @@ const slides = [
       return Number.isFinite(numeric) ? Math.min(Math.max(numeric, 0), totalSlides - 1) : 0;
     };
 
-    buttons.forEach((button) => {
+    const goNext = () => {
+      if (revealNextStep()) return;
+      setSlide(activeIndex + 1);
+    };
+
+    const goPrevious = () => {
+      setSlide(activeIndex - 1);
+    };
+
+    arrowButtons.forEach((button) => {
       button.addEventListener("click", () => {
-        setSlide(Number(button.dataset.slideButton));
+        if (button.dataset.arrowButton === "previous") goPrevious();
+        else goNext();
       });
     });
 
-    deck.addEventListener("click", () => {
-      if (revealNextStep()) return;
-      setSlide(activeIndex + 1);
+    slideVideos.forEach((video) => {
+      video.volume = 0.85;
+      video.addEventListener("pointerup", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        video.play().catch(() => {});
+      });
     });
 
     window.addEventListener("keydown", (event) => {
       if (event.key === "ArrowRight" || event.key === "PageDown") {
-        setSlide(activeIndex + 1);
+        goNext();
       }
       if (event.key === "ArrowLeft" || event.key === "PageUp") {
-        setSlide(activeIndex - 1);
+        goPrevious();
       }
     });
 
@@ -317,9 +871,50 @@ const slides = [
     position: absolute;
     inset: 0;
     z-index: 0;
+    opacity: 1;
     pointer-events: none;
+    transition: opacity 0.65s ease;
   }
 
+  .aurora-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 1;
+    pointer-events: none;
+    transition: opacity 0.65s ease;
+  }
+
+  .presentation-stage[data-light="soft"] .hero-ray-layer {
+    opacity: 0.42;
+  }
+
+  .presentation-stage[data-light="soft"] .aurora-layer {
+    opacity: 0.34;
+  }
+
+  .presentation-stage[data-mode="video"]::before,
+  .presentation-stage[data-mode="video"] .hero-ray-layer,
+  .presentation-stage[data-mode="video"] .aurora-layer,
+  .presentation-stage[data-mode="video"] .presentation-top,
+  .presentation-stage[data-mode="video"] .presentation-bottom {
+    display: none;
+  }
+
+  .presentation-stage[data-mode="video"] .presentation-shell {
+    padding: 0;
+  }
+
+  .presentation-stage[data-mode="video"] .deck {
+    min-height: 100dvh;
+  }
+
+  .presentation-page:has(.presentation-stage[data-mode="video"]) {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .presentation-page :global(#site-cursor),
   :global(#site-cursor) {
     display: none;
   }
@@ -389,8 +984,85 @@ const slides = [
     filter: none;
   }
 
+  .text-type {
+    white-space: pre-wrap;
+  }
+
+  .text-type-cursor {
+    display: inline-block;
+    margin-left: 0.08em;
+    color: currentColor;
+    animation: text-type-cursor-blink 0.55s ease-in-out infinite alternate;
+  }
+
+  .text-type.is-typed .text-type-cursor {
+    opacity: 0;
+    animation: none;
+  }
+
+  @keyframes text-type-cursor-blink {
+    from {
+      opacity: 1;
+    }
+
+    to {
+      opacity: 0.12;
+    }
+  }
+
   .slide-copy {
     max-width: 78rem;
+  }
+
+  .story-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.98fr) minmax(18rem, 0.58fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      "catch visual"
+      "info visual";
+    gap: clamp(1rem, 2vw, 2rem);
+    width: 100%;
+    align-self: center;
+  }
+
+  .catch-panel,
+  .info-panel,
+  .visual-panel {
+    min-width: 0;
+  }
+
+  .catch-panel {
+    grid-area: catch;
+  }
+
+  .info-panel {
+    grid-area: info;
+    align-self: start;
+  }
+
+  .visual-panel {
+    grid-area: visual;
+    align-self: center;
+    display: grid;
+    gap: 1rem;
+    border-left: 1px solid rgb(255 255 255 / 0.16);
+    padding-left: clamp(1rem, 2vw, 1.6rem);
+  }
+
+  .zone-label {
+    margin: 0 0 1rem;
+    color: rgb(255 255 255 / 0.56);
+    font-family: var(--font-mono);
+    font-size: clamp(0.68rem, 0.8vw, 0.78rem);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .story-layout h1 {
+    max-width: 12ch;
+    font-size: clamp(2.9rem, 5.2vw, 5.9rem);
+    line-height: 0.98;
   }
 
   .slide-cover {
@@ -436,6 +1108,193 @@ const slides = [
     letter-spacing: 0;
   }
 
+  .slide .story-layout h1 {
+    max-width: 12ch;
+    font-size: clamp(2.9rem, 5.2vw, 5.9rem);
+    line-height: 0.98;
+  }
+
+  .slide-full-catch {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .slide-full-catch .story-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "catch"
+      "info";
+    gap: clamp(2rem, 4vw, 3.6rem);
+  }
+
+  .slide-full-catch .visual-panel,
+  .slide-full-catch .zone-label {
+    display: none;
+  }
+
+  .slide-full-catch .story-layout h1 {
+    max-width: 100%;
+    font-size: clamp(3.6rem, 6.9vw, 7.6rem);
+    line-height: 0.94;
+  }
+
+  .slide-full-catch .slide-body {
+    max-width: 74rem;
+    margin-top: 0;
+    border-left: 2px solid #ff8a45;
+    padding-left: clamp(1rem, 2vw, 1.5rem);
+    color: rgb(255 255 255 / 0.84);
+    font-size: clamp(1.2rem, 1.75vw, 1.75rem);
+    line-height: 1.28;
+  }
+
+  .slide-full-catch .body-reveal-step {
+    margin: 0;
+    border-left: 0;
+    padding-left: 0;
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  .slide-logo-reveal {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .logo-reveal-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 0.86fr auto;
+    grid-template-areas:
+      "catch"
+      "products";
+    gap: clamp(1.35rem, 2.8vw, 2.6rem);
+    width: 100%;
+    min-height: 100%;
+    align-self: center;
+  }
+
+  .logo-reveal-catch {
+    grid-area: catch;
+    align-self: start;
+    justify-self: center;
+    padding-top: clamp(2.4rem, 6vh, 4.5rem);
+    text-align: center;
+  }
+
+  .logo-reveal-catch h1 {
+    max-width: none;
+    white-space: nowrap;
+    margin: 0;
+    font-size: clamp(3.8rem, 6.2vw, 6.8rem);
+    line-height: 0.92;
+  }
+
+  .logo-reveal-primary {
+    grid-area: primary;
+    display: grid;
+    gap: 1rem;
+    align-self: center;
+    justify-items: center;
+    border: 1px solid rgb(255 255 255 / 0.16);
+    background: rgb(255 255 255 / 0.93);
+    padding: clamp(1.15rem, 2vw, 1.8rem);
+    box-shadow: 0 1.5rem 5rem rgb(0 0 0 / 0.24);
+  }
+
+  .logo-reveal-primary img {
+    display: block;
+    width: min(100%, 34rem);
+    max-height: 9.2rem;
+    object-fit: contain;
+  }
+
+  .logo-reveal-primary p {
+    margin: 0;
+    color: #111111;
+    font-family: var(--font-mono);
+    font-size: clamp(1rem, 1.55vw, 1.45rem);
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .logo-reveal-products {
+    grid-area: products;
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    gap: clamp(3rem, 7vw, 6rem);
+    min-height: 9rem;
+    align-items: end;
+    padding: 0 clamp(2rem, 6vw, 5.5rem) clamp(8.2rem, 18vh, 11rem);
+  }
+
+  .logo-reveal-card {
+    display: grid;
+    grid-template-rows: auto auto;
+    gap: 1rem;
+    min-height: auto;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: var(--color-ink);
+    box-shadow: none;
+  }
+
+  .logo-reveal-card.slide-step {
+    margin: 0;
+    border-left: 0;
+    padding-left: 0;
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .logo-glass {
+    display: grid;
+    width: 25rem;
+    min-height: 8.25rem;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 0.22);
+    background:
+      linear-gradient(135deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.07)),
+      rgb(255 255 255 / 0.05);
+    padding: clamp(0.85rem, 1.35vw, 1.15rem);
+    box-shadow: 0 1rem 3.2rem rgb(0 0 0 / 0.24);
+    backdrop-filter: blur(18px) saturate(1.25);
+  }
+
+  .logo-reveal-card img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: 5.95rem;
+    object-fit: contain;
+    filter: drop-shadow(0 0.8rem 1.8rem rgb(0 0 0 / 0.28));
+  }
+
+  .logo-reveal-card span {
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: clamp(1.75rem, 2.9vw, 2.65rem);
+    font-weight: 700;
+    line-height: 1;
+    justify-self: start;
+    padding-left: 0.15rem;
+    text-transform: uppercase;
+  }
+
+  .logo-left {
+    justify-self: end;
+    width: 25rem;
+  }
+
+  .logo-right {
+    justify-self: start;
+    width: 25rem;
+  }
+
   .slide-compact {
     grid-template-columns: minmax(0, 1fr);
     align-items: center;
@@ -445,20 +1304,149 @@ const slides = [
     max-width: 62rem;
   }
 
+  .slide-compact .story-layout {
+    grid-template-columns: minmax(0, 0.94fr) minmax(18rem, 0.5fr);
+  }
+
   .slide-compact h1 {
     max-width: 16ch;
     font-size: clamp(2.55rem, 4.9vw, 5.25rem);
     line-height: 1.02;
   }
 
-  .slide-compact h1 :global(.capture-word) {
+  .slide-long {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .slide-long .slide-copy {
+    max-width: 72rem;
+  }
+
+  .slide-long h1 {
+    max-width: 12ch;
+    font-size: clamp(2.9rem, 5.6vw, 6.3rem);
+    line-height: 0.95;
+  }
+
+  .slide-long .story-layout h1 {
+    max-width: 12ch;
+    font-size: clamp(2.9rem, 5.6vw, 6.3rem);
+    line-height: 0.95;
+  }
+
+  .statement-slide {
+    display: grid;
+    grid-template-rows: auto auto;
+    justify-items: center;
+    gap: clamp(1.4rem, 3vw, 2.4rem);
+    width: 100%;
+    min-height: 100%;
+    align-items: center;
+    align-content: center;
+    text-align: center;
+  }
+
+  .statement-slide h1 {
+    max-width: 16ch;
+    margin: 0;
+    font-size: clamp(3.1rem, 6.4vw, 6.9rem);
+    line-height: 0.92;
+  }
+
+  .statement-slide img {
+    display: block;
+    width: auto;
+    height: min(38vh, 18.5rem);
+    max-width: 32vw;
+    object-fit: contain;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    box-shadow: 0 1.4rem 4rem rgb(0 0 0 / 0.32);
+  }
+
+  .slide-statement-split .statement-slide {
+    grid-template-columns: minmax(0, 0.96fr) minmax(20rem, 0.52fr);
+    grid-template-rows: auto;
+    gap: clamp(2rem, 5vw, 5rem);
+    justify-items: stretch;
+    text-align: left;
+  }
+
+  .slide-statement-split .statement-slide h1 {
+    align-self: center;
+    max-width: none;
+    white-space: normal;
+    font-size: clamp(2.55rem, 3.55vw, 4.55rem);
+    line-height: 0.9;
+  }
+
+  .slide-statement-split .statement-slide img {
+    justify-self: end;
+    align-self: center;
+    height: min(70vh, 36rem);
+    max-width: 42vw;
+  }
+
+  .slide-statement-hero .statement-slide {
+    gap: clamp(1.2rem, 2.6vw, 2rem);
+  }
+
+  .slide-statement-hero .statement-slide h1 {
+    max-width: none;
+    white-space: nowrap;
+    font-size: clamp(4rem, 7.2vw, 7.7rem);
+    line-height: 0.88;
+  }
+
+  .slide-statement-hero .statement-slide img {
+    height: min(39vh, 21rem);
+    max-width: 42vw;
+  }
+
+  .slide-product {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .slide-product .story-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "catch"
+      "info";
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .slide-product .visual-panel,
+  .slide-product .zone-label {
+    display: none;
+  }
+
+  .slide-product .story-layout h1 {
+    max-width: 17ch;
+    margin-top: 0;
+    font-size: clamp(2.35rem, 4.05vw, 4.2rem);
+    line-height: 0.96;
+  }
+
+  .slide-product .slide-body {
+    max-width: 68rem;
+    margin-top: 0;
+    color: rgb(255 255 255 / 0.8);
+    font-size: clamp(1rem, 1.35vw, 1.35rem);
+    line-height: 1.3;
+  }
+
+  .slide-compact h1 :global(.capture-word),
+  .slide-full-catch h1 :global(.capture-word) {
     position: relative;
     display: inline-block;
     padding: 0.02em 0.12em 0.06em;
     color: var(--color-ink);
   }
 
-  .slide-compact h1 :global(.capture-ants) {
+  .slide-compact h1 :global(.capture-ants),
+  .slide-full-catch h1 :global(.capture-ants) {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -467,10 +1455,11 @@ const slides = [
     pointer-events: none;
   }
 
-  .slide-compact h1 :global(.capture-ants rect) {
+  .slide-compact h1 :global(.capture-ants rect),
+  .slide-full-catch h1 :global(.capture-ants rect) {
     width: calc(100% - 4px);
     height: calc(100% - 4px);
-    fill: rgb(0 0 0 / 0.08);
+    fill: rgb(255 255 255 / 0.08);
     stroke: var(--color-ink);
     stroke-width: 3;
     stroke-dasharray: 11 7;
@@ -483,7 +1472,107 @@ const slides = [
     }
   }
 
-  .slide-compact h1 :global(.capture-handle) {
+  .logo-reveal-card span,
+  .yc-founder-layout :global(.accent-orange),
+  .traction-copy h1,
+  .traction-copy p,
+  .about-layout li:nth-child(1),
+  .achievements-layout li:nth-child(3),
+  .achievements-layout li:nth-child(4),
+  .before-after-panel span {
+    position: relative;
+    display: inline-block;
+    isolation: isolate;
+  }
+
+  .logo-reveal-card span::before,
+  .yc-founder-layout :global(.accent-orange)::before,
+  .traction-copy h1::before,
+  .traction-copy p::before,
+  .about-layout li:nth-child(1)::before,
+  .achievements-layout li:nth-child(3)::before,
+  .achievements-layout li:nth-child(4)::before,
+  .before-after-panel span::before {
+    content: "";
+    position: absolute;
+    inset: -0.16em -0.2em;
+    z-index: -1;
+    border: 2px dashed #ff8a45;
+    background: rgb(255 138 69 / 0.05);
+    pointer-events: none;
+    animation: capture-frame-pulse 1.55s ease-in-out infinite;
+  }
+
+  .logo-reveal-card span::after,
+  .yc-founder-layout :global(.accent-orange)::after,
+  .traction-copy h1::after,
+  .traction-copy p::after,
+  .about-layout li:nth-child(1)::after,
+  .achievements-layout li:nth-child(3)::after,
+  .achievements-layout li:nth-child(4)::after,
+  .before-after-panel span::after {
+    content: "";
+    position: absolute;
+    left: -0.27em;
+    top: -0.27em;
+    z-index: 2;
+    width: 0.18em;
+    height: 0.18em;
+    min-width: 8px;
+    min-height: 8px;
+    background: var(--color-paper);
+    border: 2px solid #ff8a45;
+    box-shadow:
+      calc(100% + 0.36em) 0 0 var(--color-paper),
+      calc(100% + 0.36em) 0 0 2px #ff8a45,
+      0 calc(100% + 0.36em) 0 var(--color-paper),
+      0 calc(100% + 0.36em) 0 2px #ff8a45,
+      calc(100% + 0.36em) calc(100% + 0.36em) 0 var(--color-paper),
+      calc(100% + 0.36em) calc(100% + 0.36em) 0 2px #ff8a45;
+    pointer-events: none;
+  }
+
+  @keyframes capture-frame-pulse {
+    0%,
+    100% {
+      opacity: 0.48;
+      transform: scale(0.992);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.012);
+    }
+  }
+
+  .logo-glass,
+  .statement-slide img,
+  .slide-image-frame img,
+  .before-after-panel img,
+  .before-after-panel video,
+  .yc-founder-shot,
+  .founder-praise-layout img,
+  .traction-layout img,
+  .about-layout img,
+  .achievement-photo {
+    outline: 2px dashed rgb(255 138 69 / 0.72);
+    outline-offset: 5px;
+    animation: capture-photo-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes capture-photo-pulse {
+    0%,
+    100% {
+      outline-color: rgb(255 138 69 / 0.42);
+      outline-offset: 4px;
+    }
+    50% {
+      outline-color: rgb(255 138 69 / 0.95);
+      outline-offset: 8px;
+    }
+  }
+
+  .slide-compact h1 :global(.capture-handle),
+  .slide-full-catch h1 :global(.capture-handle) {
     position: absolute;
     width: 12px;
     height: 12px;
@@ -492,22 +1581,26 @@ const slides = [
     pointer-events: none;
   }
 
-  .slide-compact h1 :global(.capture-tl) {
+  .slide-compact h1 :global(.capture-tl),
+  .slide-full-catch h1 :global(.capture-tl) {
     left: -6px;
     top: -6px;
   }
 
-  .slide-compact h1 :global(.capture-tr) {
+  .slide-compact h1 :global(.capture-tr),
+  .slide-full-catch h1 :global(.capture-tr) {
     right: -6px;
     top: -6px;
   }
 
-  .slide-compact h1 :global(.capture-bl) {
+  .slide-compact h1 :global(.capture-bl),
+  .slide-full-catch h1 :global(.capture-bl) {
     left: -6px;
     bottom: -6px;
   }
 
-  .slide-compact h1 :global(.capture-br) {
+  .slide-compact h1 :global(.capture-br),
+  .slide-full-catch h1 :global(.capture-br) {
     right: -6px;
     bottom: -6px;
   }
@@ -578,8 +1671,490 @@ const slides = [
     margin-top: clamp(1.4rem, 2.4vw, 2rem);
     max-width: 46rem;
     color: rgb(255 255 255 / 0.76);
-    font-size: clamp(1.2rem, 2.1vw, 2rem);
-    line-height: 1.25;
+    font-size: clamp(1.1rem, 1.65vw, 1.65rem);
+    line-height: 1.32;
+  }
+
+  .big-metric {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: clamp(1.5rem, 2.4vw, 2.2rem);
+  }
+
+  .big-metric strong {
+    font-family: var(--font-display);
+    font-size: clamp(3.8rem, 7.2vw, 7.8rem);
+    font-weight: 400;
+    line-height: 0.85;
+  }
+
+  .big-metric span {
+    max-width: 34rem;
+    color: rgb(255 255 255 / 0.72);
+    font-size: clamp(1.05rem, 1.35vw, 1.35rem);
+    line-height: 1.3;
+  }
+
+  .loop-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    align-items: center;
+    margin-top: clamp(1.5rem, 2.4vw, 2.2rem);
+    font-family: var(--font-mono);
+  }
+
+  .loop-list span {
+    border: 1px solid rgb(255 255 255 / 0.18);
+    background: rgb(255 255 255 / 0.055);
+    padding: 0.85rem 1rem;
+    color: rgb(255 255 255 / 0.9);
+    font-size: clamp(0.86rem, 1vw, 1rem);
+    text-transform: uppercase;
+  }
+
+  .loop-list em {
+    color: rgb(255 255 255 / 0.5);
+    font-style: normal;
+  }
+
+  .product-points {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin: clamp(1rem, 1.8vw, 1.5rem) 0 0;
+    max-width: 68rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .product-points li {
+    border: 1px solid rgb(255 255 255 / 0.16);
+    background: rgb(255 255 255 / 0.045);
+    min-height: 4.1rem;
+    padding: 0.85rem 0.95rem;
+    color: rgb(255 255 255 / 0.82);
+    font-size: clamp(0.95rem, 1.12vw, 1.08rem);
+    line-height: 1.22;
+  }
+
+  .slide-image {
+    grid-template-columns: 1fr;
+    place-items: center;
+  }
+
+  .slide-video {
+    grid-template-columns: 1fr;
+    place-items: stretch;
+    min-height: 100%;
+  }
+
+  .slide-demo-video {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  .presentation-stage[data-mode="video"] .slide-video,
+  .presentation-stage[data-mode="video"] .slide-demo-video {
+    height: 100dvh;
+  }
+
+  .slide-before-after {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .before-after-layout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.65rem, 1.4vw, 1.2rem);
+    width: 100%;
+    min-height: 100%;
+    align-items: center;
+    padding: 0 clamp(0.15rem, 0.6vw, 0.5rem);
+  }
+
+  .before-after-panel {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: clamp(0.25rem, 0.65vh, 0.5rem);
+    min-height: 0;
+    align-items: stretch;
+  }
+
+  .before-after-panel span {
+    justify-self: start;
+    color: #ff8a45;
+    font-family: var(--font-mono);
+    font-size: clamp(1.15rem, 2.15vw, 2.15rem);
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .before-after-panel img,
+  .before-after-panel video {
+    display: block;
+    justify-self: center;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    height: auto;
+    object-fit: cover;
+    object-position: center;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: 0 1.2rem 3.4rem rgb(0 0 0 / 0.34);
+  }
+
+  .slide-yc-founders {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+
+  .yc-founder-layout {
+    position: relative;
+    width: 100%;
+    min-height: 100%;
+    isolation: isolate;
+  }
+
+  .yc-founder-layout h1 {
+    position: absolute;
+    left: clamp(1rem, 2.4vw, 2.6rem);
+    top: clamp(4.2rem, 13vh, 7.4rem);
+    z-index: 4;
+    max-width: 13.5ch;
+    margin: 0;
+    white-space: nowrap;
+    font-size: clamp(2.4rem, 3.65vw, 4.5rem);
+    line-height: 0.92;
+    text-align: left;
+    text-shadow: 0 1.1rem 2.6rem rgb(0 0 0 / 0.48);
+  }
+
+  .yc-founder-layout :global(.yc-title-line) {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .yc-founder-layout :global(.accent-orange) {
+    color: #ff8a45;
+  }
+
+  .yc-founder-collage {
+    position: absolute;
+    inset: 0;
+  }
+
+  .yc-founder-shot {
+    position: absolute;
+    display: block;
+    object-fit: cover;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    background: rgb(0 0 0 / 0.32);
+    box-shadow: 0 1.4rem 4rem rgb(0 0 0 / 0.38);
+  }
+
+  .yc-founder-shot-1 {
+    right: 1.5%;
+    top: 6%;
+    z-index: 2;
+    width: min(38vw, 32rem);
+    transform: rotate(2.2deg);
+  }
+
+  .yc-founder-shot-2 {
+    right: 6%;
+    bottom: 5%;
+    z-index: 1;
+    width: min(43vw, 36rem);
+    transform: rotate(-3deg);
+  }
+
+  .yc-founder-shot-3 {
+    left: 44%;
+    top: 34%;
+    z-index: 3;
+    width: min(25vw, 21rem);
+    transform: rotate(4deg);
+  }
+
+  .slide-founder-praise {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .founder-praise-layout {
+    display: grid;
+    grid-template-columns: minmax(19rem, 0.58fr) minmax(30rem, 1fr);
+    gap: clamp(2.5rem, 4.5vw, 5rem);
+    width: 100%;
+    min-height: 100%;
+    align-items: center;
+    padding-left: clamp(2.5rem, 5vw, 5rem);
+  }
+
+  .founder-praise-layout h1 {
+    max-width: 10.5ch;
+    margin: 0;
+    white-space: pre-wrap;
+    font-size: clamp(2.45rem, 4.45vw, 5.15rem);
+    line-height: 1.08;
+    text-align: left;
+  }
+
+  .founder-praise-layout img {
+    display: block;
+    justify-self: end;
+    width: min(61vw, 56rem);
+    max-height: 76vh;
+    object-fit: contain;
+    border: 1px solid rgb(255 255 255 / 0.2);
+    background: rgb(0 0 0 / 0.28);
+    box-shadow: 0 1.4rem 4rem rgb(0 0 0 / 0.38);
+    transform: rotate(1.4deg);
+  }
+
+  .slide-traction {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .traction-layout {
+    display: grid;
+    grid-template-columns: minmax(23rem, 0.76fr) minmax(28rem, 0.78fr);
+    gap: clamp(4.5rem, 8vw, 8rem);
+    width: 100%;
+    min-height: 100%;
+    align-items: center;
+    padding-inline: clamp(1.5rem, 4vw, 4rem);
+  }
+
+  .traction-copy {
+    display: grid;
+    gap: clamp(1.35rem, 2.5vw, 2.3rem);
+    align-content: center;
+    align-self: start;
+    padding-top: clamp(6rem, 15vh, 9.5rem);
+  }
+
+  .traction-copy h1 {
+    margin: 0;
+    color: #ff8a45;
+    font-size: clamp(3.4rem, 6.8vw, 7.2rem);
+    line-height: 0.86;
+    white-space: nowrap;
+  }
+
+  .traction-copy p {
+    margin: 0;
+    max-width: 14ch;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: clamp(2.25rem, 4.4vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.02;
+    text-transform: uppercase;
+  }
+
+  .traction-layout img {
+    display: block;
+    justify-self: end;
+    align-self: center;
+    width: min(40vw, 34rem);
+    max-height: 74vh;
+    object-fit: contain;
+    border: 1px solid rgb(255 255 255 / 0.24);
+    background: rgb(255 255 255 / 0.88);
+    box-shadow: 0 1.4rem 4rem rgb(0 0 0 / 0.38);
+    transform: translate(1.6rem, 3.4rem) rotate(-1.4deg);
+  }
+
+  .slide-about {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .about-layout {
+    display: grid;
+    grid-template-columns: minmax(18rem, 0.48fr) minmax(34rem, 1fr);
+    gap: clamp(3rem, 5vw, 5.4rem);
+    width: 100%;
+    min-height: 100%;
+    align-items: center;
+  }
+
+  .about-layout img {
+    display: block;
+    justify-self: start;
+    width: min(34vw, 30rem);
+    height: min(78vh, 44rem);
+    object-fit: cover;
+    object-position: 50% 46%;
+    border: 1px solid rgb(255 255 255 / 0.2);
+    box-shadow: 0 1.8rem 5rem rgb(0 0 0 / 0.48);
+  }
+
+  .about-layout ul {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.7rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .about-layout li {
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: clamp(2.35rem, 4.2vw, 4.85rem);
+    font-weight: 700;
+    line-height: 0.98;
+    text-transform: uppercase;
+    text-shadow: 0 1rem 2.8rem rgb(0 0 0 / 0.34);
+  }
+
+  .about-layout li:nth-child(1) {
+    color: #ff8a45;
+  }
+
+  .slide-achievements {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .achievements-layout {
+    display: grid;
+    grid-template-columns: minmax(31rem, 0.92fr) minmax(28rem, 0.9fr);
+    gap: clamp(3rem, 5.5vw, 6rem);
+    width: 100%;
+    min-height: 100%;
+    align-items: center;
+  }
+
+  .achievements-collage {
+    position: relative;
+    width: min(48vw, 45rem);
+    height: min(72vh, 41rem);
+    justify-self: start;
+  }
+
+  .achievement-photo {
+    position: absolute;
+    display: block;
+    object-fit: cover;
+    border: 1px solid rgb(255 255 255 / 0.2);
+    background: rgb(255 255 255 / 0.08);
+    box-shadow: 0 1.4rem 4rem rgb(0 0 0 / 0.42);
+  }
+
+  .achievement-photo-1 {
+    left: 0;
+    top: 2%;
+    z-index: 1;
+    width: 58%;
+    height: 38%;
+    transform: rotate(-3.2deg);
+  }
+
+  .achievement-photo-2 {
+    left: 46%;
+    top: 4%;
+    z-index: 3;
+    width: 34%;
+    height: 55%;
+    transform: rotate(2.8deg);
+  }
+
+  .achievement-photo-3 {
+    left: 8%;
+    top: 43%;
+    z-index: 2;
+    width: 58%;
+    height: 39%;
+    transform: rotate(2.4deg);
+  }
+
+  .achievement-photo-4 {
+    left: 53%;
+    top: 54%;
+    z-index: 4;
+    width: 36%;
+    height: 34%;
+    transform: rotate(-2.5deg);
+  }
+
+  .achievements-layout ul {
+    display: grid;
+    gap: clamp(0.8rem, 1.6vw, 1.45rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .achievements-layout li {
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: clamp(1.45rem, 2.72vw, 3.35rem);
+    font-weight: 700;
+    line-height: 1.02;
+    text-transform: uppercase;
+    text-shadow: 0 1rem 2.8rem rgb(0 0 0 / 0.34);
+  }
+
+  .achievements-layout li:nth-child(3),
+  .achievements-layout li:nth-child(4) {
+    color: #ff8a45;
+  }
+
+  .slide-image-frame {
+    position: relative;
+    display: grid;
+    width: min(90vw, 1120px);
+    max-height: 78dvh;
+    place-items: center;
+  }
+
+  .slide-image-frame img {
+    display: block;
+    max-width: 100%;
+    max-height: 78dvh;
+    object-fit: contain;
+    border: 1px solid rgb(255 255 255 / 0.16);
+    box-shadow: 0 0 4rem rgb(0 0 0 / 0.36);
+  }
+
+  .image-fallback {
+    display: none;
+    width: min(100%, 42rem);
+    border: 1px dashed rgb(255 255 255 / 0.28);
+    padding: 3rem;
+    text-align: center;
+  }
+
+  .image-missing .image-fallback {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .image-fallback span {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 1;
+  }
+
+  .image-fallback p {
+    margin: 0;
+    color: rgb(255 255 255 / 0.62);
+  }
+
+  .image-fallback code {
+    font-family: var(--font-mono);
+    color: var(--color-ink);
   }
 
   .slide-steps {
@@ -611,6 +2186,10 @@ const slides = [
     filter: none;
   }
 
+  .slide-step p {
+    margin: 0;
+  }
+
   .slide-compact .slide-steps {
     max-width: 50rem;
     margin-top: clamp(1.6rem, 2.4vw, 2.2rem);
@@ -622,6 +2201,43 @@ const slides = [
     color: rgb(255 255 255 / 0.9);
     font-size: clamp(1.25rem, 1.95vw, 2.05rem);
     line-height: 1.18;
+  }
+
+  .reveal-question {
+    border-left-color: var(--color-ink);
+    font-weight: 700;
+  }
+
+  .reveal-product {
+    display: inline-flex;
+    max-width: max-content;
+    border-left: 0;
+    padding-left: 0;
+    margin-right: 0.6rem;
+  }
+
+  .visual-products {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .visual-products .reveal-product {
+    margin-right: 0;
+  }
+
+  .visual-products .slide-step {
+    transform: translateY(0.7rem);
+  }
+
+  .visual-placeholder {
+    display: grid;
+    min-height: 14rem;
+    place-items: center;
+    border: 1px dashed rgb(255 255 255 / 0.2);
+    color: rgb(255 255 255 / 0.18);
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 10vw, 8rem);
+    line-height: 1;
   }
 
   .slide-note {
@@ -644,7 +2260,38 @@ const slides = [
     margin-left: auto;
   }
 
+  .slide-arrows {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .slide-arrow {
+    display: grid;
+    width: 2.8rem;
+    height: 2.3rem;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 0.22);
+    background: rgb(255 255 255 / 0.055);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    line-height: 1;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .slide-arrow:hover {
+    border-color: rgb(255 255 255 / 0.6);
+    background: rgb(255 255 255 / 0.12);
+    transform: translateY(-1px);
+  }
+
   .slide-dot {
+    display: grid;
+    place-items: center;
     width: 2.6rem;
     height: 2.1rem;
     border: 1px solid rgb(255 255 255 / 0.18);
@@ -662,13 +2309,6 @@ const slides = [
     border-color: var(--color-ink);
     background: var(--color-ink);
     color: var(--color-paper);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .slide-dot:hover {
-      border-color: rgb(255 255 255 / 0.6);
-      color: var(--color-ink);
-    }
   }
 
   @media (max-width: 860px) {
