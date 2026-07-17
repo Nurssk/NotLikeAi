@@ -10,7 +10,11 @@ import FinalCTA from "../components/FinalCTA.astro";
 import Footer from "../components/Footer.astro";
 ---
 
-<Base stageSeq={true}>
+<Base
+  title="BeUniq · Fix your UI"
+  description="BeUniq reviews screenshots of AI-generated interfaces and helps make the UI cleaner, clearer, and more intentional."
+  stageSeq={true}
+>
   <Navbar />
   <main>
     <Hero />
@@ -51,3 +55,31 @@ import Footer from "../components/Footer.astro";
     window.setTimeout(reveal, 2500);
   }
 </script>
+
+<style is:global>
+  /*
+    Landing-only shadcn/Tailwind token bridge.
+    The global shadcn light defaults set --foreground to black; that made
+    unscoped landing sections render dark text over the dark ray background.
+    Keep this scoped to the index page so /presentation is not affected.
+  */
+  body {
+    --background: var(--color-paper);
+    --foreground: var(--color-ink);
+    --card: #101010;
+    --card-foreground: var(--color-ink);
+    --popover: #101010;
+    --popover-foreground: var(--color-ink);
+    --primary: var(--color-ink);
+    --primary-foreground: var(--color-paper);
+    --secondary: #151515;
+    --secondary-foreground: var(--color-ink);
+    --muted: #717171;
+    --muted-foreground: var(--color-ink-70);
+    --accent: #191919;
+    --accent-foreground: var(--color-ink);
+    --border: var(--color-rule);
+    --input: var(--color-rule);
+    --ring: var(--color-ink);
+  }
+</style>

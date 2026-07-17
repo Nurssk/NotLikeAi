@@ -278,6 +278,8 @@ const slides = [
                     <video
                       class="slide-demo-video"
                       src={slide.video}
+                      autoplay
+                      muted
                       loop
                       playsinline
                       preload="auto"
@@ -752,6 +754,7 @@ const slides = [
       slideVideos.forEach((video) => {
         const activeVideo = video.closest<HTMLElement>("[data-slide]")?.dataset.index === String(activeIndex);
         if (activeVideo) {
+          video.muted = true;
           video.currentTime = 0;
           video.play().catch(() => {});
         } else {
