@@ -55,15 +55,6 @@ const slides = [
   },
   {
     kicker: "",
-    title: "",
-    body: "",
-    note: "",
-    meta: "Bob",
-    image: "/images/bob.jpg",
-    imageAlt: "bob.jpg",
-  },
-  {
-    kicker: "",
     title: "We need a hero",
     body: "",
     note: "",
@@ -182,6 +173,15 @@ const slides = [
       "Хакатоны: 7 wins",
       "Еще куча побед в научных проектах и дебатах",
     ],
+  },
+  {
+    kicker: "",
+    title: "",
+    body: "",
+    note: "",
+    meta: "Bob",
+    image: "/images/bob.jpg",
+    imageAlt: "bob.jpg",
   },
 ];
 ---
@@ -611,7 +611,7 @@ const slides = [
   typeTextTargets.forEach(prepareTypeText);
 
   if (heroAudio) {
-    heroAudio.volume = 0.8;
+    heroAudio.volume = 0.2;
   }
 
   if (deck && slideEls.length && indicators.length) {
@@ -736,7 +736,7 @@ const slides = [
       if (heroAudio) {
         if (activeIndex === 5) {
           heroAudio.currentTime = 0;
-          heroAudio.volume = 0.8;
+          heroAudio.volume = 0.2;
           heroAudio.play().catch(() => {});
         } else {
           heroAudio.pause();
