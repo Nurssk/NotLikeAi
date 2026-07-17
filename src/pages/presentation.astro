@@ -355,6 +355,12 @@ const slides = [
                     </div>
                   ) : slide.image ? (
                     <div class="slide-image-frame">
+                      {slide.meta === "Bob" && (
+                        <div class="bob-closing-copy">
+                          <span>не будь как все</span>
+                          <strong>BeUniq.</strong>
+                        </div>
+                      )}
                       <img src={slide.image} alt={slide.imageAlt || slide.meta} />
                     </div>
                   ) : slide.logoReveal ? (
@@ -2150,6 +2156,82 @@ const slides = [
     object-fit: contain;
     border: 1px solid rgb(255 255 255 / 0.16);
     box-shadow: 0 0 4rem rgb(0 0 0 / 0.36);
+  }
+
+  .bob-closing-copy {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    justify-items: center;
+    gap: 0.12em;
+    width: max-content;
+    max-width: min(88vw, 64rem);
+    padding: 0.34em 0.5em 0.42em;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    line-height: 0.88;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 0 1rem 2.5rem rgb(0 0 0 / 0.58);
+  }
+
+  .bob-closing-copy::before {
+    content: "";
+    position: absolute;
+    inset: -0.08em -0.12em;
+    z-index: -1;
+    border: 2px dashed #ff8a45;
+    background: rgb(0 0 0 / 0.14);
+    animation: capture-frame-pulse 1.55s ease-in-out infinite;
+  }
+
+  .bob-closing-copy::after {
+    content: "";
+    position: absolute;
+    left: -0.22em;
+    top: -0.22em;
+    z-index: 2;
+    width: 0.16em;
+    height: 0.16em;
+    min-width: 9px;
+    min-height: 9px;
+    background: var(--color-paper);
+    border: 2px solid #ff8a45;
+    box-shadow:
+      calc(100% + 0.28em) 0 0 var(--color-paper),
+      calc(100% + 0.28em) 0 0 2px #ff8a45,
+      0 calc(100% + 0.28em) 0 var(--color-paper),
+      0 calc(100% + 0.28em) 0 2px #ff8a45,
+      calc(100% + 0.28em) calc(100% + 0.28em) 0 var(--color-paper),
+      calc(100% + 0.28em) calc(100% + 0.28em) 0 2px #ff8a45;
+    pointer-events: none;
+  }
+
+  .bob-closing-copy span,
+  .bob-closing-copy strong {
+    display: block;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .bob-closing-copy span {
+    font-size: clamp(1.85rem, 3.6vw, 4.15rem);
+  }
+
+  .bob-closing-copy strong {
+    color: #ff8a45;
+    font-size: clamp(2.25rem, 4.6vw, 5.25rem);
+  }
+
+  .slide-image-frame:has(.bob-closing-copy) {
+    width: min(90vw, 980px);
+    max-height: none;
+    gap: clamp(1.2rem, 2.5vh, 2rem);
+    align-content: center;
+  }
+
+  .slide-image-frame:has(.bob-closing-copy) img {
+    max-height: 61dvh;
   }
 
   .slide-steps {
