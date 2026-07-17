@@ -624,7 +624,7 @@ const slides = [
     const totalSlides = Number(deck.dataset.total || slideEls.length);
     let activeIndex = 0;
     const revealedSteps = new Map<number, number>();
-    const softLightSlides = new Set([1, 2, 5, 6, 7, 9, 10, 11, 12]);
+    const softLightSlides = new Set([1, 2, 5, 6, 7, 8, 9, 10, 11, 12]);
     const backgroundPresets = [
       {
         left: "top-left",
@@ -669,7 +669,7 @@ const slides = [
       {
         left: "middle-left",
         right: "top-right",
-        aurora: { colorStops: ["#ff8a45", "#ffffff", "#ffe2bd"], speed: 0.64, blend: 0.52, amplitude: 1.1, opacity: 0.16 },
+        aurora: { colorStops: ["#ff8a45", "#ffffff", "#ffe2bd"], speed: 0.54, blend: 0.42, amplitude: 0.72, opacity: 0.08 },
       },
       {
         left: "bottom-left",
@@ -734,7 +734,7 @@ const slides = [
         else indicator.removeAttribute("aria-current");
       });
       if (stage) {
-        stage.dataset.light = softLightSlides.has(activeIndex) ? "soft" : "normal";
+        stage.dataset.light = activeIndex === 8 ? "extra-soft" : softLightSlides.has(activeIndex) ? "soft" : "normal";
         stage.dataset.mode = slideEls[activeIndex]?.classList.contains("slide-video") ? "video" : "slides";
       }
       applySlideBackground(activeIndex);
@@ -921,6 +921,14 @@ const slides = [
 
   .presentation-stage[data-light="soft"] .aurora-layer {
     opacity: 0.34;
+  }
+
+  .presentation-stage[data-light="extra-soft"] .hero-ray-layer {
+    opacity: 0.18;
+  }
+
+  .presentation-stage[data-light="extra-soft"] .aurora-layer {
+    opacity: 0.16;
   }
 
   .presentation-stage[data-mode="video"]::before,
