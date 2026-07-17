@@ -802,6 +802,22 @@ const slides = [
       });
     });
 
+    stage?.addEventListener("click", (event) => {
+      if (event.defaultPrevented) return;
+      if (event instanceof MouseEvent && event.button !== 0) return;
+
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.closest(
+          "a, button, video, audio, input, textarea, select, [contenteditable='true'], .presentation-bottom"
+        )
+      ) {
+        return;
+      }
+
+      goNext();
+    });
+
     slideVideos.forEach((video) => {
       video.volume = 0.85;
       video.addEventListener("pointerup", (event) => {
